@@ -1,0 +1,28 @@
+[general]
+name=PCA4CD - PCA for change detections
+description=Principal components analysis for change detections
+about=Principal components analysis for change detections
+
+version=18.x.x
+qgisMinimumVersion=3.0
+qgisMaximumVersion=3.99
+
+author=Xavier Corredor Llano, SMByC
+email=xcorredorl@ideam.gov.co
+
+homepage=https://smbyc.bitbucket.io/qgisplugins/pca4cd
+tracker=https://bitbucket.org/smbyc/qgisplugin-pca4cd/issues
+repository=https://bitbucket.org/smbyc/qgisplugin-pca4cd
+
+changelog=
+
+    Previous versions:
+    - All commits in: https://bitbucket.org/smbyc/qgisplugin-pca4cd/commits/all
+
+tags=accuracy,accuracy assessment,thematic map,classification,sample,sampling design,points,remote sensing
+
+category=Plugins
+icon=icons/pca4cd.svg
+experimental=False
+deprecated=False
+
