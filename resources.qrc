@@ -1,5 +1,5 @@
 <RCC>
-    <qresource prefix="/plugins/AcATaMa" >
+    <qresource prefix="/plugins/pca4cd" >
         <file>icons/pca4cd.svg</file>
         <file>icons/about.svg</file>
         <file>icons/layer_properties.svg</file>
