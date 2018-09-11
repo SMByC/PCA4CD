@@ -1,9 +1,9 @@
 #/***************************************************************************
-# AcATaMa
+# PCA4CD
 #
-# AcATaMa is a Qgis plugin for Accuracy Assessment of Thematic Maps
+# Principal components analysis for change detections
 #                             -------------------
-#        copyright            : (C) 2017-2018 by Xavier Corredor Llano, SMByC
+#        copyright            : (C) 2018 by Xavier Corredor Llano, SMByC
 #        email                : xcorredorl@ideam.gov.co
 # ***************************************************************************/
 #
@@ -36,13 +36,13 @@ LOCALES =
 # translation
 SOURCES = \
     __init__.py \
-    acatama.py
+    pca4cd.py
 
-PLUGINNAME = AcATaMa
+PLUGINNAME = PCA4CD - PCA for change detections
 
 PY_FILES = \
     __init__.py \
-    acatama.py
+    pca4cd.py
 
 UI_FILES = 
 
