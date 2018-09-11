@@ -20,17 +20,32 @@
 """
 
 import os
+import tempfile
+import configparser
+import webbrowser
 
-from PyQt5 import QtGui, QtWidgets, uic
-from PyQt5.QtCore import pyqtSignal
+from qgis.PyQt import uic
+from qgis.PyQt.QtCore import pyqtSignal, pyqtSlot
+from qgis.PyQt.QtWidgets import QMessageBox, QFileDialog, QDockWidget
+from qgis.core import QgsProject, QgsVectorFileWriter, QgsMapLayerProxyModel, Qgis, QgsUnitTypes
+from qgis.utils import iface
 
+from pca4cd.gui.about_dialog import AboutDialog
+
+# plugin path
+plugin_folder = os.path.dirname(os.path.dirname(__file__))
 FORM_CLASS, _ = uic.loadUiType(os.path.join(
-    os.path.dirname(__file__), 'pca4cd_dockwidget_base.ui'))
+    plugin_folder, 'ui', 'pca4cd_dockwidget.ui'))
+
+cfg = configparser.ConfigParser()
+cfg.read(os.path.join(plugin_folder, 'metadata.txt'))
+VERSION = cfg.get('general', 'version')
+HOMEPAGE = cfg.get('general', 'homepage')
 
 
-class PCA4CDDockWidget(QtWidgets.QDockWidget, FORM_CLASS):
-
+class PCA4CDDockWidget(QDockWidget, FORM_CLASS):
     closingPlugin = pyqtSignal()
+    dockwidget = None
 
     def __init__(self, parent=None):
         """Constructor."""
@@ -41,7 +56,19 @@ class PCA4CDDockWidget(QtWidgets.QDockWidget, FORM_CLASS):
         # http://qt-project.org/doc/qt-4.8/designer-using-a-ui-file.html
         # #widgets-and-dialogs-with-auto-connect
         self.setupUi(self)
+        self.setup_gui()
+        # tmp dir for all process and intermediate files
+        self.tmp_dir = tempfile.mkdtemp()
+        # save instance
+        PCA4CDDockWidget.dockwidget = self
 
     def closeEvent(self, event):
         self.closingPlugin.emit()
         event.accept()
+
+    def setup_gui(self):
+        # ######### plugin info ######### #
+        self.about_dialog = AboutDialog()
+        self.QPBtn_PluginInfo.setText("v{}".format(VERSION))
+        self.QPBtn_PluginInfo.clicked.connect(self.about_dialog.show)
+        self.QPBtn_PluginDocs.clicked.connect(lambda: webbrowser.open("https://smbyc.bitbucket.io/qgisplugins/pca4cd"))

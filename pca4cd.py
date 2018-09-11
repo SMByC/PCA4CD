@@ -32,6 +32,7 @@ from .resources import *
 # Import the code for the DockWidget
 from pca4cd.gui.pca4cd_dockwidget import PCA4CDDockWidget
 from pca4cd.gui.about_dialog import AboutDialog
+from pca4cd.utils.qgis_utils import unload_layer_in_qgis
 
 
 class PCA4CD:
@@ -178,7 +179,7 @@ class PCA4CD:
 
         self.onClosePlugin()
         from qgis.utils import plugins
-        plugins["PCA4CD - PCA for change detections"].run()
+        plugins["pca4cd"].run()
 
     def removes_temporary_files(self):
         if not self.dockwidget:

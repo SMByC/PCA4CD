@@ -43,7 +43,7 @@ def error_handler():
                 iface.messageBar().pushMessage("PCA4CD", msg_error,
                                                 level=Qgis.Critical, duration=10)
                 # message in log
-                msg_error = "\n################## ERROR IN ACATAMA PLUGIN:\n"
+                msg_error = "\n################## ERROR IN PCA4CD PLUGIN:\n"
                 msg_error += traceback.format_exc()
                 msg_error += "\nPlease report the error in:\n" \
                              "\thttps://bitbucket.org/smbyc/qgisplugin-pca4cd/issues"
