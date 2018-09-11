@@ -19,15 +19,19 @@
  ***************************************************************************/
 """
 
-from PyQt5.QtCore import QSettings, QTranslator, qVersion, QCoreApplication, Qt
-from PyQt5.QtGui import QIcon
-from PyQt5.QtWidgets import QAction
+import os.path
+import shutil
+
+from qgis.PyQt.QtCore import QSettings, QTranslator, qVersion, QCoreApplication, Qt
+from qgis.PyQt.QtWidgets import QAction, QMessageBox
+from qgis.PyQt.QtGui import QIcon
+
 # Initialize Qt resources from file resources.py
 from .resources import *
 
 # Import the code for the DockWidget
-from .pca4cd_dockwidget import PCA4CDDockWidget
-import os.path
+from pca4cd.gui.pca4cd_dockwidget import PCA4CDDockWidget
+from pca4cd.gui.about_dialog import AboutDialog
 
 
 class PCA4CD:
@@ -61,17 +65,11 @@ class PCA4CD:
             if qVersion() > '4.3.3':
                 QCoreApplication.installTranslator(self.translator)
 
-        # Declare instance attributes
-        self.actions = []
-        self.menu = self.tr(u'&PCA4CD - PCA for change detections')
-        # TODO: We are going to let the user set this up in a future iteration
-        self.toolbar = self.iface.addToolBar(u'PCA4CD')
-        self.toolbar.setObjectName(u'PCA4CD')
-
-        #print "** INITIALIZING PCA4CD"
-
+        self.menu_name_plugin = self.tr("PCA4CD - PCA for change detections")
         self.pluginIsActive = False
         self.dockwidget = None
+
+        self.about_dialog = AboutDialog()
 
 
     # noinspection PyMethodMayBeStatic
@@ -89,90 +87,53 @@ class PCA4CD:
         # noinspection PyTypeChecker,PyArgumentList,PyCallByClass
         return QCoreApplication.translate('PCA4CD', message)
 
-
-    def add_action(
-        self,
-        icon_path,
-        text,
-        callback,
-        enabled_flag=True,
-        add_to_menu=True,
-        add_to_toolbar=True,
-        status_tip=None,
-        whats_this=None,
-        parent=None):
-        """Add a toolbar icon to the toolbar.
-
-        :param icon_path: Path to the icon for this action. Can be a resource
-            path (e.g. ':/plugins/foo/bar.png') or a normal file system path.
-        :type icon_path: str
-
-        :param text: Text that should be shown in menu items for this action.
-        :type text: str
-
-        :param callback: Function to be called when the action is triggered.
-        :type callback: function
-
-        :param enabled_flag: A flag indicating if the action should be enabled
-            by default. Defaults to True.
-        :type enabled_flag: bool
-
-        :param add_to_menu: Flag indicating whether the action should also
-            be added to the menu. Defaults to True.
-        :type add_to_menu: bool
-
-        :param add_to_toolbar: Flag indicating whether the action should also
-            be added to the toolbar. Defaults to True.
-        :type add_to_toolbar: bool
-
-        :param status_tip: Optional text to show in a popup when mouse pointer
-            hovers over the action.
-        :type status_tip: str
-
-        :param parent: Parent widget for the new action. Defaults None.
-        :type parent: QWidget
-
-        :param whats_this: Optional text to show in the status bar when the
-            mouse pointer hovers over the action.
-
-        :returns: The action that was created. Note that the action is also
-            added to self.actions list.
-        :rtype: QAction
-        """
-
-        icon = QIcon(icon_path)
-        action = QAction(icon, text, parent)
-        action.triggered.connect(callback)
-        action.setEnabled(enabled_flag)
-
-        if status_tip is not None:
-            action.setStatusTip(status_tip)
-
-        if whats_this is not None:
-            action.setWhatsThis(whats_this)
-
-        if add_to_toolbar:
-            self.toolbar.addAction(action)
-
-        if add_to_menu:
-            self.iface.addPluginToMenu(
-                self.menu,
-                action)
-
-        self.actions.append(action)
-
-        return action
-
-
     def initGui(self):
-        """Create the menu entries and toolbar icons inside the QGIS GUI."""
+        ### Main dockwidget menu
+        # Create action that will start plugin configuration
+        icon_path = ':/plugins/pca4cd/icons/pca4cd.svg'
+        self.dockable_action = QAction(QIcon(icon_path), "PCA4CD", self.iface.mainWindow())
+        # connect the action to the run method
+        self.dockable_action.triggered.connect(self.run)
+        # Add toolbar button and menu item
+        self.iface.addToolBarIcon(self.dockable_action)
+        self.iface.addPluginToMenu(self.menu_name_plugin, self.dockable_action)
 
-        icon_path = ':/plugins/pca4cd/icon.png'
-        self.add_action(
-            icon_path,
-            text=self.tr(u'PCA4CD - PCA for change detections'),
-            callback=self.run,
-            parent=self.iface.mainWindow())
+        # Plugin info
+        # Create action that will start plugin configuration
+        icon_path = ':/plugins/pca4cd/icons/about.svg'
+        self.about_action = QAction(QIcon(icon_path), self.tr('About'), self.iface.mainWindow())
+        # connect the action to the run method
+        self.about_action.triggered.connect(self.about)
+        # Add toolbar button and menu item
+        self.iface.addPluginToMenu(self.menu_name_plugin, self.about_action)
+
+    def about(self):
+        self.about_dialog.show()
+
+    #--------------------------------------------------------------------------
+
+    def run(self):
+        """Run method that loads and starts the plugin"""
+
+        if not self.pluginIsActive:
+            self.pluginIsActive = True
+
+            # dockwidget may not exist if:
+            #    first run of plugin
+            #    removed on close (see self.onClosePlugin method)
+            if self.dockwidget == None:
+                # Create the dockwidget (after translation) and keep reference
+                self.dockwidget = PCA4CDDockWidget()
+
+            # connect to provide cleanup on closing of dockwidget
+            self.dockwidget.closingPlugin.connect(self.onClosePlugin)
+            # reload
+            self.dockwidget.QPBtn_PluginClearReload.clicked.connect(self.clear_reload_plugin)
+
+            # show the dockwidget
+            # TODO: fix to allow choice of dock location
+            self.iface.addDockWidget(Qt.RightDockWidgetArea, self.dockwidget)
+            self.dockwidget.show()
 
     #--------------------------------------------------------------------------
 
@@ -188,45 +149,52 @@ class PCA4CD:
         # for reuse if plugin is reopened
         # Commented next statement since it causes QGIS crashe
         # when closing the docked window:
-        # self.dockwidget = None
+        self.dockwidget.deleteLater()
+        self.dockwidget = None
 
         self.pluginIsActive = False
 
+        from qgis.utils import reloadPlugin
+        reloadPlugin("PCA4CD - PCA for change detections")
 
     def unload(self):
         """Removes the plugin menu item and icon from QGIS GUI."""
+        self.removes_temporary_files()
+        # Remove the plugin menu item and icon
+        self.iface.removePluginMenu(self.menu_name_plugin, self.dockable_action)
+        self.iface.removePluginMenu(self.menu_name_plugin, self.about_action)
+        self.iface.removeToolBarIcon(self.dockable_action)
 
-        #print "** UNLOAD PCA4CD"
+        if self.dockwidget:
+            self.iface.removeDockWidget(self.dockwidget)
 
-        for action in self.actions:
-            self.iface.removePluginMenu(
-                self.tr(u'&PCA4CD - PCA for change detections'),
-                action)
-            self.iface.removeToolBarIcon(action)
-        # remove the toolbar
-        del self.toolbar
+    def clear_reload_plugin(self):
+        # first prompt
+        quit_msg = "Are you sure you want to: clean tmp files, delete all unsaved files, and reload plugin?"
+        reply = QMessageBox.question(self.dockwidget, 'Clear all and reload the PCA4CD plugin.',
+                                     quit_msg, QMessageBox.Yes, QMessageBox.No)
+        if reply == QMessageBox.No:
+            return
 
-    #--------------------------------------------------------------------------
+        self.onClosePlugin()
+        from qgis.utils import plugins
+        plugins["PCA4CD - PCA for change detections"].run()
 
-    def run(self):
-        """Run method that loads and starts the plugin"""
+    def removes_temporary_files(self):
+        if not self.dockwidget:
+            return
+        # unload all layers instances from Qgis saved in tmp dir
+        try:
+            d = self.dockwidget.tmp_dir
+            files_in_tmp_dir = [os.path.join(d, f) for f in os.listdir(d)
+                                if os.path.isfile(os.path.join(d, f))]
+        except: files_in_tmp_dir = []
 
-        if not self.pluginIsActive:
-            self.pluginIsActive = True
+        for file_tmp in files_in_tmp_dir:
+            unload_layer_in_qgis(file_tmp)
 
-            #print "** STARTING PCA4CD"
+        # clear self.dockwidget.tmp_dir
+        if self.dockwidget.tmp_dir and os.path.isdir(self.dockwidget.tmp_dir):
+            shutil.rmtree(self.dockwidget.tmp_dir, ignore_errors=True)
+        self.dockwidget.tmp_dir = None
 
-            # dockwidget may not exist if:
-            #    first run of plugin
-            #    removed on close (see self.onClosePlugin method)
-            if self.dockwidget == None:
-                # Create the dockwidget (after translation) and keep reference
-                self.dockwidget = PCA4CDDockWidget()
-
-            # connect to provide cleanup on closing of dockwidget
-            self.dockwidget.closingPlugin.connect(self.onClosePlugin)
-
-            # show the dockwidget
-            # TODO: fix to allow choice of dock location
-            self.iface.addDockWidget(Qt.RightDockWidgetArea, self.dockwidget)
-            self.dockwidget.show()
