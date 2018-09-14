@@ -141,7 +141,7 @@ class PCA4CD:
     def onClosePlugin(self):
         """Cleanup necessary items here when plugin dockwidget is closed"""
 
-        #print "** CLOSING PCA4CD"
+        self.removes_temporary_files()
 
         # disconnects
         self.dockwidget.closingPlugin.disconnect(self.onClosePlugin)
