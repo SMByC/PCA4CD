@@ -31,6 +31,7 @@ from qgis.core import QgsProject, QgsVectorFileWriter, QgsMapLayerProxyModel, Qg
 from qgis.utils import iface
 
 from pca4cd.gui.about_dialog import AboutDialog
+from pca4cd.utils.qgis_utils import load_and_select_filepath_in
 
 # plugin path
 plugin_folder = os.path.dirname(os.path.dirname(__file__))
@@ -72,3 +73,46 @@ class PCA4CDDockWidget(QDockWidget, FORM_CLASS):
         self.QPBtn_PluginInfo.setText("v{}".format(VERSION))
         self.QPBtn_PluginInfo.clicked.connect(self.about_dialog.show)
         self.QPBtn_PluginDocs.clicked.connect(lambda: webbrowser.open("https://smbyc.bitbucket.io/qgisplugins/pca4cd"))
+
+        # ######### load input raster image ######### #
+        ## A
+        # set properties to QgsMapLayerComboBox
+        self.QCBox_InputData_A.setCurrentIndex(-1)
+        self.QCBox_InputData_A.setFilters(QgsMapLayerProxyModel.RasterLayer)
+        # call to browse the thematic raster file
+        self.QPBtn_browseData_A.clicked.connect(lambda: self.fileDialog_browse(
+            self.QCBox_InputData_A,
+            dialog_title=self.tr("Select the first period of the raster image to analyze"),
+            dialog_types=self.tr("Raster files (*.tif *.img);;All files (*.*)"),
+            layer_type="raster"))
+        self.QCBox_InputData_A.currentIndexChanged.connect(self.set_number_components)
+        ## B
+        # set properties to QgsMapLayerComboBox
+        self.QCBox_InputData_B.setCurrentIndex(-1)
+        self.QCBox_InputData_B.setFilters(QgsMapLayerProxyModel.RasterLayer)
+        # call to browse the thematic raster file
+        self.QPBtn_browseData_B.clicked.connect(lambda: self.fileDialog_browse(
+            self.QCBox_InputData_B,
+            dialog_title=self.tr("Select the second period of the raster image to analyze"),
+            dialog_types=self.tr("Raster files (*.tif *.img);;All files (*.*)"),
+            layer_type="raster"))
+        self.QCBox_InputData_B.currentIndexChanged.connect(self.set_number_components)
+
+    @pyqtSlot()
+    def fileDialog_browse(self, combo_box, dialog_title, dialog_types, layer_type):
+        file_path, _ = QFileDialog.getOpenFileName(self, dialog_title, "", dialog_types)
+        if file_path != '' and os.path.isfile(file_path):
+            # load to qgis and update combobox list
+            load_and_select_filepath_in(combo_box, file_path, layer_type)
+
+    @pyqtSlot()
+    def set_number_components(self):
+        current_layer_A = self.QCBox_InputData_A.currentLayer()
+        current_layer_B = self.QCBox_InputData_B.currentLayer()
+        self.QCBox_nComponents.clear()
+        if current_layer_A is not None and current_layer_B is not None:
+            number_components = current_layer_A.bandCount() + current_layer_B.bandCount()
+            # set number of components to combobox
+            self.QCBox_nComponents.addItems([str(x) for x in range(1, number_components + 1)])
+            # select the last item
+            self.QCBox_nComponents.setCurrentIndex(number_components-1)
