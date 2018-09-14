@@ -30,8 +30,10 @@ from qgis.PyQt.QtWidgets import QMessageBox, QFileDialog, QDockWidget
 from qgis.core import QgsProject, QgsVectorFileWriter, QgsMapLayerProxyModel, Qgis, QgsUnitTypes
 from qgis.utils import iface
 
+from pca4cd.core.pca import pca
 from pca4cd.gui.about_dialog import AboutDialog
-from pca4cd.utils.qgis_utils import load_and_select_filepath_in
+from pca4cd.utils.qgis_utils import load_and_select_filepath_in, load_layer_in_qgis, get_file_path_of_layer
+from pca4cd.utils.system_utils import error_handler
 
 # plugin path
 plugin_folder = os.path.dirname(os.path.dirname(__file__))
@@ -74,7 +76,7 @@ class PCA4CDDockWidget(QDockWidget, FORM_CLASS):
         self.QPBtn_PluginInfo.clicked.connect(self.about_dialog.show)
         self.QPBtn_PluginDocs.clicked.connect(lambda: webbrowser.open("https://smbyc.bitbucket.io/qgisplugins/pca4cd"))
 
-        # ######### load input raster image ######### #
+        # ######### Input Raster Data ######### #
         ## A
         # set properties to QgsMapLayerComboBox
         self.QCBox_InputData_A.setCurrentIndex(-1)
@@ -98,6 +100,9 @@ class PCA4CDDockWidget(QDockWidget, FORM_CLASS):
             layer_type="raster"))
         self.QCBox_InputData_B.currentIndexChanged.connect(self.set_number_components)
 
+        # ######### Principal Components ######### #
+        self.QPBtn_generatePC.clicked.connect(self.generate_principal_components)
+
     @pyqtSlot()
     def fileDialog_browse(self, combo_box, dialog_title, dialog_types, layer_type):
         file_path, _ = QFileDialog.getOpenFileName(self, dialog_title, "", dialog_types)
@@ -116,3 +121,23 @@ class PCA4CDDockWidget(QDockWidget, FORM_CLASS):
             self.QCBox_nComponents.addItems([str(x) for x in range(1, number_components + 1)])
             # select the last item
             self.QCBox_nComponents.setCurrentIndex(number_components-1)
+
+    @pyqtSlot()
+    @error_handler()
+    def generate_principal_components(self):
+        path_layer_A = get_file_path_of_layer(self.QCBox_InputData_A.currentLayer())
+        path_layer_B = get_file_path_of_layer(self.QCBox_InputData_B.currentLayer())
+        n_pc = int(self.QCBox_nComponents.currentText())
+        estimator_matrix = self.QCBox_EstimatorMatrix.currentText()
+
+        pca_files = pca(path_layer_A, path_layer_B, n_pc, estimator_matrix, self.tmp_dir)
+
+        if pca_files:
+            for pca_file in pca_files:
+                load_layer_in_qgis(pca_file, "raster")
+
+            iface.messageBar().pushMessage("PCA4CD", "{} principal components were generated successfully".format(n_pc),
+                                           level=Qgis.Success)
+        else:
+            iface.messageBar().pushMessage("PCA4CD", "Error generating the principal components, check the log",
+                                           level=Qgis.Warning)

@@ -222,7 +222,7 @@
                </widget>
               </item>
               <item>
-               <widget class="QComboBox" name="QCBox_Estimator">
+               <widget class="QComboBox" name="QCBox_EstimatorMatrix">
                 <item>
                  <property name="text">
                   <string>Correlation</string>
@@ -257,7 +257,7 @@
             </widget>
            </item>
            <item>
-            <widget class="QPushButton" name="QPBtn_saveClassificationConfig">
+            <widget class="QPushButton" name="QPBtn_generatePC">
              <property name="text">
               <string>Generate Principal Components</string>
              </property>
