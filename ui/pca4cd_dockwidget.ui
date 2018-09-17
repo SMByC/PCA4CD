@@ -166,7 +166,7 @@
          </widget>
         </item>
         <item>
-         <widget class="QGroupBox" name="groupBox">
+         <widget class="QGroupBox" name="QGBox_PrincipalComponents">
           <property name="title">
            <string>Principal Components</string>
           </property>
@@ -273,7 +273,7 @@
           </property>
           <layout class="QVBoxLayout" name="verticalLayout_6">
            <item>
-            <widget class="QPushButton" name="pushButton">
+            <widget class="QPushButton" name="QPBtn_OpenChangeAnalysisDialog">
              <property name="text">
               <string>Components Analysis</string>
              </property>

@@ -32,7 +32,9 @@ from qgis.utils import iface
 
 from pca4cd.core.pca import pca
 from pca4cd.gui.about_dialog import AboutDialog
-from pca4cd.utils.qgis_utils import load_and_select_filepath_in, load_layer_in_qgis, get_file_path_of_layer
+from pca4cd.gui.change_analysis_dialog import ChangeAnalysisDialog
+from pca4cd.utils.qgis_utils import load_and_select_filepath_in, load_layer_in_qgis, get_file_path_of_layer, \
+    get_layer_by_name
 from pca4cd.utils.system_utils import error_handler
 
 # plugin path
@@ -64,6 +66,8 @@ class PCA4CDDockWidget(QDockWidget, FORM_CLASS):
         self.tmp_dir = tempfile.mkdtemp()
         # save instance
         PCA4CDDockWidget.dockwidget = self
+
+        self.pca_layers = []
 
     def closeEvent(self, event):
         self.closingPlugin.emit()
@@ -103,6 +107,10 @@ class PCA4CDDockWidget(QDockWidget, FORM_CLASS):
         # ######### Principal Components ######### #
         self.QPBtn_generatePC.clicked.connect(self.generate_principal_components)
 
+        # ######### Change Detections Analysis ######### #
+        self.QPBtn_OpenChangeAnalysisDialog.clicked.connect(self.open_change_analysis_dialog)
+
+
     @pyqtSlot()
     def fileDialog_browse(self, combo_box, dialog_title, dialog_types, layer_type):
         file_path, _ = QFileDialog.getOpenFileName(self, dialog_title, "", dialog_types)
@@ -134,10 +142,27 @@ class PCA4CDDockWidget(QDockWidget, FORM_CLASS):
 
         if pca_files:
             for pca_file in pca_files:
-                load_layer_in_qgis(pca_file, "raster")
+                self.pca_layers.append(get_layer_by_name(load_layer_in_qgis(pca_file, "raster")))
 
             iface.messageBar().pushMessage("PCA4CD", "{} principal components were generated successfully".format(n_pc),
                                            level=Qgis.Success)
         else:
             iface.messageBar().pushMessage("PCA4CD", "Error generating the principal components, check the log",
                                            level=Qgis.Warning)
+
+    @pyqtSlot()
+    def open_change_analysis_dialog(self):
+        if ChangeAnalysisDialog.is_opened:
+            self.change_analysis_dialog.activateWindow()
+            return
+
+        if not self.pca_layers:
+            iface.messageBar().pushMessage("PCA4CD", "Error, first generate the principal components",
+                                           level=Qgis.Warning)
+            return
+
+        current_layer_A = self.QCBox_InputData_A.currentLayer()
+        current_layer_B = self.QCBox_InputData_B.currentLayer()
+        self.change_analysis_dialog = ChangeAnalysisDialog(current_layer_A, current_layer_B, self.pca_layers)
+        # open dialog
+        self.change_analysis_dialog.show()
