@@ -23,7 +23,7 @@ from qgis.PyQt import uic
 from qgis.PyQt.QtGui import QColor
 from qgis.PyQt.QtWidgets import QWidget, QGridLayout, QFileDialog
 from qgis.PyQt.QtCore import QSettings, pyqtSlot, QTimer
-from qgis.core import QgsGeometry, QgsMapLayerProxyModel, QgsWkbTypes, QgsPoint
+from qgis.core import QgsMapLayerProxyModel, QgsRaster
 from qgis.gui import QgsMapCanvas, QgsMapToolPan, QgsMapTool
 from qgis.utils import iface
 
@@ -36,9 +36,6 @@ class PanAndZoomPointTool(QgsMapToolPan):
         QgsMapToolPan.__init__(self, render_widget.canvas)
         self.render_widget = render_widget
 
-    def canvasPressEvent(self, event):
-        QgsMapToolPan.canvasPressEvent(self, event)
-
     def canvasReleaseEvent(self, event):
         QgsMapToolPan.canvasReleaseEvent(self, event)
         self.update_canvas()
@@ -49,6 +46,28 @@ class PanAndZoomPointTool(QgsMapToolPan):
 
     def update_canvas(self):
         self.render_widget.parent().view_changed()
+
+
+class PickerPointTool(QgsMapTool):
+    def __init__(self, render_widget, picker_widget):
+        QgsMapTool.__init__(self, render_widget.canvas)
+        self.render_widget = render_widget
+        self.picker_widget = picker_widget
+
+    def update_pixel_value_to_widget(self, event):
+        x = event.pos().x()
+        y = event.pos().y()
+        point = self.render_widget.canvas.getCoordinateTransform().toMapCoordinates(x, y)
+        pixel_value = self.render_widget.layer.dataProvider().identify(point, QgsRaster.IdentifyFormatValue).results()[1]
+        self.picker_widget.setValue(pixel_value)
+
+    def canvasMoveEvent(self, event):
+        self.update_pixel_value_to_widget(event)
+
+    def canvasPressEvent(self, event):
+        self.update_pixel_value_to_widget(event)
+        # restart point tool
+        QTimer.singleShot(200, lambda: self.render_widget.canvas.setMapTool(self.render_widget.toolPan))
 
 
 class RenderWidget(QWidget):
@@ -67,7 +86,7 @@ class RenderWidget(QWidget):
         settings = QSettings()
         self.canvas.enableAntiAliasing(settings.value("/qgis/enable_anti_aliasing", False, type=bool))
         self.setMinimumSize(15, 15)
-        # action pan
+        # action pan and zoom
         self.toolPan = PanAndZoomPointTool(self)
         self.canvas.setMapTool(self.toolPan)
 
@@ -164,11 +183,11 @@ class ChangeAnalysisViewWidget(QWidget, FORM_CLASS):
             dialog_title=self.tr("Select the file for this view"),
             dialog_types=self.tr("Raster or vector files (*.tif *.img *.gpkg *.shp);;All files (*.*)"),
             layer_type="any"))
-
         # edit layer properties
         self.layerStyleEditor.clicked.connect(self.render_widget.layer_style_editor)
-        # action for synchronize all view extent
-        #self.render_widget.canvas.extentsChanged.connect(self.view_changed)
+        # picker pixel value widget
+        self.PickerRangeFrom.clicked.connect(lambda: self.picker_mouse_value(self.RangeChangeFrom))
+        self.PickerRangeTo.clicked.connect(lambda: self.picker_mouse_value(self.RangeChangeTo))
         # disable enter action
         self.QCBox_browseRenderFile.setAutoDefault(False)
 
@@ -190,3 +209,7 @@ class ChangeAnalysisViewWidget(QWidget, FORM_CLASS):
             for view_widget in ChangeAnalysisDialog.view_widgets:
                 if view_widget.is_active and view_widget != self:
                     view_widget.render_widget.update_canvas_to(new_extent)
+
+    @pyqtSlot()
+    def picker_mouse_value(self, picker_widget):
+        self.render_widget.canvas.setMapTool(PickerPointTool(self.render_widget, picker_widget))

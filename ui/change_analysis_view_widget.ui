@@ -250,7 +250,7 @@
           <number>0</number>
          </property>
          <item>
-          <widget class="QToolButton" name="toolButton_3">
+          <widget class="QToolButton" name="PickerRangeFrom">
            <property name="font">
             <font>
              <pointsize>7</pointsize>
@@ -265,7 +265,7 @@
           </widget>
          </item>
          <item>
-          <widget class="QDoubleSpinBox" name="RangeChangeDetectionFrom">
+          <widget class="QDoubleSpinBox" name="RangeChangeFrom">
            <property name="maximumSize">
             <size>
              <width>16777215</width>
@@ -304,7 +304,7 @@
           </widget>
          </item>
          <item>
-          <widget class="QToolButton" name="toolButton_4">
+          <widget class="QToolButton" name="PickerRangeTo">
            <property name="font">
             <font>
              <pointsize>7</pointsize>
@@ -319,7 +319,7 @@
           </widget>
          </item>
          <item>
-          <widget class="QDoubleSpinBox" name="RangeChangeDetectionTo">
+          <widget class="QDoubleSpinBox" name="RangeChangeTo">
            <property name="maximumSize">
             <size>
              <width>16777215</width>
