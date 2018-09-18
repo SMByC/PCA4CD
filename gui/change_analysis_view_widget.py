@@ -24,11 +24,31 @@ from qgis.PyQt.QtGui import QColor
 from qgis.PyQt.QtWidgets import QWidget, QGridLayout, QFileDialog
 from qgis.PyQt.QtCore import QSettings, pyqtSlot, QTimer
 from qgis.core import QgsGeometry, QgsMapLayerProxyModel, QgsWkbTypes, QgsPoint
-from qgis.gui import QgsMapCanvas, QgsMapToolPan
+from qgis.gui import QgsMapCanvas, QgsMapToolPan, QgsMapTool
 from qgis.utils import iface
 
 from pca4cd.utils.qgis_utils import load_and_select_filepath_in, StyleEditorDialog
 from pca4cd.utils.system_utils import block_signals_to
+
+
+class PanAndZoomPointTool(QgsMapToolPan):
+    def __init__(self, render_widget):
+        QgsMapToolPan.__init__(self, render_widget.canvas)
+        self.render_widget = render_widget
+
+    def canvasPressEvent(self, event):
+        QgsMapToolPan.canvasPressEvent(self, event)
+
+    def canvasReleaseEvent(self, event):
+        QgsMapToolPan.canvasReleaseEvent(self, event)
+        self.update_canvas()
+
+    def wheelEvent(self, event):
+        QgsMapToolPan.wheelEvent(self, event)
+        QTimer.singleShot(10, self.update_canvas)
+
+    def update_canvas(self):
+        self.render_widget.parent().view_changed()
 
 
 class RenderWidget(QWidget):
@@ -48,7 +68,7 @@ class RenderWidget(QWidget):
         self.canvas.enableAntiAliasing(settings.value("/qgis/enable_anti_aliasing", False, type=bool))
         self.setMinimumSize(15, 15)
         # action pan
-        self.toolPan = QgsMapToolPan(self.canvas)
+        self.toolPan = PanAndZoomPointTool(self)
         self.canvas.setMapTool(self.toolPan)
 
         gridLayout.addWidget(self.canvas)
@@ -80,16 +100,15 @@ class RenderWidget(QWidget):
             if self.crs:
                 self.canvas.setDestinationCrs(self.crs)
             # set the sampling over the layer to view
-            #self.canvas.setLayers([self.parent().sampling_layer, layer])
+            #self.canvas.setLayers([self.parent().sampling_layer, layer])  # TODO
             self.canvas.setLayers([layer])
             # set init extent from other view if any is activated else set layer extent
 
-            others_view = [(view_widget.render_widget.canvas.extent(), view_widget.current_scale_factor) for view_widget
-                           in ChangeAnalysisDialog.view_widgets if not view_widget.render_widget.canvas.extent().isEmpty()]
+            others_view = [view_widget.render_widget.canvas.extent() for view_widget in ChangeAnalysisDialog.view_widgets
+                           if not view_widget.render_widget.canvas.extent().isEmpty()]
             if others_view:
-                extent, scale = others_view[0]
-                extent.scale(1 / scale)
-                self.set_extents_and_scalefactor(extent)
+                extent = others_view[0]
+                self.update_canvas_to(extent)
             else:
                 self.canvas.setExtent(layer.extent())
 
@@ -100,10 +119,10 @@ class RenderWidget(QWidget):
             # set status for view widget
             self.parent().is_active = True
 
-    def set_extents_and_scalefactor(self, extent):
+    def update_canvas_to(self, new_extent):
         with block_signals_to(self.canvas):
-            self.canvas.setExtent(extent)
-            self.canvas.zoomByFactor(1)
+            self.canvas.setExtent(new_extent)
+            self.canvas.refresh()
 
     def layer_style_editor(self):
         style_editor_dlg = StyleEditorDialog(self.layer, self.canvas, self.parent())
@@ -149,7 +168,7 @@ class ChangeAnalysisViewWidget(QWidget, FORM_CLASS):
         # edit layer properties
         self.layerStyleEditor.clicked.connect(self.render_widget.layer_style_editor)
         # action for synchronize all view extent
-        self.render_widget.canvas.extentsChanged.connect(self.extent_changed)
+        #self.render_widget.canvas.extentsChanged.connect(self.view_changed)
         # disable enter action
         self.QCBox_browseRenderFile.setAutoDefault(False)
 
@@ -163,13 +182,11 @@ class ChangeAnalysisViewWidget(QWidget, FORM_CLASS):
             self.render_widget.render_layer(combo_box.currentLayer())
 
     @pyqtSlot()
-    def extent_changed(self):
+    def view_changed(self):
         if self.is_active:
+            new_extent = self.render_widget.canvas.extent()
+            # update canvas for all view activated except this view
             from pca4cd.gui.change_analysis_dialog import ChangeAnalysisDialog
-            view_extent = self.render_widget.canvas.extent()
-            view_extent.scale(1/self.current_scale_factor)
-
-            # set extent and scale factor for all view activated except this view
             for view_widget in ChangeAnalysisDialog.view_widgets:
                 if view_widget.is_active and view_widget != self:
-                    view_widget.render_widget.set_extents_and_scalefactor(view_extent)
+                    view_widget.render_widget.update_canvas_to(new_extent)
