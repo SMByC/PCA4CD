@@ -59,7 +59,8 @@ class PickerPointTool(QgsMapTool):
         y = event.pos().y()
         point = self.render_widget.canvas.getCoordinateTransform().toMapCoordinates(x, y)
         pixel_value = self.render_widget.layer.dataProvider().identify(point, QgsRaster.IdentifyFormatValue).results()[1]
-        self.picker_widget.setValue(pixel_value)
+        if pixel_value:
+            self.picker_widget.setValue(pixel_value)
 
     def canvasMoveEvent(self, event):
         self.update_pixel_value_to_widget(event)
