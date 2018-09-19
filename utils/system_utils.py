@@ -22,7 +22,7 @@ import traceback
 import os, sys, subprocess
 
 from qgis.PyQt.QtCore import Qt
-from qgis.PyQt.QtWidgets import QApplication
+from qgis.PyQt.QtWidgets import QApplication, QMessageBox
 from qgis.PyQt.QtGui import QCursor
 from qgis.core import QgsMessageLog, Qgis
 from qgis.utils import iface
@@ -110,3 +110,35 @@ class block_signals_to(object):
     def __exit__(self, type, value, traceback):
         # unblock
         self.object_to_block.blockSignals(False)
+
+
+def external_deps(deps):
+    # https://gis.stackexchange.com/questions/196002/development-of-a-plugin-which-depends-on-an-external-python-library
+
+    deps_not_installed = []
+    for dependency in deps:
+        try:
+            __import__(dependency)
+        except:
+            deps_not_installed.append(dependency)
+
+    if deps_not_installed:
+        msg_info = QMessageBox()
+        msg_info.setIcon(QMessageBox.Information)
+        msg_info.setWindowTitle("PCA4CD plugin dependencies")
+        msg_info.setText("installing python dependencies")
+        msg_info.open()
+
+        for dependency in deps_not_installed:
+            msg_info.setText("installing python dependencies: {}".format(dependency))
+            QApplication.processEvents()
+            status = subprocess.call([sys.executable, '-m', 'pip', 'install', dependency, '--user'])
+            if status != 0:
+                msg_info.close()
+                QMessageBox.warning(None, "PCA4CD plugin", "Error installing python dependencies for PCA4CD plugin: {}"
+                                    .format(dependency))
+                return False
+
+        msg_info.close()
+
+    return True

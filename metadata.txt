@@ -21,6 +21,8 @@ changelog=
 
 tags=accuracy,accuracy assessment,thematic map,classification,sample,sampling design,points,remote sensing
 
+external_deps=rasterio,dask,dask-rasterio
+
 category=Plugins
 icon=icons/pca4cd.svg
 experimental=False

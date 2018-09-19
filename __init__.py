@@ -28,6 +28,10 @@ def classFactory(iface):  # pylint: disable=invalid-name
     :param iface: A QGIS interface instance.
     :type iface: QgsInterface
     """
+    # install external dependencies
+    from pca4cd.utils.system_utils import external_deps
+    status_deps = external_deps(["rasterio", "dask_rasterio"])
+
     #
     from .pca4cd import PCA4CD
     return PCA4CD(iface)
