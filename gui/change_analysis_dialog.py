@@ -19,7 +19,6 @@
  ***************************************************************************/
 """
 import os
-import tempfile
 
 from qgis.PyQt import uic
 from qgis.PyQt.QtCore import Qt
@@ -124,7 +123,7 @@ class ChangeAnalysisDialog(QDialog, FORM_CLASS):
                 view_widget.QCBox_RenderFile.setCurrentIndex(file_index)
 
     def show(self):
-        from pca4cd.gui.pca4cd_dockwidget import PCA4CDDockWidget as pca4cd
+        from pca4cd.pca4cd import PCA4CD as pca4cd
         ChangeAnalysisDialog.is_opened = True
         # adjust some objects in the dockwidget
         pca4cd.dockwidget.QGBox_InputData.setDisabled(True)
@@ -145,7 +144,7 @@ class ChangeAnalysisDialog(QDialog, FORM_CLASS):
         """
         Do this before close the dialog
         """
-        from pca4cd.gui.pca4cd_dockwidget import PCA4CDDockWidget as pca4cd
+        from pca4cd.pca4cd import PCA4CD as pca4cd
 
         ChangeAnalysisDialog.is_opened = False
         # adjust some objects in the dockwidget

@@ -21,6 +21,7 @@
 
 import os.path
 import shutil
+import tempfile
 
 from qgis.PyQt.QtCore import QSettings, QTranslator, qVersion, QCoreApplication, Qt
 from qgis.PyQt.QtWidgets import QAction, QMessageBox
@@ -37,6 +38,8 @@ from pca4cd.utils.qgis_utils import unload_layer_in_qgis
 
 class PCA4CD:
     """QGIS Plugin Implementation."""
+    dockwidget = None
+    tmp_dir = None
 
     def __init__(self, iface):
         """Constructor.
@@ -68,7 +71,7 @@ class PCA4CD:
 
         self.menu_name_plugin = self.tr("PCA4CD - PCA for change detections")
         self.pluginIsActive = False
-        self.dockwidget = None
+        PCA4CD.dockwidget = None
 
         self.about_dialog = AboutDialog()
 
@@ -122,19 +125,21 @@ class PCA4CD:
             # dockwidget may not exist if:
             #    first run of plugin
             #    removed on close (see self.onClosePlugin method)
-            if self.dockwidget == None:
+            if PCA4CD.dockwidget == None:
                 # Create the dockwidget (after translation) and keep reference
-                self.dockwidget = PCA4CDDockWidget()
+                PCA4CD.dockwidget = PCA4CDDockWidget()
 
+            # init tmp dir for all process and intermediate files
+            PCA4CD.tmp_dir = tempfile.mkdtemp()
             # connect to provide cleanup on closing of dockwidget
-            self.dockwidget.closingPlugin.connect(self.onClosePlugin)
+            PCA4CD.dockwidget.closingPlugin.connect(self.onClosePlugin)
             # reload
-            self.dockwidget.QPBtn_PluginClearReload.clicked.connect(self.clear_reload_plugin)
+            PCA4CD.dockwidget.QPBtn_PluginClearReload.clicked.connect(self.clear_reload_plugin)
 
             # show the dockwidget
             # TODO: fix to allow choice of dock location
-            self.iface.addDockWidget(Qt.RightDockWidgetArea, self.dockwidget)
-            self.dockwidget.show()
+            self.iface.addDockWidget(Qt.RightDockWidgetArea, PCA4CD.dockwidget)
+            PCA4CD.dockwidget.show()
 
     #--------------------------------------------------------------------------
 
@@ -144,14 +149,14 @@ class PCA4CD:
         self.removes_temporary_files()
 
         # disconnects
-        self.dockwidget.closingPlugin.disconnect(self.onClosePlugin)
+        PCA4CD.dockwidget.closingPlugin.disconnect(self.onClosePlugin)
 
         # remove this statement if dockwidget is to remain
         # for reuse if plugin is reopened
         # Commented next statement since it causes QGIS crashe
         # when closing the docked window:
-        self.dockwidget.deleteLater()
-        self.dockwidget = None
+        PCA4CD.dockwidget.deleteLater()
+        PCA4CD.dockwidget = None
 
         self.pluginIsActive = False
 
@@ -166,13 +171,13 @@ class PCA4CD:
         self.iface.removePluginMenu(self.menu_name_plugin, self.about_action)
         self.iface.removeToolBarIcon(self.dockable_action)
 
-        if self.dockwidget:
-            self.iface.removeDockWidget(self.dockwidget)
+        if PCA4CD.dockwidget:
+            self.iface.removeDockWidget(PCA4CD.dockwidget)
 
     def clear_reload_plugin(self):
         # first prompt
         quit_msg = "Are you sure you want to: clean tmp files, delete all unsaved files, and reload plugin?"
-        reply = QMessageBox.question(self.dockwidget, 'Clear all and reload the PCA4CD plugin.',
+        reply = QMessageBox.question(PCA4CD.dockwidget, 'Clear all and reload the PCA4CD plugin.',
                                      quit_msg, QMessageBox.Yes, QMessageBox.No)
         if reply == QMessageBox.No:
             return
@@ -182,11 +187,11 @@ class PCA4CD:
         plugins["pca4cd"].run()
 
     def removes_temporary_files(self):
-        if not self.dockwidget:
+        if not PCA4CD.dockwidget:
             return
         # unload all layers instances from Qgis saved in tmp dir
         try:
-            d = self.dockwidget.tmp_dir
+            d = PCA4CD.tmp_dir
             files_in_tmp_dir = [os.path.join(d, f) for f in os.listdir(d)
                                 if os.path.isfile(os.path.join(d, f))]
         except: files_in_tmp_dir = []
@@ -194,8 +199,8 @@ class PCA4CD:
         for file_tmp in files_in_tmp_dir:
             unload_layer_in_qgis(file_tmp)
 
-        # clear self.dockwidget.tmp_dir
-        if self.dockwidget.tmp_dir and os.path.isdir(self.dockwidget.tmp_dir):
-            shutil.rmtree(self.dockwidget.tmp_dir, ignore_errors=True)
-        self.dockwidget.tmp_dir = None
+        # clear PCA4CD.tmp_dir
+        if PCA4CD.tmp_dir and os.path.isdir(PCA4CD.tmp_dir):
+            shutil.rmtree(PCA4CD.tmp_dir, ignore_errors=True)
+        PCA4CD.tmp_dir = None
 

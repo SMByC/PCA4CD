@@ -20,7 +20,6 @@
 """
 
 import os
-import tempfile
 import configparser
 import webbrowser
 
@@ -50,7 +49,6 @@ HOMEPAGE = cfg.get('general', 'homepage')
 
 class PCA4CDDockWidget(QDockWidget, FORM_CLASS):
     closingPlugin = pyqtSignal()
-    dockwidget = None
 
     def __init__(self, parent=None):
         """Constructor."""
@@ -62,10 +60,6 @@ class PCA4CDDockWidget(QDockWidget, FORM_CLASS):
         # #widgets-and-dialogs-with-auto-connect
         self.setupUi(self)
         self.setup_gui()
-        # tmp dir for all process and intermediate files
-        self.tmp_dir = tempfile.mkdtemp()
-        # save instance
-        PCA4CDDockWidget.dockwidget = self
 
         self.pca_layers = []
 
@@ -133,12 +127,13 @@ class PCA4CDDockWidget(QDockWidget, FORM_CLASS):
     @pyqtSlot()
     @error_handler()
     def generate_principal_components(self):
+        from pca4cd.pca4cd import PCA4CD as pca4cd
         path_layer_A = get_file_path_of_layer(self.QCBox_InputData_A.currentLayer())
         path_layer_B = get_file_path_of_layer(self.QCBox_InputData_B.currentLayer())
         n_pc = int(self.QCBox_nComponents.currentText())
         estimator_matrix = self.QCBox_EstimatorMatrix.currentText()
 
-        pca_files = pca(path_layer_A, path_layer_B, n_pc, estimator_matrix, self.tmp_dir)
+        pca_files = pca(path_layer_A, path_layer_B, n_pc, estimator_matrix, pca4cd.tmp_dir)
 
         if pca_files:
             for pca_file in pca_files:
@@ -155,7 +150,6 @@ class PCA4CDDockWidget(QDockWidget, FORM_CLASS):
         if ChangeAnalysisDialog.is_opened:
             self.change_analysis_dialog.activateWindow()
             return
-
         if not self.pca_layers:
             iface.messageBar().pushMessage("PCA4CD", "Error, first generate the principal components",
                                            level=Qgis.Warning)
