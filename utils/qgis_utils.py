@@ -23,8 +23,10 @@ import os
 from PyQt5.QtWidgets import QDialog, QDialogButtonBox
 from qgis.PyQt import uic
 from qgis.PyQt.QtCore import Qt
+from qgis.PyQt.QtGui import QColor
 from qgis.gui import QgsRendererPropertiesDialog, QgsRendererRasterPropertiesWidget
-from qgis.core import QgsProject, QgsRasterLayer, QgsVectorLayer, Qgis, QgsStyle, QgsMapLayer
+from qgis.core import QgsProject, QgsRasterLayer, QgsVectorLayer, Qgis, QgsStyle, QgsMapLayer, QgsRasterShader, \
+    QgsColorRampShader, QgsSingleBandPseudoColorRenderer, QgsRasterRange
 from qgis.utils import iface
 
 
@@ -100,7 +102,7 @@ def load_layer_in_qgis(file_path, layer_type):
     else:
         iface.messageBar().pushMessage("PCA4CD", "Error, {} is not a valid {} file!"
                                        .format(os.path.basename(file_path), layer_type))
-    return filename
+    return layer
 
 
 def unload_layer_in_qgis(layer_path):
@@ -140,3 +142,42 @@ class StyleEditorDialog(QDialog, FORM_CLASS):
     def apply(self):
         self.StyleEditorWidget.apply()
         self.layer.triggerRepaint()
+
+
+def apply_symbology(rlayer, symbology, transparent=0):
+    """ Apply classification symbology to raster layer """
+    # See: QgsRasterRenderer* QgsSingleBandPseudoColorRendererWidget::renderer()
+    # https://github.com/qgis/QGIS/blob/master/src/gui/raster/qgssinglebandpseudocolorrendererwidget.cpp
+    # Get raster shader
+    raster_shader = QgsRasterShader()
+    # Color ramp shader
+    color_ramp_shader = QgsColorRampShader()
+    # Loop over Fmask values and add to color item list
+    color_ramp_item_list = []
+    for name, value, color in symbology:
+        # Color ramp item - color, label, value
+        color_ramp_item = QgsColorRampShader.ColorRampItem(value, QColor(color[0], color[1], color[2], color[3]), name)
+        color_ramp_item_list.append(color_ramp_item)
+
+    # After getting list of color ramp items
+    color_ramp_shader.setColorRampItemList(color_ramp_item_list)
+    # Exact color ramp
+    color_ramp_shader.setColorRampType('EXACT')
+    # Add color ramp shader to raster shader
+    raster_shader.setRasterShaderFunction(color_ramp_shader)
+    # Create color renderer for raster layer
+    renderer = QgsSingleBandPseudoColorRenderer(rlayer.dataProvider(), 1, raster_shader)
+    # Set renderer for raster layer
+    rlayer.setRenderer(renderer)
+
+    # Set NoData transparency to layer qgis (temporal)
+    if not isinstance(transparent, list):
+        transparent = [transparent]
+    nodata = [QgsRasterRange(t, t) for t in transparent]
+    if nodata:
+        rlayer.dataProvider().setUserNoDataValue(1, nodata)
+
+    # Repaint
+    if hasattr(rlayer, 'setCacheImage'):
+        rlayer.setCacheImage(None)
+    rlayer.triggerRepaint()
