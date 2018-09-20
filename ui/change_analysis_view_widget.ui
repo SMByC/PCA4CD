@@ -212,6 +212,9 @@
           <pointsize>7</pointsize>
          </font>
         </property>
+        <property name="toolTip">
+         <string>Enable/Disable the change layer</string>
+        </property>
         <property name="text">
          <string/>
         </property>
@@ -256,8 +259,15 @@
              <pointsize>7</pointsize>
             </font>
            </property>
+           <property name="toolTip">
+            <string>Picker the pixel value using mouse cursor for set the initial change value</string>
+           </property>
            <property name="text">
-            <string>...</string>
+            <string/>
+           </property>
+           <property name="icon">
+            <iconset>
+             <normaloff>:/plugins/pca4cd/icons/cursor_picker.svg</normaloff>:/plugins/pca4cd/icons/cursor_picker.svg</iconset>
            </property>
            <property name="autoRaise">
             <bool>true</bool>
@@ -276,6 +286,9 @@
             <font>
              <pointsize>7</pointsize>
             </font>
+           </property>
+           <property name="toolTip">
+            <string>Initial change value</string>
            </property>
            <property name="frame">
             <bool>false</bool>
@@ -310,8 +323,15 @@
              <pointsize>7</pointsize>
             </font>
            </property>
+           <property name="toolTip">
+            <string>Picker the pixel value using mouse cursor for set the final change value</string>
+           </property>
            <property name="text">
-            <string>...</string>
+            <string/>
+           </property>
+           <property name="icon">
+            <iconset>
+             <normaloff>:/plugins/pca4cd/icons/cursor_picker.svg</normaloff>:/plugins/pca4cd/icons/cursor_picker.svg</iconset>
            </property>
            <property name="autoRaise">
             <bool>true</bool>
@@ -330,6 +350,9 @@
             <font>
              <pointsize>7</pointsize>
             </font>
+           </property>
+           <property name="toolTip">
+            <string>Final change value</string>
            </property>
            <property name="frame">
             <bool>false</bool>
@@ -352,8 +375,15 @@
              <pointsize>7</pointsize>
             </font>
            </property>
+           <property name="toolTip">
+            <string>Generate the change layer for this component</string>
+           </property>
            <property name="text">
-            <string>...</string>
+            <string/>
+           </property>
+           <property name="icon">
+            <iconset>
+             <normaloff>:/plugins/pca4cd/icons/run.svg</normaloff>:/plugins/pca4cd/icons/run.svg</iconset>
            </property>
            <property name="autoRaise">
             <bool>true</bool>

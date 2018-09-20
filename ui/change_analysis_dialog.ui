@@ -61,7 +61,7 @@
        <widget class="QWidget" name="widget_3" native="true">
         <property name="maximumSize">
          <size>
-          <width>260</width>
+          <width>230</width>
           <height>16777215</height>
          </size>
         </property>
@@ -87,34 +87,10 @@
             </font>
            </property>
            <property name="text">
-            <string>Classification</string>
+            <string>Change Layer</string>
            </property>
            <property name="alignment">
             <set>Qt::AlignCenter</set>
-           </property>
-          </widget>
-         </item>
-         <item>
-          <widget class="QLabel" name="label_5">
-           <property name="sizePolicy">
-            <sizepolicy hsizetype="Ignored" vsizetype="Preferred">
-             <horstretch>0</horstretch>
-             <verstretch>0</verstretch>
-            </sizepolicy>
-           </property>
-           <property name="font">
-            <font>
-             <pointsize>8</pointsize>
-            </font>
-           </property>
-           <property name="text">
-            <string>Classification of each sample into one of the following custom categories:</string>
-           </property>
-           <property name="alignment">
-            <set>Qt::AlignCenter</set>
-           </property>
-           <property name="wordWrap">
-            <bool>true</bool>
            </property>
           </widget>
          </item>
@@ -165,8 +141,8 @@
              <rect>
               <x>0</x>
               <y>0</y>
-              <width>254</width>
-              <height>585</height>
+              <width>224</width>
+              <height>708</height>
              </rect>
             </property>
             <layout class="QVBoxLayout" name="verticalLayout_5">

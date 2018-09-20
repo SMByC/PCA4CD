@@ -5,5 +5,7 @@
         <file>icons/layer_properties.svg</file>
         <file>icons/reload.svg</file>
         <file>icons/trash.svg</file>
+        <file>icons/cursor_picker.svg</file>
+        <file>icons/run.svg</file>
     </qresource>
 </RCC>
