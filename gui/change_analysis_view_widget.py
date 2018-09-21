@@ -97,7 +97,8 @@ class RenderWidget(QWidget):
         gridLayout.addWidget(self.canvas)
 
     def render_layer(self, layer):
-        from pca4cd.gui.change_analysis_dialog import ChangeAnalysisDialog
+        if self.layer == layer:
+            return
 
         with block_signals_to(self):
             if not layer:
@@ -125,7 +126,7 @@ class RenderWidget(QWidget):
             # set the sampling over the layer to view
             self.canvas.setLayers([layer])
             # set init extent from other view if any is activated else set layer extent
-
+            from pca4cd.gui.change_analysis_dialog import ChangeAnalysisDialog
             others_view = [view_widget.render_widget.canvas.extent() for view_widget in ChangeAnalysisDialog.view_widgets
                            if not view_widget.render_widget.canvas.extent().isEmpty()]
             if others_view:
@@ -148,14 +149,17 @@ class RenderWidget(QWidget):
 
     def set_detection_layer(self, detection_layer):
         self.detection_layer = detection_layer
-        self.canvas.setLayers([self.detection_layer, self.layer])
+        self.show_detection_layer()
 
     def show_detection_layer(self):
-        if self.detection_layer:
+        if self.detection_layer and self.layer:
             self.canvas.setLayers([self.detection_layer, self.layer])
+            self.canvas.refresh()
 
     def hide_detection_layer(self):
-        self.canvas.setLayers([self.layer])
+        if self.layer:
+            self.canvas.setLayers([self.layer])
+            self.canvas.refresh()
 
     def layer_style_editor(self):
         style_editor_dlg = StyleEditorDialog(self.layer, self.canvas, self.parent())
@@ -185,9 +189,9 @@ class ChangeAnalysisViewWidget(QWidget, FORM_CLASS):
         self.detection_layers = None
         # set properties to QgsMapLayerComboBox
         self.QCBox_RenderFile.setCurrentIndex(-1)
-        self.QCBox_RenderFile.setFilters(QgsMapLayerProxyModel.All)
+        #self.QCBox_RenderFile.setFilters(QgsMapLayerProxyModel.All)
         # ignore and not show the sampling layer
-        self.QCBox_RenderFile.setExceptedLayerList([self.detection_layers])
+        #self.QCBox_RenderFile.setExceptedLayerList([self.detection_layers])
         # handle connect layer selection with render canvas
         self.QCBox_RenderFile.currentIndexChanged.connect(lambda: self.render_widget.render_layer(
             self.QCBox_RenderFile.currentLayer()))
