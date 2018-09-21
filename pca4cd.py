@@ -3,7 +3,7 @@
 /***************************************************************************
  PCA4CD
                                  A QGIS plugin
- Principal components analysis for change detections
+ Principal components analysis for change detection
                               -------------------
         copyright            : (C) 2018 by Xavier Corredor Llano, SMByC
         email                : xcorredorl@ideam.gov.co
@@ -69,7 +69,7 @@ class PCA4CD:
             if qVersion() > '4.3.3':
                 QCoreApplication.installTranslator(self.translator)
 
-        self.menu_name_plugin = self.tr("PCA4CD - PCA for change detections")
+        self.menu_name_plugin = self.tr("PCA4CD - PCA for change detection")
         self.pluginIsActive = False
         PCA4CD.dockwidget = None
 
@@ -161,7 +161,7 @@ class PCA4CD:
         self.pluginIsActive = False
 
         from qgis.utils import reloadPlugin
-        reloadPlugin("PCA4CD - PCA for change detections")
+        reloadPlugin("PCA4CD - PCA for change detection")
 
     def unload(self):
         """Removes the plugin menu item and icon from QGIS GUI."""

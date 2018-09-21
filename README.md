@@ -1,6 +1,6 @@
-# PCA4CD - PCA for change detections #
+# PCA4CD - PCA for change detection #
 
-The PCA4CD is a Qgis plugin for generate the principal components analysis for change detections for a stack images.
+The PCA4CD is a Qgis plugin for generate the principal components analysis for change detection for a one or two images stack.
 
 ## Documentation
 

@@ -3,7 +3,7 @@
 /***************************************************************************
  PCA4CD
                                  A QGIS plugin
- Principal components analysis for change detections
+ Principal components analysis for change detection
                               -------------------
         copyright            : (C) 2018 by Xavier Corredor Llano, SMByC
         email                : xcorredorl@ideam.gov.co
@@ -99,9 +99,9 @@ class PCA4CDDockWidget(QDockWidget, FORM_CLASS):
         self.QCBox_InputData_B.currentIndexChanged.connect(self.set_number_components)
 
         # ######### Principal Components ######### #
-        self.QPBtn_generatePC.clicked.connect(self.generate_principal_components)
+        self.QPBtn_runPCA.clicked.connect(self.generate_principal_components)
 
-        # ######### Change Detections Analysis ######### #
+        # ######### Change Detection Analysis ######### #
         self.QPBtn_OpenChangeAnalysisDialog.clicked.connect(self.open_change_analysis_dialog)
 
 

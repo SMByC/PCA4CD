@@ -1,7 +1,7 @@
 #/***************************************************************************
 # PCA4CD
 #
-# Principal components analysis for change detections
+# Principal components analysis for change detection
 #                             -------------------
 #        copyright            : (C) 2018 by Xavier Corredor Llano, SMByC
 #        email                : xcorredorl@ideam.gov.co
@@ -38,7 +38,7 @@ SOURCES = \
     __init__.py \
     pca4cd.py
 
-PLUGINNAME = PCA4CD - PCA for change detections
+PLUGINNAME = PCA4CD - PCA for change detection
 
 PY_FILES = \
     __init__.py \

@@ -11,7 +11,7 @@
    </rect>
   </property>
   <property name="windowTitle">
-   <string>PCA4CD - PCA &amp;for change detections</string>
+   <string>PCA4CD - PCA &amp;for change detection</string>
   </property>
   <widget class="QWidget" name="dockWidgetContents">
    <layout class="QVBoxLayout" name="verticalLayout">
@@ -39,7 +39,7 @@
         <item>
          <widget class="QGroupBox" name="QGBox_InputData">
           <property name="title">
-           <string>Input Raters Data</string>
+           <string>Input Rasters Data</string>
           </property>
           <layout class="QVBoxLayout" name="verticalLayout_3">
            <item>
@@ -259,7 +259,7 @@
            <item>
             <widget class="QPushButton" name="QPBtn_generatePC">
              <property name="text">
-              <string>Generate Principal Components</string>
+              <string>Run PCA</string>
              </property>
             </widget>
            </item>
@@ -269,7 +269,7 @@
         <item>
          <widget class="QGroupBox" name="groupBox_3">
           <property name="title">
-           <string>Change Detections Analysis</string>
+           <string>Change Detection Analysis</string>
           </property>
           <layout class="QVBoxLayout" name="verticalLayout_6">
            <item>

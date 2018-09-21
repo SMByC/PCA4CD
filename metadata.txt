@@ -1,7 +1,7 @@
 [general]
-name=PCA4CD - PCA for change detections
-description=Principal components analysis for change detections
-about=Principal components analysis for change detections
+name=PCA4CD - PCA for change detection
+description=Principal components analysis for change detection
+about=Principal components analysis for change detection
 
 version=18.x.x
 qgisMinimumVersion=3.0
