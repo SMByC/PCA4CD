@@ -111,12 +111,12 @@ class ChangeAnalysisDialog(QDialog, FORM_CLASS):
                 view_widget.QLabel_ViewName.setText("Layer A")
                 file_index = view_widget.QCBox_RenderFile.findText(self.layer_a.name(), Qt.MatchFixedString)
                 view_widget.QCBox_RenderFile.setCurrentIndex(file_index)
-                view_widget.widget_rangeChangeDetection.setVisible(False)
+                view_widget.WidgetDetectionLayer.setVisible(False)
             if num_view == 2:
                 view_widget.QLabel_ViewName.setText("Layer B")
                 file_index = view_widget.QCBox_RenderFile.findText(self.layer_b.name(), Qt.MatchFixedString)
                 view_widget.QCBox_RenderFile.setCurrentIndex(file_index)
-                view_widget.widget_rangeChangeDetection.setVisible(False)
+                view_widget.WidgetDetectionLayer.setVisible(False)
             if 2 < num_view <= len(self.pca_layers)+2:
                 view_widget.QLabel_ViewName.setText("Principal Component {}".format(num_view-2))
                 file_index = view_widget.QCBox_RenderFile.findText(self.pca_layers[num_view-3].name(), Qt.MatchFixedString)

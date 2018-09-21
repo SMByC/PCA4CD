@@ -27,8 +27,10 @@ from qgis.core import QgsMapLayerProxyModel, QgsRaster
 from qgis.gui import QgsMapCanvas, QgsMapToolPan, QgsMapTool
 from qgis.utils import iface
 
-from pca4cd.utils.qgis_utils import load_and_select_filepath_in, StyleEditorDialog
-from pca4cd.utils.system_utils import block_signals_to
+from pca4cd.libs import gdal_calc
+from pca4cd.utils.qgis_utils import load_and_select_filepath_in, StyleEditorDialog, get_file_path_of_layer, \
+    load_layer_in_qgis, apply_symbology
+from pca4cd.utils.system_utils import block_signals_to, wait_process
 
 
 class PanAndZoomPointTool(QgsMapToolPan):
@@ -59,7 +61,7 @@ class PickerPointTool(QgsMapTool):
         y = event.pos().y()
         point = self.render_widget.canvas.getCoordinateTransform().toMapCoordinates(x, y)
         pixel_value = self.render_widget.layer.dataProvider().identify(point, QgsRaster.IdentifyFormatValue).results()[1]
-        if pixel_value:
+        if pixel_value is not None:
             self.picker_widget.setValue(pixel_value)
 
     def canvasMoveEvent(self, event):
@@ -76,6 +78,7 @@ class RenderWidget(QWidget):
         QWidget.__init__(self, parent)
         self.setupUi()
         self.layer = None
+        self.detection_layer = None
         self.crs = None
 
     def setupUi(self):
@@ -120,7 +123,6 @@ class RenderWidget(QWidget):
             if self.crs:
                 self.canvas.setDestinationCrs(self.crs)
             # set the sampling over the layer to view
-            #self.canvas.setLayers([self.parent().sampling_layer, layer])  # TODO
             self.canvas.setLayers([layer])
             # set init extent from other view if any is activated else set layer extent
 
@@ -143,6 +145,17 @@ class RenderWidget(QWidget):
         with block_signals_to(self.canvas):
             self.canvas.setExtent(new_extent)
             self.canvas.refresh()
+
+    def set_detection_layer(self, detection_layer):
+        self.detection_layer = detection_layer
+        self.canvas.setLayers([self.detection_layer, self.layer])
+
+    def show_detection_layer(self):
+        if self.detection_layer:
+            self.canvas.setLayers([self.detection_layer, self.layer])
+
+    def hide_detection_layer(self):
+        self.canvas.setLayers([self.layer])
 
     def layer_style_editor(self):
         style_editor_dlg = StyleEditorDialog(self.layer, self.canvas, self.parent())
@@ -169,12 +182,12 @@ class ChangeAnalysisViewWidget(QWidget, FORM_CLASS):
 
     def setup_view_widget(self, crs):
         self.render_widget.crs = crs
-        self.change_layer = None
+        self.detection_layers = None
         # set properties to QgsMapLayerComboBox
         self.QCBox_RenderFile.setCurrentIndex(-1)
         self.QCBox_RenderFile.setFilters(QgsMapLayerProxyModel.All)
         # ignore and not show the sampling layer
-        self.QCBox_RenderFile.setExceptedLayerList([self.change_layer])
+        self.QCBox_RenderFile.setExceptedLayerList([self.detection_layers])
         # handle connect layer selection with render canvas
         self.QCBox_RenderFile.currentIndexChanged.connect(lambda: self.render_widget.render_layer(
             self.QCBox_RenderFile.currentLayer()))
@@ -189,6 +202,10 @@ class ChangeAnalysisViewWidget(QWidget, FORM_CLASS):
         # picker pixel value widget
         self.PickerRangeFrom.clicked.connect(lambda: self.picker_mouse_value(self.RangeChangeFrom))
         self.PickerRangeTo.clicked.connect(lambda: self.picker_mouse_value(self.RangeChangeTo))
+        # detection layer
+        self.GenerateDetectionLayer.clicked.connect(self.generate_detection_layer)
+        # active/deactive
+        self.EnableChangeDetection.toggled.connect(self.detection_layer_toggled)
         # disable enter action
         self.QCBox_browseRenderFile.setAutoDefault(False)
 
@@ -214,3 +231,29 @@ class ChangeAnalysisViewWidget(QWidget, FORM_CLASS):
     @pyqtSlot()
     def picker_mouse_value(self, picker_widget):
         self.render_widget.canvas.setMapTool(PickerPointTool(self.render_widget, picker_widget))
+
+    @pyqtSlot()
+    def detection_layer_toggled(self):
+        if self.EnableChangeDetection.isChecked():
+            self.render_widget.show_detection_layer()
+        else:
+            self.render_widget.hide_detection_layer()
+
+    @pyqtSlot()
+    @wait_process()
+    def generate_detection_layer(self):
+        from pca4cd.pca4cd import PCA4CD as pca4cd
+        detection_from = self.RangeChangeFrom.value()
+        detection_to = self.RangeChangeTo.value()
+        pca_layer = self.render_widget.layer
+        output_change_layer = os.path.join(pca4cd.tmp_dir, pca_layer.name()+"_detection.tif")
+
+        gdal_calc.Calc(calc="0*logical_and(A<{range_from},A>{range_to})+1*logical_and(A>={range_from},A<={range_to})"
+                       .format(range_from=detection_from, range_to=detection_to), A=get_file_path_of_layer(pca_layer),
+                       outfile=output_change_layer, type="Byte", NoDataValue=0)
+
+        detection_layer = load_layer_in_qgis(output_change_layer, "raster")
+        apply_symbology(detection_layer, [("detection", 1, (255, 255, 0, 255))])
+
+        self.render_widget.set_detection_layer(detection_layer)
+

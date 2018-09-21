@@ -175,7 +175,7 @@
     </widget>
    </item>
    <item>
-    <widget class="QWidget" name="widget_rangeChangeDetection" native="true">
+    <widget class="QWidget" name="WidgetDetectionLayer" native="true">
      <layout class="QHBoxLayout" name="horizontalLayout_3">
       <property name="spacing">
        <number>0</number>
@@ -299,6 +299,9 @@
            <property name="decimals">
             <number>3</number>
            </property>
+           <property name="minimum">
+            <double>-100000.000000000000000</double>
+           </property>
            <property name="maximum">
             <double>100000.000000000000000</double>
            </property>
@@ -363,13 +366,16 @@
            <property name="decimals">
             <number>3</number>
            </property>
+           <property name="minimum">
+            <double>-100000.000000000000000</double>
+           </property>
            <property name="maximum">
             <double>100000.000000000000000</double>
            </property>
           </widget>
          </item>
          <item>
-          <widget class="QToolButton" name="toolButton">
+          <widget class="QToolButton" name="GenerateDetectionLayer">
            <property name="font">
             <font>
              <pointsize>7</pointsize>
