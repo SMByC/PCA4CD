@@ -90,16 +90,16 @@ class ChangeAnalysisDialog(QDialog, FORM_CLASS):
             view_widget.setup_view_widget(crs=self.layer_a.crs())
         # set views
         for num_view, view_widget in enumerate(ChangeAnalysisDialog.view_widgets, start=1):
+            if 1 <= num_view <= grid_columns:
+                view_widget.WidgetDetectionLayer.setEnabled(False)
             if num_view == 2:
                 view_widget.QLabel_ViewName.setText("Layer A")
                 file_index = view_widget.QCBox_RenderFile.findText(self.layer_a.name(), Qt.MatchFixedString)
                 view_widget.QCBox_RenderFile.setCurrentIndex(file_index)
-                view_widget.WidgetDetectionLayer.setVisible(False)
             if num_view == 3:
                 view_widget.QLabel_ViewName.setText("Layer B")
                 file_index = view_widget.QCBox_RenderFile.findText(self.layer_b.name(), Qt.MatchFixedString)
                 view_widget.QCBox_RenderFile.setCurrentIndex(file_index)
-                view_widget.WidgetDetectionLayer.setVisible(False)
             if grid_columns < num_view <= len(self.pca_layers)+grid_columns:
                 view_widget.QLabel_ViewName.setText("Principal Component {}".format(num_view-grid_columns))
                 file_index = view_widget.QCBox_RenderFile.findText(self.pca_layers[num_view-grid_columns-1].name(), Qt.MatchFixedString)
