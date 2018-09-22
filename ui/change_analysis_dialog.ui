@@ -209,25 +209,7 @@
        </widget>
       </item>
       <item row="0" column="0" rowspan="2">
-       <widget class="QWidget" name="widget_view_windows" native="true">
-        <layout class="QVBoxLayout" name="verticalLayout_20">
-         <property name="spacing">
-          <number>0</number>
-         </property>
-         <property name="leftMargin">
-          <number>0</number>
-         </property>
-         <property name="topMargin">
-          <number>0</number>
-         </property>
-         <property name="rightMargin">
-          <number>0</number>
-         </property>
-         <property name="bottomMargin">
-          <number>0</number>
-         </property>
-        </layout>
-       </widget>
+       <widget class="QWidget" name="widget_view_windows" native="true"/>
       </item>
      </layout>
     </widget>

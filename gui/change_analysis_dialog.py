@@ -22,13 +22,8 @@ import os
 
 from qgis.PyQt import uic
 from qgis.PyQt.QtCore import Qt
-from qgis.PyQt.QtWidgets import QTableWidgetItem, QSplitter, QColorDialog, QDialog, QDialogButtonBox, QPushButton
-from qgis.PyQt.QtGui import QColor, QIcon
-from qgis.core import QgsCoordinateReferenceSystem, QgsCoordinateTransform, Qgis, QgsProject, QgsUnitTypes
+from qgis.PyQt.QtWidgets import QDialog, QDialogButtonBox, QGridLayout
 
-from pca4cd.utils.qgis_utils import valid_file_selected_in, get_current_file_path_in, \
-    load_and_select_filepath_in
-from pca4cd.utils.system_utils import open_file, block_signals_to
 from pca4cd.gui.change_analysis_view_widget import ChangeAnalysisViewWidget
 
 # plugin path
@@ -57,48 +52,36 @@ class ChangeAnalysisDialog(QDialog, FORM_CLASS):
         self.closeButton.button(QDialogButtonBox.Ok).setAutoDefault(False)
         self.closeButton.button(QDialogButtonBox.Discard).setAutoDefault(False)
 
-        # create dynamic size of the view render widgets windows
-        # inside the grid with columns x rows divide by splitters
-        grid_columns = [2]
+        # size of the grid with view render widgets windows
         if len(pca_layers) <= 4:
             grid_rows = 2
-            grid_columns.append(len(pca_layers))
-        elif len(pca_layers) <= 6:
-            grid_rows = 3
-            grid_columns += [3, 3]
+            grid_columns = 4
         elif len(pca_layers) <= 8:
             grid_rows = 3
-            grid_columns += [4, 4]
-        elif len(pca_layers) <= 9:
-            grid_rows = 4
-            grid_columns += [3, 3, 3]
+            grid_columns = 4
         elif len(pca_layers) <= 12:
             grid_rows = 4
-            grid_columns += [4, 4, 4]
-        elif len(pca_layers) <= 15:
-            grid_rows = 4
-            grid_columns += [5, 5, 5]
+            grid_columns = 4
         elif len(pca_layers) <= 16:
             grid_rows = 5
-            grid_columns += [4, 4, 4, 4]
+            grid_columns = 4
         elif len(pca_layers) <= 20:
             grid_rows = 5
-            grid_columns += [5, 5, 5, 5]
+            grid_columns = 5
 
-        h_splitters = []
+        # configure the views layout
+        views_layout = QGridLayout()
+        views_layout.setSpacing(0)
+        views_layout.setMargin(0)
         view_widgets = []
         for row in range(grid_rows):
-            splitter = QSplitter(Qt.Horizontal)
-            for column in range(grid_columns[row]):
+            for column in range(grid_columns):
                 new_view_widget = ChangeAnalysisViewWidget()
-                splitter.addWidget(new_view_widget)
-                h_splitters.append(splitter)
+                views_layout.addWidget(new_view_widget, row, column)
                 view_widgets.append(new_view_widget)
-        v_splitter = QSplitter(Qt.Vertical)
-        for splitter in h_splitters:
-            v_splitter.addWidget(splitter)
+
         # add to change analysis dialog
-        self.widget_view_windows.layout().addWidget(v_splitter)
+        self.widget_view_windows.setLayout(views_layout)
         # save instances
         ChangeAnalysisDialog.view_widgets = view_widgets
         # setup view widget
@@ -107,19 +90,19 @@ class ChangeAnalysisDialog(QDialog, FORM_CLASS):
             view_widget.setup_view_widget(crs=self.layer_a.crs())
         # set views
         for num_view, view_widget in enumerate(ChangeAnalysisDialog.view_widgets, start=1):
-            if num_view == 1:
+            if num_view == 2:
                 view_widget.QLabel_ViewName.setText("Layer A")
                 file_index = view_widget.QCBox_RenderFile.findText(self.layer_a.name(), Qt.MatchFixedString)
                 view_widget.QCBox_RenderFile.setCurrentIndex(file_index)
                 view_widget.WidgetDetectionLayer.setVisible(False)
-            if num_view == 2:
+            if num_view == 3:
                 view_widget.QLabel_ViewName.setText("Layer B")
                 file_index = view_widget.QCBox_RenderFile.findText(self.layer_b.name(), Qt.MatchFixedString)
                 view_widget.QCBox_RenderFile.setCurrentIndex(file_index)
                 view_widget.WidgetDetectionLayer.setVisible(False)
-            if 2 < num_view <= len(self.pca_layers)+2:
-                view_widget.QLabel_ViewName.setText("Principal Component {}".format(num_view-2))
-                file_index = view_widget.QCBox_RenderFile.findText(self.pca_layers[num_view-3].name(), Qt.MatchFixedString)
+            if grid_columns < num_view <= len(self.pca_layers)+grid_columns:
+                view_widget.QLabel_ViewName.setText("Principal Component {}".format(num_view-grid_columns))
+                file_index = view_widget.QCBox_RenderFile.findText(self.pca_layers[num_view-grid_columns-1].name(), Qt.MatchFixedString)
                 view_widget.QCBox_RenderFile.setCurrentIndex(file_index)
 
     def show(self):
