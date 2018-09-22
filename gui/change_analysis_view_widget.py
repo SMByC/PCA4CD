@@ -97,29 +97,7 @@ class RenderWidget(QWidget):
         gridLayout.addWidget(self.canvas)
 
     def render_layer(self, layer):
-        if self.layer == layer:
-            return
-
         with block_signals_to(self):
-            if not layer:
-                self.canvas.setLayers([])
-                self.canvas.clearCache()
-                self.canvas.refresh()
-                self.layer = None
-                # deactivate some parts of this view
-                self.parent().QLabel_ViewName.setDisabled(True)
-                self.parent().render_widget.setDisabled(True)
-                self.parent().layerStyleEditor.setDisabled(True)
-                self.canvas.setCanvasColor(QColor(245, 245, 245))
-                # set status for view widget
-                self.parent().is_active = False
-                return
-            # activate some parts of this view
-            self.parent().QLabel_ViewName.setEnabled(True)
-            self.parent().render_widget.setEnabled(True)
-            self.parent().layerStyleEditor.setEnabled(True)
-            self.canvas.setCanvasColor(QColor(255, 255, 255))
-
             # set the CRS of the canvas view
             if self.crs:
                 self.canvas.setDestinationCrs(self.crs)
@@ -137,10 +115,6 @@ class RenderWidget(QWidget):
 
             self.canvas.refresh()
             self.layer = layer
-            # show marker
-
-            # set status for view widget
-            self.parent().is_active = True
 
     def update_canvas_to(self, new_extent):
         with block_signals_to(self.canvas):
@@ -182,7 +156,7 @@ class ChangeAnalysisViewWidget(QWidget, FORM_CLASS):
         self.qgs_main_canvas = iface.mapCanvas()
         self.setupUi(self)
         # init as unactivated render widget for new instances
-        self.render_widget.render_layer(None)
+        self.disable()
 
     def setup_view_widget(self, crs):
         self.render_widget.crs = crs
@@ -193,8 +167,7 @@ class ChangeAnalysisViewWidget(QWidget, FORM_CLASS):
         # ignore and not show the sampling layer
         #self.QCBox_RenderFile.setExceptedLayerList([self.detection_layers])
         # handle connect layer selection with render canvas
-        self.QCBox_RenderFile.currentIndexChanged.connect(lambda: self.render_widget.render_layer(
-            self.QCBox_RenderFile.currentLayer()))
+        self.QCBox_RenderFile.currentIndexChanged.connect(lambda: self.set_render_layer(self.QCBox_RenderFile.currentLayer()))
         # call to browse the render file
         self.QCBox_browseRenderFile.clicked.connect(lambda: self.fileDialog_browse(
             self.QCBox_RenderFile,
@@ -213,6 +186,38 @@ class ChangeAnalysisViewWidget(QWidget, FORM_CLASS):
         # disable enter action
         self.QCBox_browseRenderFile.setAutoDefault(False)
 
+    def enable(self):
+        with block_signals_to(self.render_widget):
+            # activate some parts of this view
+            self.QLabel_ViewName.setEnabled(True)
+            self.render_widget.setEnabled(True)
+            self.layerStyleEditor.setEnabled(True)
+            self.render_widget.canvas.setCanvasColor(QColor(255, 255, 255))
+            # set status for view widget
+            self.is_active = True
+
+    def disable(self):
+        with block_signals_to(self.render_widget):
+            self.render_widget.canvas.setLayers([])
+            self.render_widget.canvas.clearCache()
+            self.render_widget.canvas.refresh()
+            self.render_widget.layer = None
+            # deactivate some parts of this view
+            self.QLabel_ViewName.setDisabled(True)
+            self.render_widget.setDisabled(True)
+            self.layerStyleEditor.setDisabled(True)
+            self.render_widget.canvas.setCanvasColor(QColor(245, 245, 245))
+            # set status for view widget
+            self.is_active = False
+
+    def set_render_layer(self, layer):
+        if not layer:
+            self.disable()
+            return
+
+        self.enable()
+        self.render_widget.render_layer(layer)
+
     @pyqtSlot()
     def fileDialog_browse(self, combo_box, dialog_title, dialog_types, layer_type):
         file_path, _ = QFileDialog.getOpenFileName(self, dialog_title, "", dialog_types)
@@ -220,7 +225,7 @@ class ChangeAnalysisViewWidget(QWidget, FORM_CLASS):
             # load to qgis and update combobox list
             load_and_select_filepath_in(combo_box, file_path, layer_type)
 
-            self.render_widget.render_layer(combo_box.currentLayer())
+            self.set_render_layer(combo_box.currentLayer())
 
     @pyqtSlot()
     def view_changed(self):
