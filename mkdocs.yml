@@ -1,5 +1,5 @@
 site_name: PCA4CD - Qgis plugin
-site_description: The PCA4CD is a Qgis plugin for generate the principal components analysis for change detection
+site_description: The PCA4CD is a Qgis plugin for generate and analysis the principal components (PCA) for change detection
 site_author: Xavier Corredor Llano, SMByC-IDEAM
 site_favicon: img/favicon.png
 site_url: https://smbyc.bitbucket.io/qgisplugins/pca4cd
