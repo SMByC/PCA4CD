@@ -114,10 +114,6 @@ class ChangeAnalysisDialog(QDialog, FORM_CLASS):
         pca4cd.dockwidget.QPBtn_OpenChangeAnalysisDialog.setText("Analysis dialog is opened, click to show")
         # show dialog
         super(ChangeAnalysisDialog, self).show()
-        # update canvas
-        for view_widget in ChangeAnalysisDialog.view_widgets:
-            if view_widget.is_active and view_widget.id in [1, 2]:
-                view_widget.view_changed()
 
     def closeEvent(self, event):
         self.closing()
