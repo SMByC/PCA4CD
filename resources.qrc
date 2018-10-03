@@ -6,6 +6,7 @@
         <file>icons/reload.svg</file>
         <file>icons/trash.svg</file>
         <file>icons/cursor_picker.svg</file>
+        <file>icons/change_detection_layer.svg</file>
         <file>icons/run.svg</file>
     </qresource>
 </RCC>

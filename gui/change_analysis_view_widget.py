@@ -47,7 +47,7 @@ class PanAndZoomPointTool(QgsMapToolPan):
         QTimer.singleShot(10, self.update_canvas)
 
     def update_canvas(self):
-        self.render_widget.parent().view_changed()
+        self.render_widget.parent_view.canvas_changed()
 
 
 class PickerPointTool(QgsMapTool):
@@ -70,7 +70,7 @@ class PickerPointTool(QgsMapTool):
     def canvasPressEvent(self, event):
         self.update_pixel_value_to_widget(event)
         # restart point tool
-        QTimer.singleShot(200, lambda: self.render_widget.canvas.setMapTool(self.render_widget.toolPan))
+        QTimer.singleShot(200, lambda: self.render_widget.canvas.setMapTool(self.render_widget.pan_zoom_tool))
 
 
 class RenderWidget(QWidget):
@@ -91,8 +91,8 @@ class RenderWidget(QWidget):
         self.canvas.enableAntiAliasing(settings.value("/qgis/enable_anti_aliasing", False, type=bool))
         self.setMinimumSize(15, 15)
         # action pan and zoom
-        self.toolPan = PanAndZoomPointTool(self)
-        self.canvas.setMapTool(self.toolPan)
+        self.pan_zoom_tool = PanAndZoomPointTool(self)
+        self.canvas.setMapTool(self.pan_zoom_tool)
 
         gridLayout.addWidget(self.canvas)
 
@@ -152,13 +152,12 @@ class ChangeAnalysisViewWidget(QWidget, FORM_CLASS):
         QWidget.__init__(self, parent)
         self.id = None
         self.is_active = False
-        self.current_scale_factor = 1.0
-        self.qgs_main_canvas = iface.mapCanvas()
         self.setupUi(self)
         # init as unactivated render widget for new instances
         self.disable()
 
     def setup_view_widget(self, crs):
+        self.render_widget.parent_view = self
         self.render_widget.crs = crs
         self.detection_layers = None
         # set properties to QgsMapLayerComboBox
@@ -176,15 +175,13 @@ class ChangeAnalysisViewWidget(QWidget, FORM_CLASS):
             layer_type="any"))
         # edit layer properties
         self.layerStyleEditor.clicked.connect(self.render_widget.layer_style_editor)
-        # picker pixel value widget
-        self.PickerRangeFrom.clicked.connect(lambda: self.picker_mouse_value(self.RangeChangeFrom))
-        self.PickerRangeTo.clicked.connect(lambda: self.picker_mouse_value(self.RangeChangeTo))
-        # detection layer
-        self.GenerateDetectionLayer.clicked.connect(self.generate_detection_layer)
         # active/deactive
         self.EnableChangeDetection.toggled.connect(self.detection_layer_toggled)
         # disable enter action
         self.QCBox_browseRenderFile.setAutoDefault(False)
+
+        # component analysis layer
+        self.QPBtn_ComponentAnalysisDialog.clicked.connect(self.open_component_analysis_dialog)
 
     def enable(self):
         with block_signals_to(self.render_widget):
@@ -228,7 +225,7 @@ class ChangeAnalysisViewWidget(QWidget, FORM_CLASS):
             self.set_render_layer(combo_box.currentLayer())
 
     @pyqtSlot()
-    def view_changed(self):
+    def canvas_changed(self):
         if self.is_active:
             new_extent = self.render_widget.canvas.extent()
             # update canvas for all view activated except this view
@@ -238,8 +235,57 @@ class ChangeAnalysisViewWidget(QWidget, FORM_CLASS):
                     view_widget.render_widget.update_canvas_to(new_extent)
 
     @pyqtSlot()
-    def picker_mouse_value(self, picker_widget):
-        self.render_widget.canvas.setMapTool(PickerPointTool(self.render_widget, picker_widget))
+    def detection_layer_toggled(self):
+        if self.EnableChangeDetection.isChecked():
+            self.render_widget.show_detection_layer()
+        else:
+            self.render_widget.hide_detection_layer()
+
+    @pyqtSlot()
+    def open_component_analysis_dialog(self):
+        self.change_detection_layer = ComponentAnalysisDialog(view_widget=self)
+        if self.change_detection_layer.show():
+            # ok button -> accept the new buttons config
+            pass
+        else:
+            # cancel button -> restore the old button config
+            pass
+
+
+# plugin path
+plugin_folder = os.path.dirname(os.path.dirname(__file__))
+FORM_CLASS, _ = uic.loadUiType(os.path.join(
+    plugin_folder, 'ui', 'component_analysis_dialog.ui'))
+
+
+class ComponentAnalysisDialog(QWidget, FORM_CLASS):
+    def __init__(self, view_widget, parent=None):
+        QWidget.__init__(self, parent)
+        self.setupUi(self)
+        self.render_widget.parent_view = self
+        self.render_widget.crs = view_widget.render_widget.crs
+        # edit layer properties
+        self.layerStyleEditor.clicked.connect(self.render_widget.layer_style_editor)
+        # set layer
+        self.render_widget.render_layer(view_widget.render_widget.layer)
+        # set name
+        self.QLabel_ViewName.setText(view_widget.QLabel_ViewName.text())
+        # picker pixel value widget
+        self.PickerRangeFrom.clicked.connect(lambda: self.picker_mouse_value(self.RangeChangeFrom))
+        self.PickerRangeTo.clicked.connect(lambda: self.picker_mouse_value(self.RangeChangeTo))
+        # detection layer
+        self.GenerateDetectionLayer.clicked.connect(self.generate_detection_layer)
+        # active/deactive
+        self.EnableChangeDetection.toggled.connect(self.detection_layer_toggled)
+
+    @pyqtSlot()
+    def canvas_changed(self):
+        new_extent = self.render_widget.canvas.extent()
+        # update canvas for all view activated except this view
+        from pca4cd.gui.change_analysis_dialog import ChangeAnalysisDialog
+        for view_widget in ChangeAnalysisDialog.view_widgets:
+            if view_widget.is_active and view_widget != self:
+                view_widget.render_widget.update_canvas_to(new_extent)
 
     @pyqtSlot()
     def detection_layer_toggled(self):
@@ -247,6 +293,10 @@ class ChangeAnalysisViewWidget(QWidget, FORM_CLASS):
             self.render_widget.show_detection_layer()
         else:
             self.render_widget.hide_detection_layer()
+
+    @pyqtSlot()
+    def picker_mouse_value(self, picker_widget):
+        self.render_widget.canvas.setMapTool(PickerPointTool(self.render_widget, picker_widget))
 
     @pyqtSlot()
     @wait_process()

@@ -221,182 +221,37 @@
        </widget>
       </item>
       <item>
-       <widget class="QWidget" name="widget_4" native="true">
+       <widget class="QToolButton" name="QPBtn_ComponentAnalysisDialog">
         <property name="enabled">
          <bool>false</bool>
         </property>
-        <property name="sizePolicy">
-         <sizepolicy hsizetype="Expanding" vsizetype="Preferred">
-          <horstretch>0</horstretch>
-          <verstretch>0</verstretch>
-         </sizepolicy>
+        <property name="maximumSize">
+         <size>
+          <width>16777215</width>
+          <height>24</height>
+         </size>
         </property>
         <property name="font">
          <font>
           <pointsize>7</pointsize>
          </font>
         </property>
-        <layout class="QHBoxLayout" name="horizontalLayout_4">
-         <property name="spacing">
-          <number>0</number>
-         </property>
-         <property name="leftMargin">
-          <number>0</number>
-         </property>
-         <property name="topMargin">
-          <number>0</number>
-         </property>
-         <property name="rightMargin">
-          <number>0</number>
-         </property>
-         <property name="bottomMargin">
-          <number>0</number>
-         </property>
-         <item>
-          <widget class="QToolButton" name="PickerRangeFrom">
-           <property name="font">
-            <font>
-             <pointsize>7</pointsize>
-            </font>
-           </property>
-           <property name="toolTip">
-            <string>Picker the pixel value using mouse cursor for set the initial change value</string>
-           </property>
-           <property name="text">
-            <string/>
-           </property>
-           <property name="icon">
-            <iconset>
-             <normaloff>:/plugins/pca4cd/icons/cursor_picker.svg</normaloff>:/plugins/pca4cd/icons/cursor_picker.svg</iconset>
-           </property>
-           <property name="autoRaise">
-            <bool>true</bool>
-           </property>
-          </widget>
-         </item>
-         <item>
-          <widget class="QDoubleSpinBox" name="RangeChangeFrom">
-           <property name="maximumSize">
-            <size>
-             <width>16777215</width>
-             <height>24</height>
-            </size>
-           </property>
-           <property name="font">
-            <font>
-             <pointsize>7</pointsize>
-            </font>
-           </property>
-           <property name="toolTip">
-            <string>Initial change value</string>
-           </property>
-           <property name="frame">
-            <bool>false</bool>
-           </property>
-           <property name="alignment">
-            <set>Qt::AlignCenter</set>
-           </property>
-           <property name="decimals">
-            <number>3</number>
-           </property>
-           <property name="minimum">
-            <double>-100000.000000000000000</double>
-           </property>
-           <property name="maximum">
-            <double>100000.000000000000000</double>
-           </property>
-          </widget>
-         </item>
-         <item>
-          <widget class="QLabel" name="label">
-           <property name="font">
-            <font>
-             <pointsize>7</pointsize>
-            </font>
-           </property>
-           <property name="text">
-            <string> to </string>
-           </property>
-          </widget>
-         </item>
-         <item>
-          <widget class="QToolButton" name="PickerRangeTo">
-           <property name="font">
-            <font>
-             <pointsize>7</pointsize>
-            </font>
-           </property>
-           <property name="toolTip">
-            <string>Picker the pixel value using mouse cursor for set the final change value</string>
-           </property>
-           <property name="text">
-            <string/>
-           </property>
-           <property name="icon">
-            <iconset>
-             <normaloff>:/plugins/pca4cd/icons/cursor_picker.svg</normaloff>:/plugins/pca4cd/icons/cursor_picker.svg</iconset>
-           </property>
-           <property name="autoRaise">
-            <bool>true</bool>
-           </property>
-          </widget>
-         </item>
-         <item>
-          <widget class="QDoubleSpinBox" name="RangeChangeTo">
-           <property name="maximumSize">
-            <size>
-             <width>16777215</width>
-             <height>24</height>
-            </size>
-           </property>
-           <property name="font">
-            <font>
-             <pointsize>7</pointsize>
-            </font>
-           </property>
-           <property name="toolTip">
-            <string>Final change value</string>
-           </property>
-           <property name="frame">
-            <bool>false</bool>
-           </property>
-           <property name="alignment">
-            <set>Qt::AlignCenter</set>
-           </property>
-           <property name="decimals">
-            <number>3</number>
-           </property>
-           <property name="minimum">
-            <double>-100000.000000000000000</double>
-           </property>
-           <property name="maximum">
-            <double>100000.000000000000000</double>
-           </property>
-          </widget>
-         </item>
-         <item>
-          <widget class="QToolButton" name="GenerateDetectionLayer">
-           <property name="font">
-            <font>
-             <pointsize>7</pointsize>
-            </font>
-           </property>
-           <property name="toolTip">
-            <string>Generate the change layer for this component</string>
-           </property>
-           <property name="text">
-            <string/>
-           </property>
-           <property name="icon">
-            <iconset>
-             <normaloff>:/plugins/pca4cd/icons/run.svg</normaloff>:/plugins/pca4cd/icons/run.svg</iconset>
-           </property>
-           <property name="autoRaise">
-            <bool>true</bool>
-           </property>
-          </widget>
-         </item>
-        </layout>
+        <property name="toolTip">
+         <string>Generate the change layer for this component</string>
+        </property>
+        <property name="text">
+         <string>Change detection layer</string>
+        </property>
+        <property name="icon">
+         <iconset>
+          <normaloff>:/plugins/pca4cd/icons/change_detection_layer.svg</normaloff>:/plugins/pca4cd/icons/change_detection_layer.svg</iconset>
+        </property>
+        <property name="toolButtonStyle">
+         <enum>Qt::ToolButtonTextBesideIcon</enum>
+        </property>
+        <property name="autoRaise">
+         <bool>true</bool>
+        </property>
        </widget>
       </item>
       <item>
@@ -435,16 +290,16 @@
   <connection>
    <sender>EnableChangeDetection</sender>
    <signal>clicked(bool)</signal>
-   <receiver>widget_4</receiver>
+   <receiver>QPBtn_ComponentAnalysisDialog</receiver>
    <slot>setEnabled(bool)</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>70</x>
-     <y>486</y>
+     <x>158</x>
+     <y>484</y>
     </hint>
     <hint type="destinationlabel">
-     <x>94</x>
-     <y>456</y>
+     <x>200</x>
+     <y>487</y>
     </hint>
    </hints>
   </connection>
