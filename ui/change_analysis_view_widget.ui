@@ -176,6 +176,9 @@
    </item>
    <item>
     <widget class="QWidget" name="WidgetDetectionLayer" native="true">
+     <property name="enabled">
+      <bool>false</bool>
+     </property>
      <layout class="QHBoxLayout" name="horizontalLayout_3">
       <property name="spacing">
        <number>0</number>
