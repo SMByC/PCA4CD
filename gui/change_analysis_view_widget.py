@@ -19,6 +19,10 @@
  ***************************************************************************/
 """
 import os
+import numpy as np
+from osgeo import gdal
+from osgeo.gdalconst import GA_ReadOnly
+
 from qgis.PyQt import uic
 from qgis.PyQt.QtGui import QColor
 from qgis.PyQt.QtWidgets import QWidget, QGridLayout, QFileDialog
@@ -281,6 +285,11 @@ class ComponentAnalysisDialog(QWidget, FORM_CLASS):
         # active/deactive
         self.EnableChangeDetection.toggled.connect(self.detection_layer_toggled)
 
+        # statistics
+        self.statistics()
+        # plot
+        self.histogram_plot()
+
     @pyqtSlot()
     def canvas_changed(self):
         new_extent = self.render_widget.canvas.extent()
@@ -318,3 +327,34 @@ class ComponentAnalysisDialog(QWidget, FORM_CLASS):
         apply_symbology(detection_layer, [("detection", 1, (255, 255, 0, 255))])
 
         self.render_widget.set_detection_layer(detection_layer)
+
+    @wait_process()
+    def statistics(self):
+        from pca4cd.gui.change_analysis_dialog import ChangeAnalysisDialog
+        self.stats_eigenvalue.setText("{} ({}%)".format(round(ChangeAnalysisDialog.pca_stats["eigenvals"][self.pc_id-1], 2),
+                                                        round(ChangeAnalysisDialog.pca_stats["eigenvals_%"][self.pc_id-1], 2)))
+
+        gdal.AllRegister()
+        pca_layer = self.render_widget.layer
+        dataset = gdal.Open(get_file_path_of_layer(pca_layer), GA_ReadOnly)
+        band = dataset.GetRasterBand(1).ReadAsArray()
+        pca_flat = band.flatten()
+
+        self.stats_min.setText(str(round(np.min(pca_flat), 2)))
+        self.stats_max.setText(str(round(np.max(pca_flat), 2)))
+        self.stats_std.setText(str(round(np.std(pca_flat), 2)))
+        self.stats_p25.setText(str(round(np.percentile(pca_flat, 25), 2)))
+        self.stats_p50.setText(str(round(np.percentile(pca_flat, 50), 2)))
+        self.stats_p75.setText(str(round(np.percentile(pca_flat, 75), 2)))
+
+    @wait_process()
+    def histogram_plot(self):
+        # config plot
+        self.HistogramPlot.setTitle('Histogram of PC {}'.format(self.pc_id))
+        self.HistogramPlot.setBackground('w')
+        self.HistogramPlot.showGrid(x=True, y=True, alpha=0.2)
+
+
+
+        x, y = range(10), range(10)
+        self.HistogramPlot.plot(x, y)
