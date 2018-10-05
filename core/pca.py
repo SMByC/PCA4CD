@@ -18,7 +18,7 @@ def pca(A, B, n_pc, estimator_matrix, out_dir):
     :param n_pc: number of principal components to output
     :param estimator_matrix: pca with correlation of covariance
     :param out_dir: directory to save the outputs
-    :return: pca files list
+    :return: pca files list and statistics
     """
     # init dask as threads (shared memory is required)
     dask.config.set(scheduler='threads')
@@ -103,5 +103,12 @@ def pca(A, B, n_pc, estimator_matrix, out_dir):
 
     dask.compute(*[pyramids(pca_file) for pca_file in pca_files], num_workers=2)
 
-    return pca_files
+    ########
+    # pca statistics
+    pca_stats = {}
+    pca_stats["eigenvals"] = eigenvals
+    pca_stats["eigenvals_%"] = eigenvals*100/n_bands
+    pca_stats["eigenvectors"] = eigenvectors
+
+    return pca_files, pca_stats
 

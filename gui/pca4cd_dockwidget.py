@@ -62,6 +62,7 @@ class PCA4CDDockWidget(QDockWidget, FORM_CLASS):
         self.setup_gui()
 
         self.pca_layers = []
+        self.pca_stats = None
 
     def closeEvent(self, event):
         self.closingPlugin.emit()
@@ -133,7 +134,7 @@ class PCA4CDDockWidget(QDockWidget, FORM_CLASS):
         n_pc = int(self.QCBox_nComponents.currentText())
         estimator_matrix = self.QCBox_EstimatorMatrix.currentText()
 
-        pca_files = pca(path_layer_A, path_layer_B, n_pc, estimator_matrix, pca4cd.tmp_dir)
+        pca_files, self.pca_stats = pca(path_layer_A, path_layer_B, n_pc, estimator_matrix, pca4cd.tmp_dir)
 
         if pca_files:
             for pca_file in pca_files:
@@ -157,6 +158,6 @@ class PCA4CDDockWidget(QDockWidget, FORM_CLASS):
 
         current_layer_A = self.QCBox_InputData_A.currentLayer()
         current_layer_B = self.QCBox_InputData_B.currentLayer()
-        self.change_analysis_dialog = ChangeAnalysisDialog(current_layer_A, current_layer_B, self.pca_layers)
+        self.change_analysis_dialog = ChangeAnalysisDialog(current_layer_A, current_layer_B, self.pca_layers, self.pca_stats)
         # open dialog
         self.change_analysis_dialog.show()

@@ -35,14 +35,17 @@ FORM_CLASS, _ = uic.loadUiType(os.path.join(
 class ChangeAnalysisDialog(QDialog, FORM_CLASS):
     is_opened = False
     view_widgets = []
+    pca_stats = None
     current_sample = None
     instance = None
 
-    def __init__(self, layer_a, layer_b, pca_layers):
+    def __init__(self, layer_a, layer_b, pca_layers, pca_stats):
         QDialog.__init__(self)
         self.layer_a = layer_a
         self.layer_b = layer_b
         self.pca_layers = pca_layers
+        ChangeAnalysisDialog.pca_stats = pca_stats
+
         self.setupUi(self)
         ChangeAnalysisDialog.instance = self
 
