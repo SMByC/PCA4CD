@@ -101,7 +101,9 @@ class ChangeAnalysisDialog(QDialog, FORM_CLASS):
                 file_index = view_widget.QCBox_RenderFile.findText(self.layer_b.name(), Qt.MatchFixedString)
                 view_widget.QCBox_RenderFile.setCurrentIndex(file_index)
             if grid_columns < num_view <= len(self.pca_layers)+grid_columns:
-                view_widget.QLabel_ViewName.setText("Principal Component {}".format(num_view-grid_columns))
+                pc_id = num_view-grid_columns
+                view_widget.pc_id = pc_id
+                view_widget.QLabel_ViewName.setText("Principal Component {}".format(pc_id))
                 file_index = view_widget.QCBox_RenderFile.findText(self.pca_layers[num_view-grid_columns-1].name(), Qt.MatchFixedString)
                 view_widget.QCBox_RenderFile.setCurrentIndex(file_index)
 

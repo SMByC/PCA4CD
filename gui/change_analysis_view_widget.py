@@ -23,7 +23,7 @@ from qgis.PyQt import uic
 from qgis.PyQt.QtGui import QColor
 from qgis.PyQt.QtWidgets import QWidget, QGridLayout, QFileDialog
 from qgis.PyQt.QtCore import QSettings, pyqtSlot, QTimer
-from qgis.core import QgsMapLayerProxyModel, QgsRaster
+from qgis.core import QgsRaster
 from qgis.gui import QgsMapCanvas, QgsMapToolPan, QgsMapTool
 from qgis.utils import iface
 
@@ -151,6 +151,7 @@ class ChangeAnalysisViewWidget(QWidget, FORM_CLASS):
     def __init__(self, parent=None):
         QWidget.__init__(self, parent)
         self.id = None
+        self.pc_id = None
         self.is_active = False
         self.setupUi(self)
         # init as unactivated render widget for new instances
@@ -264,6 +265,8 @@ class ComponentAnalysisDialog(QWidget, FORM_CLASS):
         self.setupUi(self)
         self.render_widget.parent_view = self
         self.render_widget.crs = view_widget.render_widget.crs
+        # principal component ID
+        self.pc_id = view_widget.pc_id
         # edit layer properties
         self.layerStyleEditor.clicked.connect(self.render_widget.layer_style_editor)
         # set layer
@@ -315,4 +318,3 @@ class ComponentAnalysisDialog(QWidget, FORM_CLASS):
         apply_symbology(detection_layer, [("detection", 1, (255, 255, 0, 255))])
 
         self.render_widget.set_detection_layer(detection_layer)
-
