@@ -10,11 +10,11 @@ from pca4cd.utils.system_utils import wait_process
 
 @wait_process()
 def pca(A, B, n_pc, estimator_matrix, out_dir):
-    """Calculate the principal components for the vertical stack of the
-    two raster A and B
+    """Calculate the principal components for the vertical stack A or with
+    combinations of the stack B
 
     :param A: first input raster data (fists period)
-    :param B: second input raster data (second period)
+    :param B: second input raster data (second period) or None
     :param n_pc: number of principal components to output
     :param estimator_matrix: pca with correlation of covariance
     :param out_dir: directory to save the outputs
@@ -28,9 +28,12 @@ def pca(A, B, n_pc, estimator_matrix, out_dir):
         with rasterio.open(path) as src:
             return src.profile.copy()
 
-    raw_image_a = read_raster(A, block_size=1000)
-    raw_image_b = read_raster(B, block_size=1000)
-    raw_image = dask.array.vstack((raw_image_a, raw_image_b))
+    if B is not None:
+        raw_image_a = read_raster(A, block_size=1000)
+        raw_image_b = read_raster(B, block_size=1000)
+        raw_image = dask.array.vstack((raw_image_a, raw_image_b))
+    else:
+        raw_image = read_raster(A, block_size=1000)
 
     # flat each dimension (bands)
     flat_dims = raw_image.reshape((raw_image.shape[0], raw_image.shape[1] * raw_image.shape[2]))
