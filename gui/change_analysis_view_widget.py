@@ -352,9 +352,13 @@ class ComponentAnalysisDialog(QWidget, FORM_CLASS):
         # config plot
         self.HistogramPlot.setTitle('Histogram of PC {}'.format(self.pc_id))
         self.HistogramPlot.setBackground('w')
-        self.HistogramPlot.showGrid(x=True, y=True, alpha=0.2)
+        self.HistogramPlot.showGrid(x=True, y=True, alpha=0.3)
 
+        gdal.AllRegister()
+        pca_layer = self.render_widget.layer
+        dataset = gdal.Open(get_file_path_of_layer(pca_layer), GA_ReadOnly)
+        band = dataset.GetRasterBand(1).ReadAsArray()
+        pca_flat = band.flatten()
 
-
-        x, y = range(10), range(10)
-        self.HistogramPlot.plot(x, y)
+        y, x = np.histogram(pca_flat, bins=80)
+        self.HistogramPlot.plot(x, y, stepMode=True, fillLevel=0, brush=(80, 80, 80))
