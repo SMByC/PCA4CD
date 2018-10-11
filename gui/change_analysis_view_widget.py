@@ -26,12 +26,13 @@ from osgeo.gdalconst import GA_ReadOnly
 from qgis.PyQt import uic
 from qgis.PyQt.QtGui import QColor
 from qgis.PyQt.QtWidgets import QWidget, QGridLayout, QFileDialog
-from qgis.PyQt.QtCore import QSettings, pyqtSlot, QTimer
-from qgis.core import QgsRaster
-from qgis.gui import QgsMapCanvas, QgsMapToolPan, QgsMapTool
+from qgis.PyQt.QtCore import QSettings, pyqtSlot, QTimer, Qt
+from qgis.core import QgsRaster, QgsVectorLayer, QgsFeature, QgsGeometry, QgsWkbTypes, edit
+from qgis.gui import QgsMapCanvas, QgsMapToolPan, QgsMapTool, QgsRubberBand
 from qgis.utils import iface
 
 from pca4cd.libs import gdal_calc
+from pca4cd.utils.others_utils import clip_raster_with_shape
 from pca4cd.utils.qgis_utils import load_and_select_filepath_in, StyleEditorDialog, get_file_path_of_layer, \
     load_layer_in_qgis, apply_symbology
 from pca4cd.utils.system_utils import block_signals_to, wait_process
@@ -42,39 +43,21 @@ class PanAndZoomPointTool(QgsMapToolPan):
         QgsMapToolPan.__init__(self, render_widget.canvas)
         self.render_widget = render_widget
 
+    def update_canvas(self):
+        self.render_widget.parent_view.canvas_changed()
+
     def canvasReleaseEvent(self, event):
-        QgsMapToolPan.canvasReleaseEvent(self, event)
-        self.update_canvas()
+        if event.button() != Qt.RightButton:
+            QgsMapToolPan.canvasReleaseEvent(self, event)
+            self.update_canvas()
 
     def wheelEvent(self, event):
         QgsMapToolPan.wheelEvent(self, event)
         QTimer.singleShot(10, self.update_canvas)
 
-    def update_canvas(self):
-        self.render_widget.parent_view.canvas_changed()
-
-
-class PickerPointTool(QgsMapTool):
-    def __init__(self, render_widget, picker_widget):
-        QgsMapTool.__init__(self, render_widget.canvas)
-        self.render_widget = render_widget
-        self.picker_widget = picker_widget
-
-    def update_pixel_value_to_widget(self, event):
-        x = event.pos().x()
-        y = event.pos().y()
-        point = self.render_widget.canvas.getCoordinateTransform().toMapCoordinates(x, y)
-        pixel_value = self.render_widget.layer.dataProvider().identify(point, QgsRaster.IdentifyFormatValue).results()[1]
-        if pixel_value is not None:
-            self.picker_widget.setValue(pixel_value)
-
-    def canvasMoveEvent(self, event):
-        self.update_pixel_value_to_widget(event)
-
     def canvasPressEvent(self, event):
-        self.update_pixel_value_to_widget(event)
-        # restart point tool
-        QTimer.singleShot(200, lambda: self.render_widget.canvas.setMapTool(self.render_widget.pan_zoom_tool))
+        if event.button() != Qt.RightButton:
+            QgsMapToolPan.canvasPressEvent(self, event)
 
 
 class RenderWidget(QWidget):
@@ -96,7 +79,7 @@ class RenderWidget(QWidget):
         self.setMinimumSize(15, 15)
         # action pan and zoom
         self.pan_zoom_tool = PanAndZoomPointTool(self)
-        self.canvas.setMapTool(self.pan_zoom_tool)
+        self.canvas.setMapTool(self.pan_zoom_tool, clean=True)
 
         gridLayout.addWidget(self.canvas)
 
@@ -256,6 +239,83 @@ class ChangeAnalysisViewWidget(QWidget, FORM_CLASS):
             # cancel button -> restore the old button config
             pass
 
+# #### component analysis dialog
+
+
+class PickerPixelPointTool(QgsMapTool):
+    def __init__(self, render_widget, picker_widget):
+        QgsMapTool.__init__(self, render_widget.canvas)
+        self.render_widget = render_widget
+        self.picker_widget = picker_widget
+
+    def update_pixel_value_to_widget(self, event):
+        x = event.pos().x()
+        y = event.pos().y()
+        point = self.render_widget.canvas.getCoordinateTransform().toMapCoordinates(x, y)
+        pixel_value = self.render_widget.layer.dataProvider().identify(point, QgsRaster.IdentifyFormatValue).results()[1]
+        if pixel_value is not None:
+            self.picker_widget.setValue(pixel_value)
+
+    def canvasMoveEvent(self, event):
+        self.update_pixel_value_to_widget(event)
+
+    def canvasPressEvent(self, event):
+        self.update_pixel_value_to_widget(event)
+        # restart point tool
+        self.deactivate()
+        QTimer.singleShot(180, lambda:
+            self.render_widget.canvas.setMapTool(self.render_widget.pan_zoom_tool, clean=True))
+
+
+class PickerAOIPointTool(QgsMapTool):
+    def __init__(self, cad):
+        QgsMapTool.__init__(self, cad.render_widget.canvas)
+        self.cad = cad
+        self.coordinates = []
+        self.drawing = True
+        # create the polygon rubber band associated to the current canvas
+        self.rubber_band = QgsRubberBand(cad.render_widget.canvas, QgsWkbTypes.PolygonGeometry)
+        # set rubber band style
+        color = QColor("red")
+        color.setAlpha(90)
+        self.rubber_band.setColor(color)
+        self.rubber_band.setWidth(3)
+
+    def canvasMoveEvent(self, event):
+        if self.rubber_band and self.rubber_band.numberOfVertices() and self.drawing:
+            x = event.pos().x()
+            y = event.pos().y()
+            point = self.cad.render_widget.canvas.getCoordinateTransform().toMapCoordinates(x, y)
+            self.rubber_band.removeLastPoint()
+            self.rubber_band.addPoint(point)
+
+    def canvasPressEvent(self, event):
+        if not self.drawing:
+            return
+
+        if event.button() == Qt.LeftButton:
+            x = event.pos().x()
+            y = event.pos().y()
+            point = self.cad.render_widget.canvas.getCoordinateTransform().toMapCoordinates(x, y)
+            self.rubber_band.addPoint(point)
+            self.coordinates.append(point)
+
+        if event.button() == Qt.RightButton:
+            if self.rubber_band and self.rubber_band.numberOfVertices():
+                self.rubber_band.removeLastPoint()
+            new_feature = QgsFeature()
+            new_feature.setGeometry(QgsGeometry.fromPolygonXY([self.coordinates]))
+            # add the new feature and update the statistics
+            self.cad.aoi_changes(new_feature)
+            # clear
+            self.coordinates = []
+            self.drawing = False
+
+            # restart point tool
+            self.deactivate()
+            QTimer.singleShot(180, lambda:
+                self.cad.render_widget.canvas.setMapTool(self.cad.render_widget.pan_zoom_tool, clean=True))
+
 
 # plugin path
 plugin_folder = os.path.dirname(os.path.dirname(__file__))
@@ -275,6 +335,7 @@ class ComponentAnalysisDialog(QWidget, FORM_CLASS):
         self.layerStyleEditor.clicked.connect(self.render_widget.layer_style_editor)
         # set layer
         self.render_widget.render_layer(view_widget.render_widget.layer)
+        self.pc_layer = self.render_widget.layer
         # set name
         self.QLabel_ViewName.setText(view_widget.QLabel_ViewName.text())
         # picker pixel value widget
@@ -284,6 +345,10 @@ class ComponentAnalysisDialog(QWidget, FORM_CLASS):
         self.GenerateDetectionLayer.clicked.connect(self.generate_detection_layer)
         # active/deactive
         self.EnableChangeDetection.toggled.connect(self.detection_layer_toggled)
+        # init temporal AOI layer
+        self.tmp_aoi = QgsVectorLayer("Polygon?crs=" + self.pc_layer.crs().toWkt(), "aoi", "memory")
+        # aoi picker
+        self.AOI_Picker.clicked.connect(lambda: self.render_widget.canvas.setMapTool(PickerAOIPointTool(self), clean=True))
 
         # statistics
         self.statistics()
@@ -308,7 +373,7 @@ class ComponentAnalysisDialog(QWidget, FORM_CLASS):
 
     @pyqtSlot()
     def picker_mouse_value(self, picker_widget):
-        self.render_widget.canvas.setMapTool(PickerPointTool(self.render_widget, picker_widget))
+        self.render_widget.canvas.setMapTool(PickerPixelPointTool(self.render_widget, picker_widget), clean=True)
 
     @pyqtSlot()
     @wait_process()
@@ -316,11 +381,10 @@ class ComponentAnalysisDialog(QWidget, FORM_CLASS):
         from pca4cd.pca4cd import PCA4CD as pca4cd
         detection_from = self.RangeChangeFrom.value()
         detection_to = self.RangeChangeTo.value()
-        pca_layer = self.render_widget.layer
-        output_change_layer = os.path.join(pca4cd.tmp_dir, pca_layer.name()+"_detection.tif")
+        output_change_layer = os.path.join(pca4cd.tmp_dir, self.pc_layer.name()+"_detection.tif")
 
         gdal_calc.Calc(calc="0*logical_and(A<{range_from},A>{range_to})+1*logical_and(A>={range_from},A<={range_to})"
-                       .format(range_from=detection_from, range_to=detection_to), A=get_file_path_of_layer(pca_layer),
+                       .format(range_from=detection_from, range_to=detection_to), A=get_file_path_of_layer(self.pc_layer),
                        outfile=output_change_layer, type="Byte", NoDataValue=0)
 
         detection_layer = load_layer_in_qgis(output_change_layer, "raster")
@@ -335,8 +399,7 @@ class ComponentAnalysisDialog(QWidget, FORM_CLASS):
                                                         round(ChangeAnalysisDialog.pca_stats["eigenvals_%"][self.pc_id-1], 2)))
 
         gdal.AllRegister()
-        pca_layer = self.render_widget.layer
-        dataset = gdal.Open(get_file_path_of_layer(pca_layer), GA_ReadOnly)
+        dataset = gdal.Open(get_file_path_of_layer(self.pc_layer), GA_ReadOnly)
         band = dataset.GetRasterBand(1).ReadAsArray()
         pca_flat = band.flatten()
 
@@ -355,10 +418,27 @@ class ComponentAnalysisDialog(QWidget, FORM_CLASS):
         self.HistogramPlot.showGrid(x=True, y=True, alpha=0.3)
 
         gdal.AllRegister()
-        pca_layer = self.render_widget.layer
-        dataset = gdal.Open(get_file_path_of_layer(pca_layer), GA_ReadOnly)
+        dataset = gdal.Open(get_file_path_of_layer(self.pc_layer), GA_ReadOnly)
         band = dataset.GetRasterBand(1).ReadAsArray()
-        pca_flat = band.flatten()
+        pc_flat = band.flatten()
 
-        y, x = np.histogram(pca_flat, bins=80)
+        y, x = np.histogram(pc_flat, bins=80)
         self.HistogramPlot.plot(x, y, stepMode=True, fillLevel=0, brush=(80, 80, 80))
+
+    @wait_process()
+    def aoi_changes(self, new_feature):
+        from pca4cd.pca4cd import PCA4CD as pca4cd
+        # update AOI
+        with edit(self.tmp_aoi):
+            self.tmp_aoi.addFeature(new_feature)
+        # clip the raster component in AOI for get only the pixel values inside it
+        pc_aoi = os.path.join(pca4cd.tmp_dir, self.pc_layer.name() + "_clip_aoi.tif")
+        clip_raster_with_shape(self.pc_layer, self.tmp_aoi, pc_aoi)
+        gdal.AllRegister()
+        dataset = gdal.Open(pc_aoi, GA_ReadOnly)
+        band = dataset.GetRasterBand(1).ReadAsArray()
+        pc_aoi_flat = band.flatten()
+        pc_aoi_flat = np.delete(pc_aoi_flat, np.where(pc_aoi_flat == 0))
+
+        print(pc_aoi_flat)
+
