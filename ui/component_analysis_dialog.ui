@@ -6,18 +6,24 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>1136</width>
-    <height>658</height>
+    <width>1177</width>
+    <height>643</height>
    </rect>
   </property>
   <layout class="QHBoxLayout" name="horizontalLayout">
    <item>
     <widget class="QSplitter" name="splitter">
+     <property name="orientation">
+      <enum>Qt::Horizontal</enum>
+     </property>
      <property name="handleWidth">
       <number>2</number>
      </property>
      <widget class="QWidget" name="widget_2" native="true">
       <layout class="QVBoxLayout" name="verticalLayout">
+       <property name="spacing">
+        <number>3</number>
+       </property>
        <property name="leftMargin">
         <number>0</number>
        </property>
@@ -33,9 +39,6 @@
        <item>
         <widget class="QWidget" name="widget_3" native="true">
          <layout class="QHBoxLayout" name="horizontalLayout_2">
-          <property name="spacing">
-           <number>0</number>
-          </property>
           <property name="leftMargin">
            <number>0</number>
           </property>
@@ -50,17 +53,6 @@
           </property>
           <item>
            <widget class="QToolButton" name="layerStyleEditor">
-            <property name="maximumSize">
-             <size>
-              <width>16777215</width>
-              <height>22</height>
-             </size>
-            </property>
-            <property name="font">
-             <font>
-              <pointsize>7</pointsize>
-             </font>
-            </property>
             <property name="toolTip">
              <string>Open the style editor for this layer</string>
             </property>
@@ -81,13 +73,6 @@
           </item>
           <item>
            <widget class="QLineEdit" name="QLabel_ViewName">
-            <property name="font">
-             <font>
-              <pointsize>7</pointsize>
-              <weight>75</weight>
-              <bold>true</bold>
-             </font>
-            </property>
             <property name="frame">
              <bool>false</bool>
             </property>
@@ -116,10 +101,10 @@
         </widget>
        </item>
        <item>
-        <widget class="QWidget" name="WidgetDetectionLayer" native="true">
-         <layout class="QHBoxLayout" name="horizontalLayout_3">
+        <widget class="QWidget" name="widget_9" native="true">
+         <layout class="QHBoxLayout" name="horizontalLayout_7">
           <property name="spacing">
-           <number>0</number>
+           <number>3</number>
           </property>
           <property name="leftMargin">
            <number>3</number>
@@ -131,7 +116,64 @@
            <number>3</number>
           </property>
           <property name="bottomMargin">
+           <number>0</number>
+          </property>
+          <item>
+           <spacer name="horizontalSpacer">
+            <property name="orientation">
+             <enum>Qt::Horizontal</enum>
+            </property>
+            <property name="sizeHint" stdset="0">
+             <size>
+              <width>40</width>
+              <height>20</height>
+             </size>
+            </property>
+           </spacer>
+          </item>
+          <item>
+           <widget class="QRadioButton" name="EnableChangeDetection">
+            <property name="text">
+             <string>Enable/Disable &amp;the change layer</string>
+            </property>
+           </widget>
+          </item>
+          <item>
+           <spacer name="horizontalSpacer_2">
+            <property name="orientation">
+             <enum>Qt::Horizontal</enum>
+            </property>
+            <property name="sizeHint" stdset="0">
+             <size>
+              <width>40</width>
+              <height>20</height>
+             </size>
+            </property>
+           </spacer>
+          </item>
+         </layout>
+        </widget>
+       </item>
+       <item>
+        <widget class="QWidget" name="WidgetDetectionLayer" native="true">
+         <property name="enabled">
+          <bool>false</bool>
+         </property>
+         <layout class="QHBoxLayout" name="horizontalLayout_3">
+          <property name="spacing">
            <number>3</number>
+          </property>
+          <property name="leftMargin">
+           <number>3</number>
+          </property>
+          <property name="topMargin">
+           <number>0</number>
+          </property>
+          <property name="rightMargin">
+           <number>3</number>
+          </property>
+          <property name="bottomMargin">
+           <number>0</number>
           </property>
           <item>
            <spacer name="horizontalSpacer_4">
@@ -147,39 +189,10 @@
            </spacer>
           </item>
           <item>
-           <widget class="QRadioButton" name="EnableChangeDetection">
-            <property name="font">
-             <font>
-              <pointsize>7</pointsize>
-             </font>
-            </property>
-            <property name="toolTip">
-             <string>Enable/Disable the change layer</string>
-            </property>
-            <property name="text">
-             <string/>
-            </property>
-           </widget>
-          </item>
-          <item>
            <widget class="QWidget" name="widget_4" native="true">
-            <property name="enabled">
-             <bool>false</bool>
-            </property>
-            <property name="sizePolicy">
-             <sizepolicy hsizetype="Expanding" vsizetype="Preferred">
-              <horstretch>0</horstretch>
-              <verstretch>0</verstretch>
-             </sizepolicy>
-            </property>
-            <property name="font">
-             <font>
-              <pointsize>7</pointsize>
-             </font>
-            </property>
             <layout class="QHBoxLayout" name="horizontalLayout_4">
              <property name="spacing">
-              <number>0</number>
+              <number>3</number>
              </property>
              <property name="leftMargin">
               <number>0</number>
@@ -194,12 +207,14 @@
               <number>0</number>
              </property>
              <item>
-              <widget class="QToolButton" name="PickerRangeFrom">
-               <property name="font">
-                <font>
-                 <pointsize>7</pointsize>
-                </font>
+              <widget class="QLabel" name="label_5">
+               <property name="text">
+                <string>from:</string>
                </property>
+              </widget>
+             </item>
+             <item>
+              <widget class="QToolButton" name="PickerRangeFrom">
                <property name="toolTip">
                 <string>Picker the pixel value using mouse cursor for set the initial change value</string>
                </property>
@@ -217,19 +232,8 @@
              </item>
              <item>
               <widget class="QDoubleSpinBox" name="RangeChangeFrom">
-               <property name="maximumSize">
-                <size>
-                 <width>16777215</width>
-                 <height>24</height>
-                </size>
-               </property>
-               <property name="font">
-                <font>
-                 <pointsize>7</pointsize>
-                </font>
-               </property>
                <property name="toolTip">
-                <string>Initial change value</string>
+                <string>Generate the change layer from value</string>
                </property>
                <property name="frame">
                 <bool>false</bool>
@@ -250,23 +254,13 @@
              </item>
              <item>
               <widget class="QLabel" name="label">
-               <property name="font">
-                <font>
-                 <pointsize>7</pointsize>
-                </font>
-               </property>
                <property name="text">
-                <string> to </string>
+                <string> to:</string>
                </property>
               </widget>
              </item>
              <item>
               <widget class="QToolButton" name="PickerRangeTo">
-               <property name="font">
-                <font>
-                 <pointsize>7</pointsize>
-                </font>
-               </property>
                <property name="toolTip">
                 <string>Picker the pixel value using mouse cursor for set the final change value</string>
                </property>
@@ -284,19 +278,8 @@
              </item>
              <item>
               <widget class="QDoubleSpinBox" name="RangeChangeTo">
-               <property name="maximumSize">
-                <size>
-                 <width>16777215</width>
-                 <height>24</height>
-                </size>
-               </property>
-               <property name="font">
-                <font>
-                 <pointsize>7</pointsize>
-                </font>
-               </property>
                <property name="toolTip">
-                <string>Final change value</string>
+                <string>Generate the change layer to value</string>
                </property>
                <property name="frame">
                 <bool>false</bool>
@@ -317,20 +300,18 @@
              </item>
              <item>
               <widget class="QToolButton" name="GenerateDetectionLayer">
-               <property name="font">
-                <font>
-                 <pointsize>7</pointsize>
-                </font>
-               </property>
                <property name="toolTip">
                 <string>Generate the change layer for this component</string>
                </property>
                <property name="text">
-                <string/>
+                <string>Generate</string>
                </property>
                <property name="icon">
                 <iconset>
                  <normaloff>:/plugins/pca4cd/icons/run.svg</normaloff>:/plugins/pca4cd/icons/run.svg</iconset>
+               </property>
+               <property name="toolButtonStyle">
+                <enum>Qt::ToolButtonTextBesideIcon</enum>
                </property>
                <property name="autoRaise">
                 <bool>true</bool>
@@ -358,19 +339,69 @@
        </item>
        <item>
         <widget class="QWidget" name="widget_5" native="true">
-         <widget class="QLabel" name="label_2">
-          <property name="geometry">
-           <rect>
-            <x>210</x>
-            <y>110</y>
-            <width>107</width>
-            <height>34</height>
-           </rect>
+         <property name="enabled">
+          <bool>false</bool>
+         </property>
+         <layout class="QHBoxLayout" name="horizontalLayout_8">
+          <property name="spacing">
+           <number>3</number>
           </property>
-          <property name="text">
-           <string>TextLabel</string>
+          <property name="leftMargin">
+           <number>3</number>
           </property>
-         </widget>
+          <property name="topMargin">
+           <number>0</number>
+          </property>
+          <property name="rightMargin">
+           <number>3</number>
+          </property>
+          <property name="bottomMargin">
+           <number>0</number>
+          </property>
+          <item>
+           <spacer name="horizontalSpacer_3">
+            <property name="orientation">
+             <enum>Qt::Horizontal</enum>
+            </property>
+            <property name="sizeHint" stdset="0">
+             <size>
+              <width>40</width>
+              <height>20</height>
+             </size>
+            </property>
+           </spacer>
+          </item>
+          <item>
+           <widget class="QLabel" name="label_2">
+            <property name="text">
+             <string>Fill range values (min/max) from:</string>
+            </property>
+           </widget>
+          </item>
+          <item>
+           <widget class="QToolButton" name="AOI_Picker">
+            <property name="text">
+             <string>AOI picker</string>
+            </property>
+            <property name="autoRaise">
+             <bool>true</bool>
+            </property>
+           </widget>
+          </item>
+          <item>
+           <spacer name="horizontalSpacer_6">
+            <property name="orientation">
+             <enum>Qt::Horizontal</enum>
+            </property>
+            <property name="sizeHint" stdset="0">
+             <size>
+              <width>40</width>
+              <height>20</height>
+             </size>
+            </property>
+           </spacer>
+          </item>
+         </layout>
         </widget>
        </item>
       </layout>
@@ -415,19 +446,49 @@
            <number>0</number>
           </property>
           <item>
-           <widget class="QLabel" name="label_4">
-            <property name="font">
-             <font>
-              <weight>75</weight>
-              <bold>true</bold>
-             </font>
-            </property>
-            <property name="text">
-             <string>Statistics</string>
-            </property>
-            <property name="alignment">
-             <set>Qt::AlignCenter</set>
-            </property>
+           <widget class="QWidget" name="widget_10" native="true">
+            <layout class="QHBoxLayout" name="horizontalLayout_9">
+             <property name="leftMargin">
+              <number>0</number>
+             </property>
+             <property name="topMargin">
+              <number>0</number>
+             </property>
+             <property name="rightMargin">
+              <number>0</number>
+             </property>
+             <property name="bottomMargin">
+              <number>0</number>
+             </property>
+             <item>
+              <widget class="QLabel" name="label_4">
+               <property name="font">
+                <font>
+                 <weight>75</weight>
+                 <bold>true</bold>
+                </font>
+               </property>
+               <property name="text">
+                <string>Statistics for: </string>
+               </property>
+               <property name="alignment">
+                <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
+               </property>
+              </widget>
+             </item>
+             <item>
+              <widget class="QComboBox" name="QCBox_StatsLayer">
+               <property name="font">
+                <font>
+                 <pointsize>10</pointsize>
+                </font>
+               </property>
+               <property name="frame">
+                <bool>false</bool>
+               </property>
+              </widget>
+             </item>
+            </layout>
            </widget>
           </item>
           <item>
@@ -667,16 +728,16 @@
   <connection>
    <sender>EnableChangeDetection</sender>
    <signal>clicked(bool)</signal>
-   <receiver>widget_4</receiver>
+   <receiver>WidgetDetectionLayer</receiver>
    <slot>setEnabled(bool)</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>242</x>
-     <y>391</y>
+     <x>407</x>
+     <y>523</y>
     </hint>
     <hint type="destinationlabel">
-     <x>442</x>
-     <y>451</y>
+     <x>359</x>
+     <y>555</y>
     </hint>
    </hints>
   </connection>
@@ -687,12 +748,28 @@
    <slot>close()</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>1146</x>
-     <y>585</y>
+     <x>1170</x>
+     <y>636</y>
     </hint>
     <hint type="destinationlabel">
      <x>1173</x>
      <y>612</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>EnableChangeDetection</sender>
+   <signal>clicked(bool)</signal>
+   <receiver>widget_5</receiver>
+   <slot>setEnabled(bool)</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>174</x>
+     <y>500</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>16</x>
+     <y>587</y>
     </hint>
    </hints>
   </connection>
