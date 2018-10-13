@@ -271,7 +271,6 @@ class PickerAOIPointTool(QgsMapTool):
     def __init__(self, cad):
         QgsMapTool.__init__(self, cad.render_widget.canvas)
         self.cad = cad
-        self.drawing = True
         # create the polygon rubber band associated to the current canvas
         self.rubber_band = QgsRubberBand(cad.render_widget.canvas, QgsWkbTypes.PolygonGeometry)
         # set rubber band style
@@ -281,32 +280,16 @@ class PickerAOIPointTool(QgsMapTool):
         self.rubber_band.setWidth(3)
 
     def finish_drawing(self):
-        self.drawing = False
+        self.rubber_band = None
         # restart point tool
         self.clean()
         QTimer.singleShot(180, lambda:
             self.cad.render_widget.canvas.setMapTool(self.cad.render_widget.pan_zoom_tool, clean=True))
 
-    class while_drawing(object):
-        """Block all signals emits while modify rubber band"""
-        def __init__(self, aoi_point_tool):
-            self.aoi_point_tool = aoi_point_tool
-            if not self.aoi_point_tool.drawing:
-                self.aoi_point_tool.finish_drawing()
-                return
-
-        def __enter__(self):
-            # block
-            self.aoi_point_tool.cad.render_widget.canvas.blockSignals(True)
-            self.aoi_point_tool.drawing = False
-
-        def __exit__(self, type, value, traceback):
-            # unblock
-            self.aoi_point_tool.cad.render_widget.canvas.blockSignals(False)
-            self.aoi_point_tool.drawing = True
-
     def canvasMoveEvent(self, event):
-        if self.rubber_band and self.rubber_band.numberOfVertices() and self.drawing:
+        if self.rubber_band is None:
+            return
+        if self.rubber_band and self.rubber_band.numberOfVertices():
             x = event.pos().x()
             y = event.pos().y()
             point = self.cad.render_widget.canvas.getCoordinateTransform().toMapCoordinates(x, y)
@@ -314,31 +297,36 @@ class PickerAOIPointTool(QgsMapTool):
             self.rubber_band.addPoint(point)
 
     def canvasPressEvent(self, event):
-        with self.while_drawing(self):
-            # new point on polygon
-            if event.button() == Qt.LeftButton:
-                x = event.pos().x()
-                y = event.pos().y()
-                point = self.cad.render_widget.canvas.getCoordinateTransform().toMapCoordinates(x, y)
-                self.rubber_band.addPoint(point)
-            # delete the last point
-            if event.button() == Qt.RightButton:
-                if self.rubber_band and self.rubber_band.numberOfVertices():
-                    self.rubber_band.removeLastPoint()
-                    self.canvasMoveEvent(event)
+        if self.rubber_band is None:
+            self.finish_drawing()
+            return
+        # new point on polygon
+        if event.button() == Qt.LeftButton:
+            x = event.pos().x()
+            y = event.pos().y()
+            point = self.cad.render_widget.canvas.getCoordinateTransform().toMapCoordinates(x, y)
+            self.rubber_band.addPoint(point)
+        # delete the last point
+        if event.button() == Qt.RightButton:
+            if self.rubber_band and self.rubber_band.numberOfVertices():
+                self.rubber_band.removeLastPoint()
+                self.canvasMoveEvent(event)
 
     def canvasDoubleClickEvent(self, event):
+        if self.rubber_band is None:
+            self.finish_drawing()
+            return
         # save polygon
         if event.button() == Qt.LeftButton:
-            with self.while_drawing(self):
-                if not self.rubber_band or self.rubber_band.numberOfVertices() < 3:
-                    self.finish_drawing()
-                    return
-                self.rubber_band.removeLastPoint()
-                new_feature = QgsFeature()
-                new_feature.setGeometry(self.rubber_band.asGeometry())
-                # add the new feature and update the statistics
-                self.cad.aoi_changes(new_feature)
+            if self.rubber_band.numberOfVertices() < 3:
+                self.finish_drawing()
+                return
+            self.rubber_band.removeLastPoint()
+            new_feature = QgsFeature()
+            new_feature.setGeometry(self.rubber_band.asGeometry())
+            self.rubber_band = None
+            # add the new feature and update the statistics
+            self.cad.aoi_changes(new_feature)
             self.finish_drawing()
 
 
