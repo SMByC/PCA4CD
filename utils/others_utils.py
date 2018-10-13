@@ -44,8 +44,6 @@ def mask(input_list, boolean_mask):
 
 def clip_raster_with_shape(target_layer, shape_layer, out_path, dst_nodata=None):
     target_file = get_file_path_of_layer(target_layer)
-    filename, ext = os.path.splitext(out_path)
-    tmp_file = filename + "_tmp" + ext
     # set the nodata
     dst_nodata = "-dstnodata {}".format(dst_nodata) if dst_nodata is not None else ""
     # set the file path for the area of interest
@@ -57,32 +55,15 @@ def clip_raster_with_shape(target_layer, shape_layer, out_path, dst_nodata=None)
         shape_file = tmp_memory_file
     else:
         shape_file = get_file_path_of_layer(shape_layer)
+
     # clipping in shape
     return_code = call('gdalwarp -multi -wo NUM_THREADS=ALL_CPUS --config GDALWARP_IGNORE_BAD_CUTLINE YES'
-                       ' -cutline "{}" {} "{}" "{}"'.format(shape_file, dst_nodata, target_file, tmp_file), shell=True)
-    # create convert coordinates
-    crsSrc = QgsCoordinateReferenceSystem(shape_layer.crs())
-    crsDest = QgsCoordinateReferenceSystem(target_layer.crs())
-    xform = QgsCoordinateTransform(crsSrc, crsDest, QgsProject.instance())
-    # trim the boundaries using the maximum extent for all features
-    box = []
-    for f in shape_layer.getFeatures():
-        g = f.geometry()
-        g.transform(xform)
-        f.setGeometry(g)
-        if box:
-            box.combineExtentWith(f.geometry().boundingBox())
-        else:
-            box = f.geometry().boundingBox()
-    # intersect with the rater file extent
-    box = box.intersect(target_layer.extent())
-    # trim
-    gdal.Translate(out_path, tmp_file, projWin=[box.xMinimum(), box.yMaximum(), box.xMaximum(), box.yMinimum()])
+                       ' -cutline "{}" {} "{}" "{}"'.format(shape_file, dst_nodata, target_file, out_path),
+                       shell=True)
+
     # clean tmp file
     if get_file_path_of_layer(shape_layer).startswith("memory") and os.path.isfile(tmp_memory_file):
         os.remove(tmp_memory_file)
-    if os.path.isfile(tmp_file):
-        os.remove(tmp_file)
 
     if return_code == 0:  # successfully
         return True
