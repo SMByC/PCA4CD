@@ -413,7 +413,7 @@ class ComponentAnalysisDialog(QWidget, FORM_CLASS):
                        .format(range_from=detection_from, range_to=detection_to), A=get_file_path_of_layer(self.pc_layer),
                        outfile=output_change_layer, type="Byte", NoDataValue=0)
 
-        detection_layer = load_layer_in_qgis(output_change_layer, "raster")
+        detection_layer = load_layer_in_qgis(output_change_layer, "raster", False)
         apply_symbology(detection_layer, [("detection", 1, (255, 255, 0, 255))])
 
         self.render_widget.set_detection_layer(detection_layer)
