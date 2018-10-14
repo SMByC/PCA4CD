@@ -138,7 +138,7 @@ class PCA4CDDockWidget(QDockWidget, FORM_CLASS):
 
         if pca_files:
             for pca_file in pca_files:
-                self.pca_layers.append(load_layer_in_qgis(pca_file, "raster"))
+                self.pca_layers.append(load_layer_in_qgis(pca_file, "raster", False))
 
             iface.messageBar().pushMessage("PCA4CD", "{} principal components were generated successfully".format(n_pc),
                                            level=Qgis.Success)
