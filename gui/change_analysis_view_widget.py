@@ -461,6 +461,7 @@ class ComponentAnalysisDialog(QWidget, FORM_CLASS):
 
     @wait_process()
     def aoi_changes(self, new_feature):
+        """Actions after added each polygon in the AOI"""
         from pca4cd.pca4cd import PCA4CD as pca4cd
         # update AOI
         with edit(self.tmp_aoi):
@@ -480,6 +481,8 @@ class ComponentAnalysisDialog(QWidget, FORM_CLASS):
         # update range values using min/max of AOI with decimal adjusted for include in change layer
         self.RangeChangeFrom.setValue(np.floor(np.min(self.aoi_data)*1000)/1000)
         self.RangeChangeTo.setValue(np.ceil(np.max(self.aoi_data)*1000)/1000)
+        # auto generate/update the detection layer
+        self.generate_detection_layer()
 
         del dataset, band
         if os.path.isfile(pc_aoi):
