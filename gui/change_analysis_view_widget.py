@@ -141,6 +141,7 @@ class ChangeAnalysisViewWidget(QWidget, FORM_CLASS):
         self.pc_id = None
         self.is_active = False
         self.setupUi(self)
+        self.component_analysis_dialog = None
         # init as unactivated render widget for new instances
         self.disable()
 
@@ -231,13 +232,10 @@ class ChangeAnalysisViewWidget(QWidget, FORM_CLASS):
 
     @pyqtSlot()
     def open_component_analysis_dialog(self):
-        self.change_detection_layer = ComponentAnalysisDialog(view_widget=self)
-        if self.change_detection_layer.show():
-            # ok button -> accept the new buttons config
-            pass
-        else:
-            # cancel button -> restore the old button config
-            pass
+        if not self.component_analysis_dialog:
+            self.component_analysis_dialog = ComponentAnalysisDialog(view_widget=self)
+        self.component_analysis_dialog.show()
+
 
 # #### component analysis dialog
 
