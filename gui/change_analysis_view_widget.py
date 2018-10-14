@@ -475,6 +475,9 @@ class ComponentAnalysisDialog(QWidget, FORM_CLASS):
             self.aoi_data = np.array([np.nan])
         # update statistics and histogram plot
         self.set_statistics(stats_for="Areas Of Interest")
+        # update range values using min/max of AOI
+        self.RangeChangeFrom.setValue(np.min(self.aoi_data))
+        self.RangeChangeTo.setValue(np.max(self.aoi_data))
 
         del dataset, band
         if os.path.isfile(pc_aoi):
