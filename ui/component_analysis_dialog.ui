@@ -374,7 +374,7 @@
           <item>
            <widget class="QLabel" name="label_2">
             <property name="text">
-             <string>Fill range values (min/max) from:</string>
+             <string>Use areas of interest for set the range values:</string>
             </property>
            </widget>
           </item>
@@ -478,13 +478,8 @@
              </item>
              <item>
               <widget class="QComboBox" name="QCBox_StatsLayer">
-               <property name="font">
-                <font>
-                 <pointsize>10</pointsize>
-                </font>
-               </property>
-               <property name="frame">
-                <bool>false</bool>
+               <property name="sizeAdjustPolicy">
+                <enum>QComboBox::AdjustToContents</enum>
                </property>
               </widget>
              </item>
@@ -508,30 +503,12 @@
               <number>0</number>
              </property>
              <item>
-              <widget class="QLabel" name="label_8">
-               <property name="toolTip">
-                <string>It shows how are the dispersion of the data with respect to its component</string>
-               </property>
-               <property name="text">
-                <string>Eigenvalue:</string>
-               </property>
-               <property name="alignment">
-                <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
-               </property>
-              </widget>
-             </item>
-             <item>
-              <widget class="QLabel" name="stats_eigenvalue">
-               <property name="font">
-                <font>
-                 <italic>true</italic>
-                </font>
-               </property>
-               <property name="toolTip">
-                <string>It shows how are the dispersion of the data with respect to its component</string>
-               </property>
+              <widget class="QLabel" name="stats_header">
                <property name="text">
                 <string>eigen (nn%)</string>
+               </property>
+               <property name="alignment">
+                <set>Qt::AlignCenter</set>
                </property>
               </widget>
              </item>

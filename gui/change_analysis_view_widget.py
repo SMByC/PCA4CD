@@ -27,7 +27,7 @@ from qgis.PyQt import uic
 from qgis.PyQt.QtGui import QColor
 from qgis.PyQt.QtWidgets import QWidget, QGridLayout, QFileDialog
 from qgis.PyQt.QtCore import QSettings, pyqtSlot, QTimer, Qt
-from qgis.core import QgsRaster, QgsVectorLayer, QgsFeature, QgsGeometry, QgsWkbTypes, edit
+from qgis.core import QgsRaster, QgsVectorLayer, QgsFeature, QgsWkbTypes, edit
 from qgis.gui import QgsMapCanvas, QgsMapToolPan, QgsMapTool, QgsRubberBand
 from qgis.utils import iface
 
@@ -337,6 +337,7 @@ FORM_CLASS, _ = uic.loadUiType(os.path.join(
 
 
 class ComponentAnalysisDialog(QWidget, FORM_CLASS):
+    @wait_process()
     def __init__(self, view_widget, parent=None):
         QWidget.__init__(self, parent)
         self.setupUi(self)
@@ -350,7 +351,8 @@ class ComponentAnalysisDialog(QWidget, FORM_CLASS):
         self.render_widget.render_layer(view_widget.render_widget.layer)
         self.pc_layer = self.render_widget.layer
         # set name
-        self.QLabel_ViewName.setText(view_widget.QLabel_ViewName.text())
+        self.pc_name = view_widget.QLabel_ViewName.text()
+        self.QLabel_ViewName.setText(self.pc_name)
         # picker pixel value widget
         self.PickerRangeFrom.clicked.connect(lambda: self.picker_mouse_value(self.RangeChangeFrom))
         self.PickerRangeTo.clicked.connect(lambda: self.picker_mouse_value(self.RangeChangeTo))
@@ -362,11 +364,22 @@ class ComponentAnalysisDialog(QWidget, FORM_CLASS):
         self.tmp_aoi = QgsVectorLayer("Polygon?crs=" + self.pc_layer.crs().toWkt(), "aoi", "memory")
         # aoi picker
         self.AOI_Picker.clicked.connect(lambda: self.render_widget.canvas.setMapTool(PickerAOIPointTool(self), clean=True))
+        # set statistics from combobox
+        self.QCBox_StatsLayer.addItems([self.pc_name, "Areas Of Interest"])
+        self.QCBox_StatsLayer.currentIndexChanged[str].connect(self.set_statistics)
 
-        # statistics
-        self.statistics()
-        # plot
-        self.histogram_plot()
+        # statistics for current principal component
+        gdal.AllRegister()
+        dataset = gdal.Open(get_file_path_of_layer(self.pc_layer), GA_ReadOnly)
+        band = dataset.GetRasterBand(1).ReadAsArray()
+        self.pc_data = band.flatten()
+        self.set_statistics(stats_for=self.pc_name)
+        # init aoi data
+        self.aoi_data = np.array([np.nan])
+        # init histogram plot
+        self.HistogramPlot.setTitle('Histogram')
+        self.HistogramPlot.setBackground('w')
+        self.HistogramPlot.showGrid(x=True, y=True, alpha=0.3)
 
     @pyqtSlot()
     def canvas_changed(self):
@@ -406,37 +419,43 @@ class ComponentAnalysisDialog(QWidget, FORM_CLASS):
         self.render_widget.set_detection_layer(detection_layer)
 
     @wait_process()
-    def statistics(self):
-        from pca4cd.gui.change_analysis_dialog import ChangeAnalysisDialog
-        self.stats_eigenvalue.setText("{} ({}%)".format(round(ChangeAnalysisDialog.pca_stats["eigenvals"][self.pc_id-1], 2),
-                                                        round(ChangeAnalysisDialog.pca_stats["eigenvals_%"][self.pc_id-1], 2)))
+    def set_statistics(self, stats_for=None):
+        if stats_for == self.pc_name:
+            from pca4cd.gui.change_analysis_dialog import ChangeAnalysisDialog
+            self.statistics(self.pc_data, ChangeAnalysisDialog.pca_stats)
+            self.histogram_plot(self.pc_data)
+            with block_signals_to(self.QCBox_StatsLayer):
+                self.QCBox_StatsLayer.setCurrentIndex(0)
+        if stats_for == "Areas Of Interest":
+            self.statistics(self.aoi_data)
+            self.histogram_plot(self.aoi_data)
+            with block_signals_to(self.QCBox_StatsLayer):
+                self.QCBox_StatsLayer.setCurrentIndex(1)
 
-        gdal.AllRegister()
-        dataset = gdal.Open(get_file_path_of_layer(self.pc_layer), GA_ReadOnly)
-        band = dataset.GetRasterBand(1).ReadAsArray()
-        pca_flat = band.flatten()
+    def statistics(self, data, pca_stats=None):
+        if pca_stats:  # for pca
+            self.stats_header.setText("Eigenvalue: {} ({}%)".format(round(pca_stats["eigenvals"][self.pc_id-1], 2),
+                                                                    round(pca_stats["eigenvals_%"][self.pc_id-1], 2)))
+            self.stats_header.setToolTip("It shows how are the dispersion of the data with respect to its component")
+        else:  # for aoi
+            self.stats_header.setText("Pixels in AOI: {}".format(round(data.size if data.size > 1 else 0, 2)))
+            self.stats_header.setToolTip("")
 
-        self.stats_min.setText(str(round(np.min(pca_flat), 2)))
-        self.stats_max.setText(str(round(np.max(pca_flat), 2)))
-        self.stats_std.setText(str(round(np.std(pca_flat), 2)))
-        self.stats_p25.setText(str(round(np.percentile(pca_flat, 25), 2)))
-        self.stats_p50.setText(str(round(np.percentile(pca_flat, 50), 2)))
-        self.stats_p75.setText(str(round(np.percentile(pca_flat, 75), 2)))
+        self.stats_min.setText(str(round(np.min(data), 2)))
+        self.stats_max.setText(str(round(np.max(data), 2)))
+        self.stats_std.setText(str(round(np.std(data), 2)))
+        self.stats_p25.setText(str(round(np.percentile(data, 25), 2)))
+        self.stats_p50.setText(str(round(np.percentile(data, 50), 2)))
+        self.stats_p75.setText(str(round(np.percentile(data, 75), 2)))
 
-    @wait_process()
-    def histogram_plot(self):
-        # config plot
-        self.HistogramPlot.setTitle('Histogram of PC {}'.format(self.pc_id))
-        self.HistogramPlot.setBackground('w')
-        self.HistogramPlot.showGrid(x=True, y=True, alpha=0.3)
-
-        gdal.AllRegister()
-        dataset = gdal.Open(get_file_path_of_layer(self.pc_layer), GA_ReadOnly)
-        band = dataset.GetRasterBand(1).ReadAsArray()
-        pc_flat = band.flatten()
-
-        y, x = np.histogram(pc_flat, bins=80)
+    def histogram_plot(self, data):
+        if data.size <= 1:
+            self.HistogramPlot.clear()
+            return
+        y, x = np.histogram(data, bins=80)
+        self.HistogramPlot.clear()
         self.HistogramPlot.plot(x, y, stepMode=True, fillLevel=0, brush=(80, 80, 80))
+        self.HistogramPlot.autoRange()
 
     @wait_process()
     def aoi_changes(self, new_feature):
@@ -450,10 +469,12 @@ class ComponentAnalysisDialog(QWidget, FORM_CLASS):
         gdal.AllRegister()
         dataset = gdal.Open(pc_aoi, GA_ReadOnly)
         band = dataset.GetRasterBand(1).ReadAsArray()
-        pc_aoi_flat = band.flatten()
-        pc_aoi_flat = np.delete(pc_aoi_flat, np.where(pc_aoi_flat == 0))
-
-        print(pc_aoi_flat)
+        self.aoi_data = band.flatten()
+        self.aoi_data = np.delete(self.aoi_data, np.where(self.aoi_data == 0))
+        if self.aoi_data.size == 0:
+            self.aoi_data = np.array([np.nan])
+        # update statistics and histogram plot
+        self.set_statistics(stats_for="Areas Of Interest")
 
         del dataset, band
         if os.path.isfile(pc_aoi):
