@@ -383,6 +383,30 @@
             <property name="text">
              <string>AOI picker</string>
             </property>
+            <property name="icon">
+             <iconset>
+              <normaloff>:/plugins/pca4cd/icons/aoi_picker.svg</normaloff>:/plugins/pca4cd/icons/aoi_picker.svg</iconset>
+            </property>
+            <property name="toolButtonStyle">
+             <enum>Qt::ToolButtonTextBesideIcon</enum>
+            </property>
+            <property name="autoRaise">
+             <bool>true</bool>
+            </property>
+           </widget>
+          </item>
+          <item>
+           <widget class="QToolButton" name="Delete_AOI">
+            <property name="toolTip">
+             <string>Delete AOI</string>
+            </property>
+            <property name="icon">
+             <iconset>
+              <normaloff>:/plugins/pca4cd/icons/trash.svg</normaloff>:/plugins/pca4cd/icons/trash.svg</iconset>
+            </property>
+            <property name="toolButtonStyle">
+             <enum>Qt::ToolButtonIconOnly</enum>
+            </property>
             <property name="autoRaise">
              <bool>true</bool>
             </property>

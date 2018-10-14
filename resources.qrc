@@ -8,5 +8,6 @@
         <file>icons/cursor_picker.svg</file>
         <file>icons/change_detection_layer.svg</file>
         <file>icons/run.svg</file>
+        <file>icons/aoi_picker.svg</file>
     </qresource>
 </RCC>
