@@ -101,64 +101,7 @@
         </widget>
        </item>
        <item>
-        <widget class="QWidget" name="widget_9" native="true">
-         <layout class="QHBoxLayout" name="horizontalLayout_7">
-          <property name="spacing">
-           <number>3</number>
-          </property>
-          <property name="leftMargin">
-           <number>3</number>
-          </property>
-          <property name="topMargin">
-           <number>3</number>
-          </property>
-          <property name="rightMargin">
-           <number>3</number>
-          </property>
-          <property name="bottomMargin">
-           <number>0</number>
-          </property>
-          <item>
-           <spacer name="horizontalSpacer">
-            <property name="orientation">
-             <enum>Qt::Horizontal</enum>
-            </property>
-            <property name="sizeHint" stdset="0">
-             <size>
-              <width>40</width>
-              <height>20</height>
-             </size>
-            </property>
-           </spacer>
-          </item>
-          <item>
-           <widget class="QRadioButton" name="EnableChangeDetection">
-            <property name="text">
-             <string>Enable/Disable &amp;the change layer</string>
-            </property>
-           </widget>
-          </item>
-          <item>
-           <spacer name="horizontalSpacer_2">
-            <property name="orientation">
-             <enum>Qt::Horizontal</enum>
-            </property>
-            <property name="sizeHint" stdset="0">
-             <size>
-              <width>40</width>
-              <height>20</height>
-             </size>
-            </property>
-           </spacer>
-          </item>
-         </layout>
-        </widget>
-       </item>
-       <item>
         <widget class="QWidget" name="WidgetDetectionLayer" native="true">
-         <property name="enabled">
-          <bool>false</bool>
-         </property>
          <layout class="QHBoxLayout" name="horizontalLayout_3">
           <property name="spacing">
            <number>3</number>
@@ -189,136 +132,164 @@
            </spacer>
           </item>
           <item>
-           <widget class="QWidget" name="widget_4" native="true">
-            <layout class="QHBoxLayout" name="horizontalLayout_4">
-             <property name="spacing">
-              <number>3</number>
-             </property>
-             <property name="leftMargin">
-              <number>0</number>
-             </property>
-             <property name="topMargin">
-              <number>0</number>
-             </property>
-             <property name="rightMargin">
-              <number>0</number>
-             </property>
-             <property name="bottomMargin">
-              <number>0</number>
-             </property>
-             <item>
-              <widget class="QLabel" name="label_5">
-               <property name="text">
-                <string>from:</string>
-               </property>
-              </widget>
-             </item>
-             <item>
-              <widget class="QToolButton" name="PickerRangeFrom">
-               <property name="toolTip">
-                <string>Picker the pixel value using mouse cursor for set the initial change value</string>
-               </property>
-               <property name="text">
-                <string/>
-               </property>
-               <property name="icon">
-                <iconset>
-                 <normaloff>:/plugins/pca4cd/icons/cursor_picker.svg</normaloff>:/plugins/pca4cd/icons/cursor_picker.svg</iconset>
-               </property>
-               <property name="autoRaise">
-                <bool>true</bool>
-               </property>
-              </widget>
-             </item>
-             <item>
-              <widget class="QDoubleSpinBox" name="RangeChangeFrom">
-               <property name="toolTip">
-                <string>Generate the change layer from value</string>
-               </property>
-               <property name="frame">
-                <bool>false</bool>
-               </property>
-               <property name="alignment">
-                <set>Qt::AlignCenter</set>
-               </property>
-               <property name="decimals">
-                <number>3</number>
-               </property>
-               <property name="minimum">
-                <double>-100000.000000000000000</double>
-               </property>
-               <property name="maximum">
-                <double>100000.000000000000000</double>
-               </property>
-              </widget>
-             </item>
-             <item>
-              <widget class="QLabel" name="label">
-               <property name="text">
-                <string> to:</string>
-               </property>
-              </widget>
-             </item>
-             <item>
-              <widget class="QToolButton" name="PickerRangeTo">
-               <property name="toolTip">
-                <string>Picker the pixel value using mouse cursor for set the final change value</string>
-               </property>
-               <property name="text">
-                <string/>
-               </property>
-               <property name="icon">
-                <iconset>
-                 <normaloff>:/plugins/pca4cd/icons/cursor_picker.svg</normaloff>:/plugins/pca4cd/icons/cursor_picker.svg</iconset>
-               </property>
-               <property name="autoRaise">
-                <bool>true</bool>
-               </property>
-              </widget>
-             </item>
-             <item>
-              <widget class="QDoubleSpinBox" name="RangeChangeTo">
-               <property name="toolTip">
-                <string>Generate the change layer to value</string>
-               </property>
-               <property name="frame">
-                <bool>false</bool>
-               </property>
-               <property name="alignment">
-                <set>Qt::AlignCenter</set>
-               </property>
-               <property name="decimals">
-                <number>3</number>
-               </property>
-               <property name="minimum">
-                <double>-100000.000000000000000</double>
-               </property>
-               <property name="maximum">
-                <double>100000.000000000000000</double>
-               </property>
-              </widget>
-             </item>
-             <item>
-              <widget class="QToolButton" name="GenerateDetectionLayer">
-               <property name="toolTip">
-                <string>Generate the change layer for this component</string>
-               </property>
-               <property name="text">
-                <string>Generate</string>
-               </property>
-               <property name="icon">
-                <iconset>
-                 <normaloff>:/plugins/pca4cd/icons/run.svg</normaloff>:/plugins/pca4cd/icons/run.svg</iconset>
-               </property>
-               <property name="toolButtonStyle">
-                <enum>Qt::ToolButtonTextBesideIcon</enum>
-               </property>
-               <property name="autoRaise">
-                <bool>true</bool>
-               </property>
-              </widget>
-             </item>
-            </layout>
+           <widget class="QRadioButton" name="ShowHideChangeDetection">
+            <property name="enabled">
+             <bool>false</bool>
+            </property>
+            <property name="toolTip">
+             <string>Show/hide the change layer generated</string>
+            </property>
+            <property name="icon">
+             <iconset>
+              <normaloff>:/plugins/pca4cd/icons/visibility.svg</normaloff>:/plugins/pca4cd/icons/visibility.svg</iconset>
+            </property>
+            <property name="checked">
+             <bool>true</bool>
+            </property>
+           </widget>
+          </item>
+          <item>
+           <spacer name="horizontalSpacer">
+            <property name="orientation">
+             <enum>Qt::Horizontal</enum>
+            </property>
+            <property name="sizeType">
+             <enum>QSizePolicy::Fixed</enum>
+            </property>
+            <property name="sizeHint" stdset="0">
+             <size>
+              <width>6</width>
+              <height>20</height>
+             </size>
+            </property>
+           </spacer>
+          </item>
+          <item>
+           <widget class="QLabel" name="label_5">
+            <property name="text">
+             <string>from:</string>
+            </property>
+           </widget>
+          </item>
+          <item>
+           <widget class="QToolButton" name="PickerRangeFrom">
+            <property name="toolTip">
+             <string>Picker the pixel value using mouse cursor for set the initial change value</string>
+            </property>
+            <property name="text">
+             <string/>
+            </property>
+            <property name="icon">
+             <iconset>
+              <normaloff>:/plugins/pca4cd/icons/cursor_picker.svg</normaloff>:/plugins/pca4cd/icons/cursor_picker.svg</iconset>
+            </property>
+            <property name="autoRaise">
+             <bool>true</bool>
+            </property>
+           </widget>
+          </item>
+          <item>
+           <widget class="QDoubleSpinBox" name="RangeChangeFrom">
+            <property name="toolTip">
+             <string>Generate the change layer from value</string>
+            </property>
+            <property name="frame">
+             <bool>false</bool>
+            </property>
+            <property name="alignment">
+             <set>Qt::AlignCenter</set>
+            </property>
+            <property name="decimals">
+             <number>3</number>
+            </property>
+            <property name="minimum">
+             <double>-100000.000000000000000</double>
+            </property>
+            <property name="maximum">
+             <double>100000.000000000000000</double>
+            </property>
+           </widget>
+          </item>
+          <item>
+           <widget class="QLabel" name="label">
+            <property name="text">
+             <string> to:</string>
+            </property>
+           </widget>
+          </item>
+          <item>
+           <widget class="QToolButton" name="PickerRangeTo">
+            <property name="toolTip">
+             <string>Picker the pixel value using mouse cursor for set the final change value</string>
+            </property>
+            <property name="text">
+             <string/>
+            </property>
+            <property name="icon">
+             <iconset>
+              <normaloff>:/plugins/pca4cd/icons/cursor_picker.svg</normaloff>:/plugins/pca4cd/icons/cursor_picker.svg</iconset>
+            </property>
+            <property name="autoRaise">
+             <bool>true</bool>
+            </property>
+           </widget>
+          </item>
+          <item>
+           <widget class="QDoubleSpinBox" name="RangeChangeTo">
+            <property name="toolTip">
+             <string>Generate the change layer to value</string>
+            </property>
+            <property name="frame">
+             <bool>false</bool>
+            </property>
+            <property name="alignment">
+             <set>Qt::AlignCenter</set>
+            </property>
+            <property name="decimals">
+             <number>3</number>
+            </property>
+            <property name="minimum">
+             <double>-100000.000000000000000</double>
+            </property>
+            <property name="maximum">
+             <double>100000.000000000000000</double>
+            </property>
+           </widget>
+          </item>
+          <item>
+           <spacer name="horizontalSpacer_2">
+            <property name="orientation">
+             <enum>Qt::Horizontal</enum>
+            </property>
+            <property name="sizeType">
+             <enum>QSizePolicy::Fixed</enum>
+            </property>
+            <property name="sizeHint" stdset="0">
+             <size>
+              <width>6</width>
+              <height>20</height>
+             </size>
+            </property>
+           </spacer>
+          </item>
+          <item>
+           <widget class="QToolButton" name="GenerateDetectionLayer">
+            <property name="toolTip">
+             <string>Generate the change layer for this component</string>
+            </property>
+            <property name="text">
+             <string>Generate</string>
+            </property>
+            <property name="icon">
+             <iconset>
+              <normaloff>:/plugins/pca4cd/icons/run.svg</normaloff>:/plugins/pca4cd/icons/run.svg</iconset>
+            </property>
+            <property name="toolButtonStyle">
+             <enum>Qt::ToolButtonTextBesideIcon</enum>
+            </property>
+            <property name="autoRaise">
+             <bool>true</bool>
+            </property>
            </widget>
           </item>
           <item>
@@ -339,9 +310,6 @@
        </item>
        <item>
         <widget class="QWidget" name="widget_5" native="true">
-         <property name="enabled">
-          <bool>false</bool>
-         </property>
          <layout class="QHBoxLayout" name="horizontalLayout_8">
           <property name="spacing">
            <number>3</number>
@@ -373,6 +341,9 @@
           </item>
           <item>
            <widget class="QLabel" name="label_2">
+            <property name="toolTip">
+             <string>Use min and max value of all pixels inside areas of interest for fill from/to range values</string>
+            </property>
             <property name="text">
              <string>Use areas of interest for set the range values:</string>
             </property>
@@ -727,22 +698,6 @@
  <resources/>
  <connections>
   <connection>
-   <sender>EnableChangeDetection</sender>
-   <signal>clicked(bool)</signal>
-   <receiver>WidgetDetectionLayer</receiver>
-   <slot>setEnabled(bool)</slot>
-   <hints>
-    <hint type="sourcelabel">
-     <x>407</x>
-     <y>523</y>
-    </hint>
-    <hint type="destinationlabel">
-     <x>359</x>
-     <y>555</y>
-    </hint>
-   </hints>
-  </connection>
-  <connection>
    <sender>buttonBox</sender>
    <signal>accepted()</signal>
    <receiver>ViewWidget</receiver>
@@ -755,22 +710,6 @@
     <hint type="destinationlabel">
      <x>1173</x>
      <y>612</y>
-    </hint>
-   </hints>
-  </connection>
-  <connection>
-   <sender>EnableChangeDetection</sender>
-   <signal>clicked(bool)</signal>
-   <receiver>widget_5</receiver>
-   <slot>setEnabled(bool)</slot>
-   <hints>
-    <hint type="sourcelabel">
-     <x>174</x>
-     <y>500</y>
-    </hint>
-    <hint type="destinationlabel">
-     <x>16</x>
-     <y>587</y>
     </hint>
    </hints>
   </connection>

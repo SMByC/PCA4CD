@@ -359,7 +359,7 @@ class ComponentAnalysisDialog(QWidget, FORM_CLASS):
         # detection layer
         self.GenerateDetectionLayer.clicked.connect(self.generate_detection_layer)
         # active/deactive
-        self.EnableChangeDetection.toggled.connect(self.detection_layer_toggled)
+        self.ShowHideChangeDetection.toggled.connect(self.detection_layer_toggled)
         # init temporal AOI layer
         self.tmp_aoi = QgsVectorLayer("Polygon?crs=" + self.pc_layer.crs().toWkt(), "aoi", "memory")
         # aoi picker
@@ -392,7 +392,7 @@ class ComponentAnalysisDialog(QWidget, FORM_CLASS):
 
     @pyqtSlot()
     def detection_layer_toggled(self):
-        if self.EnableChangeDetection.isChecked():
+        if self.ShowHideChangeDetection.isChecked():
             self.render_widget.show_detection_layer()
         else:
             self.render_widget.hide_detection_layer()
@@ -417,6 +417,8 @@ class ComponentAnalysisDialog(QWidget, FORM_CLASS):
         apply_symbology(detection_layer, [("detection", 1, (255, 255, 0, 255))])
 
         self.render_widget.set_detection_layer(detection_layer)
+        self.ShowHideChangeDetection.setEnabled(True)
+        self.ShowHideChangeDetection.setChecked(True)
 
     @wait_process()
     def set_statistics(self, stats_for=None):
