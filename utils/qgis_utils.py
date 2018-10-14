@@ -82,7 +82,7 @@ def load_and_select_filepath_in(combo_box, file_path, layer_type="any"):
     return get_layer_by_name(filename)
 
 
-def load_layer_in_qgis(file_path, layer_type):
+def load_layer_in_qgis(file_path, layer_type, add_to_legend=True):
     # first unload layer from qgis if exists
     unload_layer_in_qgis(file_path)
     # create layer
@@ -98,7 +98,7 @@ def load_layer_in_qgis(file_path, layer_type):
             layer = QgsVectorLayer(file_path, filename, "ogr")
     # load
     if layer.isValid():
-        QgsProject.instance().addMapLayer(layer)
+        QgsProject.instance().addMapLayer(layer, add_to_legend)
     else:
         iface.messageBar().pushMessage("PCA4CD", "Error, {} is not a valid {} file!"
                                        .format(os.path.basename(file_path), layer_type))
