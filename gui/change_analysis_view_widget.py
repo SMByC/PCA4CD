@@ -151,9 +151,6 @@ class ChangeAnalysisViewWidget(QWidget, FORM_CLASS):
         self.detection_layers = None
         # set properties to QgsMapLayerComboBox
         self.QCBox_RenderFile.setCurrentIndex(-1)
-        #self.QCBox_RenderFile.setFilters(QgsMapLayerProxyModel.All)
-        # ignore and not show the sampling layer
-        #self.QCBox_RenderFile.setExceptedLayerList([self.detection_layers])
         # handle connect layer selection with render canvas
         self.QCBox_RenderFile.currentIndexChanged.connect(lambda: self.set_render_layer(self.QCBox_RenderFile.currentLayer()))
         # call to browse the render file
@@ -233,7 +230,7 @@ class ChangeAnalysisViewWidget(QWidget, FORM_CLASS):
     @pyqtSlot()
     def open_component_analysis_dialog(self):
         if not self.component_analysis_dialog:
-            self.component_analysis_dialog = ComponentAnalysisDialog(view_widget=self)
+            self.component_analysis_dialog = ComponentAnalysisDialog(parent_view_widget=self)
         self.component_analysis_dialog.show()
 
 
@@ -336,20 +333,21 @@ FORM_CLASS, _ = uic.loadUiType(os.path.join(
 
 class ComponentAnalysisDialog(QWidget, FORM_CLASS):
     @wait_process()
-    def __init__(self, view_widget, parent=None):
+    def __init__(self, parent_view_widget, parent=None):
         QWidget.__init__(self, parent)
         self.setupUi(self)
+        self.parent_view_widget = parent_view_widget
         self.render_widget.parent_view = self
-        self.render_widget.crs = view_widget.render_widget.crs
+        self.render_widget.crs = parent_view_widget.render_widget.crs
         # principal component ID
-        self.pc_id = view_widget.pc_id
+        self.pc_id = parent_view_widget.pc_id
         # edit layer properties
         self.layerStyleEditor.clicked.connect(self.render_widget.layer_style_editor)
         # set layer
-        self.render_widget.render_layer(view_widget.render_widget.layer)
+        self.render_widget.render_layer(parent_view_widget.render_widget.layer)
         self.pc_layer = self.render_widget.layer
         # set name
-        self.pc_name = view_widget.QLabel_ViewName.text()
+        self.pc_name = parent_view_widget.QLabel_ViewName.text()
         self.QLabel_ViewName.setText(self.pc_name)
         # picker pixel value widget
         self.PickerRangeFrom.clicked.connect(lambda: self.picker_mouse_value(self.RangeChangeFrom))
@@ -415,6 +413,7 @@ class ComponentAnalysisDialog(QWidget, FORM_CLASS):
         apply_symbology(detection_layer, [("detection", 1, (255, 255, 0, 255))])
 
         self.render_widget.set_detection_layer(detection_layer)
+        self.parent_view_widget.render_widget.set_detection_layer(detection_layer)
         self.ShowHideChangeDetection.setEnabled(True)
         self.ShowHideChangeDetection.setChecked(True)
 
