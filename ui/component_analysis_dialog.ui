@@ -367,7 +367,7 @@
            </widget>
           </item>
           <item>
-           <widget class="QToolButton" name="Delete_AOI">
+           <widget class="QToolButton" name="DeleteAllAOI">
             <property name="toolTip">
              <string>Delete AOI</string>
             </property>

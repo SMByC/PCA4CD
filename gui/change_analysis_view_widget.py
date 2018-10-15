@@ -319,6 +319,7 @@ class PickerAOIPointTool(QgsMapTool):
             self.rubber_band.removeLastPoint()
             new_feature = QgsFeature()
             new_feature.setGeometry(self.rubber_band.asGeometry())
+            self.cad.rubber_bands.append(self.rubber_band)
             self.rubber_band = None
             # add the new feature and update the statistics
             self.cad.aoi_changes(new_feature)
@@ -357,9 +358,11 @@ class ComponentAnalysisDialog(QWidget, FORM_CLASS):
         # active/deactive
         self.ShowHideChangeDetection.toggled.connect(self.detection_layer_toggled)
         # init temporal AOI layer
-        self.tmp_aoi = QgsVectorLayer("Polygon?crs=" + self.pc_layer.crs().toWkt(), "aoi", "memory")
-        # aoi picker
+        self.aoi_features = QgsVectorLayer("Polygon?crs=" + self.pc_layer.crs().toWkt(), "aoi", "memory")
+        # aoi
+        self.rubber_bands = []
         self.AOI_Picker.clicked.connect(lambda: self.render_widget.canvas.setMapTool(PickerAOIPointTool(self), clean=True))
+        self.DeleteAllAOI.clicked.connect(self.delete_all_aoi)
         # set statistics from combobox
         self.QCBox_StatsLayer.addItems([self.pc_name, "Areas Of Interest"])
         self.QCBox_StatsLayer.currentIndexChanged[str].connect(self.set_statistics)
@@ -461,11 +464,11 @@ class ComponentAnalysisDialog(QWidget, FORM_CLASS):
         """Actions after added each polygon in the AOI"""
         from pca4cd.pca4cd import PCA4CD as pca4cd
         # update AOI
-        with edit(self.tmp_aoi):
-            self.tmp_aoi.addFeature(new_feature)
+        with edit(self.aoi_features):
+            self.aoi_features.addFeature(new_feature)
         # clip the raster component in AOI for get only the pixel values inside it
         pc_aoi = os.path.join(pca4cd.tmp_dir, self.pc_layer.name() + "_clip_aoi.tif")
-        clip_raster_with_shape(self.pc_layer, self.tmp_aoi, pc_aoi)
+        clip_raster_with_shape(self.pc_layer, self.aoi_features, pc_aoi)
         gdal.AllRegister()
         dataset = gdal.Open(pc_aoi, GA_ReadOnly)
         band = dataset.GetRasterBand(1).ReadAsArray()
@@ -485,3 +488,15 @@ class ComponentAnalysisDialog(QWidget, FORM_CLASS):
         if os.path.isfile(pc_aoi):
             os.remove(pc_aoi)
 
+    @pyqtSlot()
+    @wait_process()
+    def delete_all_aoi(self):
+        # clear/reset all rubber bands
+        for rubber_band in self.rubber_bands:
+            rubber_band.reset(QgsWkbTypes.PolygonGeometry)
+        self.rubber_bands = []
+        # remove all features in aoi
+        self.aoi_features.dataProvider().truncate()
+        # update statistics and histogram plot
+        self.aoi_data = np.array([np.nan])
+        self.set_statistics(stats_for="Areas Of Interest")
