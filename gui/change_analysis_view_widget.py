@@ -232,6 +232,9 @@ class ChangeAnalysisViewWidget(QWidget, FORM_CLASS):
         if not self.component_analysis_dialog:
             self.component_analysis_dialog = ComponentAnalysisDialog(parent_view_widget=self)
         self.component_analysis_dialog.show()
+        # synchronize extent canvas for the component analysis dialog respect to parent view widget
+        new_extent = self.render_widget.canvas.extent()
+        self.component_analysis_dialog.render_widget.update_canvas_to(new_extent)
 
 
 # #### component analysis dialog
