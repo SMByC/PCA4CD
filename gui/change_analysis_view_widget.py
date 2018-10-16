@@ -231,6 +231,9 @@ class ChangeAnalysisViewWidget(QWidget, FORM_CLASS):
     def open_component_analysis_dialog(self):
         if not self.component_analysis_dialog:
             self.component_analysis_dialog = ComponentAnalysisDialog(parent_view_widget=self)
+        if self.component_analysis_dialog.is_opened:
+            self.component_analysis_dialog.activateWindow()
+            return
         self.component_analysis_dialog.show()
         # synchronize extent canvas for the component analysis dialog respect to parent view widget
         new_extent = self.render_widget.canvas.extent()
@@ -340,6 +343,7 @@ class ComponentAnalysisDialog(QWidget, FORM_CLASS):
     def __init__(self, parent_view_widget, parent=None):
         QWidget.__init__(self, parent)
         self.setupUi(self)
+        self.is_opened = False
         self.parent_view_widget = parent_view_widget
         self.render_widget.parent_view = self
         self.render_widget.crs = parent_view_widget.render_widget.crs
@@ -382,6 +386,17 @@ class ComponentAnalysisDialog(QWidget, FORM_CLASS):
         self.HistogramPlot.setTitle('Histogram')
         self.HistogramPlot.setBackground('w')
         self.HistogramPlot.showGrid(x=True, y=True, alpha=0.3)
+
+    @pyqtSlot()
+    def show(self):
+        self.is_opened = True
+        self.parent_view_widget.QPBtn_ComponentAnalysisDialog.setText("Opened, click to show")
+        super(ComponentAnalysisDialog, self).show()
+
+    def closeEvent(self, event):
+        self.is_opened = False
+        self.parent_view_widget.QPBtn_ComponentAnalysisDialog.setText("Change detection layer")
+        super(ComponentAnalysisDialog, self).closeEvent(event)
 
     @pyqtSlot()
     def canvas_changed(self):

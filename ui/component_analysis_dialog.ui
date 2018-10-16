@@ -369,7 +369,7 @@
           <item>
            <widget class="QToolButton" name="DeleteAllAOI">
             <property name="toolTip">
-             <string>Delete AOI</string>
+             <string>Delete all AOI</string>
             </property>
             <property name="icon">
              <iconset>
@@ -664,7 +664,7 @@
            <widget class="PlotWidget" name="HistogramPlot"/>
           </item>
           <item>
-           <widget class="QDialogButtonBox" name="buttonBox">
+           <widget class="QDialogButtonBox" name="DialogButtons">
             <property name="orientation">
              <enum>Qt::Horizontal</enum>
             </property>
@@ -698,7 +698,7 @@
  <resources/>
  <connections>
   <connection>
-   <sender>buttonBox</sender>
+   <sender>DialogButtons</sender>
    <signal>accepted()</signal>
    <receiver>ViewWidget</receiver>
    <slot>close()</slot>
