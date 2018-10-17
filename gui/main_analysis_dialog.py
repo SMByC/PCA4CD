@@ -24,15 +24,15 @@ from qgis.PyQt import uic
 from qgis.PyQt.QtCore import Qt
 from qgis.PyQt.QtWidgets import QDialog, QDialogButtonBox, QGridLayout
 
-from pca4cd.gui.change_analysis_view_widget import ChangeAnalysisViewWidget
+from pca4cd.gui.layer_view_widget import LayerViewWidget
 
 # plugin path
 plugin_folder = os.path.dirname(os.path.dirname(__file__))
 FORM_CLASS, _ = uic.loadUiType(os.path.join(
-    plugin_folder, 'ui', 'change_analysis_dialog.ui'))
+    plugin_folder, 'ui', 'main_analysis_dialog.ui'))
 
 
-class ChangeAnalysisDialog(QDialog, FORM_CLASS):
+class MainAnalysisDialog(QDialog, FORM_CLASS):
     is_opened = False
     view_widgets = []
     pca_stats = None
@@ -44,10 +44,10 @@ class ChangeAnalysisDialog(QDialog, FORM_CLASS):
         self.layer_a = layer_a
         self.layer_b = layer_b
         self.pca_layers = pca_layers
-        ChangeAnalysisDialog.pca_stats = pca_stats
+        MainAnalysisDialog.pca_stats = pca_stats
 
         self.setupUi(self)
-        ChangeAnalysisDialog.instance = self
+        MainAnalysisDialog.instance = self
 
         # dialog buttons box
         self.closeButton.rejected.connect(self.closing)
@@ -79,20 +79,20 @@ class ChangeAnalysisDialog(QDialog, FORM_CLASS):
         view_widgets = []
         for row in range(grid_rows):
             for column in range(grid_columns):
-                new_view_widget = ChangeAnalysisViewWidget()
+                new_view_widget = LayerViewWidget()
                 views_layout.addWidget(new_view_widget, row, column)
                 view_widgets.append(new_view_widget)
 
         # add to change analysis dialog
         self.widget_view_windows.setLayout(views_layout)
         # save instances
-        ChangeAnalysisDialog.view_widgets = view_widgets
+        MainAnalysisDialog.view_widgets = view_widgets
         # setup view widget
-        for idx, view_widget in enumerate(ChangeAnalysisDialog.view_widgets, start=1):
+        for idx, view_widget in enumerate(MainAnalysisDialog.view_widgets, start=1):
             view_widget.id = idx
             view_widget.setup_view_widget(crs=self.layer_a.crs())
         # set views
-        for num_view, view_widget in enumerate(ChangeAnalysisDialog.view_widgets, start=1):
+        for num_view, view_widget in enumerate(MainAnalysisDialog.view_widgets, start=1):
             if num_view == 2:
                 view_widget.QLabel_ViewName.setText("Layer A")
                 file_index = view_widget.QCBox_RenderFile.findText(self.layer_a.name(), Qt.MatchFixedString)
@@ -116,13 +116,13 @@ class ChangeAnalysisDialog(QDialog, FORM_CLASS):
 
     def show(self):
         from pca4cd.pca4cd import PCA4CD as pca4cd
-        ChangeAnalysisDialog.is_opened = True
+        MainAnalysisDialog.is_opened = True
         # adjust some objects in the dockwidget
         pca4cd.dockwidget.QGBox_InputData.setDisabled(True)
         pca4cd.dockwidget.QGBox_PrincipalComponents.setDisabled(True)
         pca4cd.dockwidget.QPBtn_OpenChangeAnalysisDialog.setText("Analysis dialog is opened, click to show")
         # show dialog
-        super(ChangeAnalysisDialog, self).show()
+        super(MainAnalysisDialog, self).show()
 
     def closeEvent(self, event):
         self.closing()
@@ -134,7 +134,7 @@ class ChangeAnalysisDialog(QDialog, FORM_CLASS):
         """
         from pca4cd.pca4cd import PCA4CD as pca4cd
 
-        ChangeAnalysisDialog.is_opened = False
+        MainAnalysisDialog.is_opened = False
         # adjust some objects in the dockwidget
         pca4cd.dockwidget.QGBox_InputData.setEnabled(True)
         pca4cd.dockwidget.QGBox_PrincipalComponents.setEnabled(True)
@@ -143,5 +143,5 @@ class ChangeAnalysisDialog(QDialog, FORM_CLASS):
 
     def reject(self, is_ok_to_close=False):
         if is_ok_to_close:
-            super(ChangeAnalysisDialog, self).reject()
+            super(MainAnalysisDialog, self).reject()
 

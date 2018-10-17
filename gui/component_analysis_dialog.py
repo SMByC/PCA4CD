@@ -20,227 +20,21 @@
 """
 import os
 import numpy as np
+from PyQt5.QtCore import QTimer, Qt, pyqtSlot
+from PyQt5.QtGui import QColor
+from PyQt5.QtWidgets import QWidget
 from osgeo import gdal
 from osgeo.gdalconst import GA_ReadOnly
 
 from qgis.PyQt import uic
-from qgis.PyQt.QtGui import QColor
-from qgis.PyQt.QtWidgets import QWidget, QGridLayout, QFileDialog
-from qgis.PyQt.QtCore import QSettings, pyqtSlot, QTimer, Qt
-from qgis.core import QgsRaster, QgsVectorLayer, QgsFeature, QgsWkbTypes, edit
-from qgis.gui import QgsMapCanvas, QgsMapToolPan, QgsMapTool, QgsRubberBand
-from qgis.utils import iface
+from qgis.core import QgsRaster, QgsWkbTypes, QgsFeature, QgsVectorLayer
+from qgis.gui import QgsMapTool, QgsRubberBand
+from qgis.core import edit
 
 from pca4cd.libs import gdal_calc
 from pca4cd.utils.others_utils import clip_raster_with_shape
-from pca4cd.utils.qgis_utils import load_and_select_filepath_in, StyleEditorDialog, get_file_path_of_layer, \
-    load_layer_in_qgis, apply_symbology
-from pca4cd.utils.system_utils import block_signals_to, wait_process
-
-
-class PanAndZoomPointTool(QgsMapToolPan):
-    def __init__(self, render_widget):
-        QgsMapToolPan.__init__(self, render_widget.canvas)
-        self.render_widget = render_widget
-
-    def update_canvas(self):
-        self.render_widget.parent_view.canvas_changed()
-
-    def canvasReleaseEvent(self, event):
-        if event.button() != Qt.RightButton:
-            QgsMapToolPan.canvasReleaseEvent(self, event)
-            self.update_canvas()
-
-    def wheelEvent(self, event):
-        QgsMapToolPan.wheelEvent(self, event)
-        QTimer.singleShot(10, self.update_canvas)
-
-    def canvasPressEvent(self, event):
-        if event.button() != Qt.RightButton:
-            QgsMapToolPan.canvasPressEvent(self, event)
-
-
-class RenderWidget(QWidget):
-    def __init__(self, parent=None):
-        QWidget.__init__(self, parent)
-        self.setupUi()
-        self.layer = None
-        self.detection_layer = None
-        self.crs = None
-
-    def setupUi(self):
-        gridLayout = QGridLayout(self)
-        gridLayout.setContentsMargins(0, 0, 0, 0)
-        self.canvas = QgsMapCanvas()
-        self.canvas.setCanvasColor(QColor(255, 255, 255))
-        self.canvas.setStyleSheet("border: 0px;")
-        settings = QSettings()
-        self.canvas.enableAntiAliasing(settings.value("/qgis/enable_anti_aliasing", False, type=bool))
-        self.setMinimumSize(15, 15)
-        # action pan and zoom
-        self.pan_zoom_tool = PanAndZoomPointTool(self)
-        self.canvas.setMapTool(self.pan_zoom_tool, clean=True)
-
-        gridLayout.addWidget(self.canvas)
-
-    def render_layer(self, layer):
-        with block_signals_to(self):
-            # set the CRS of the canvas view
-            if self.crs:
-                self.canvas.setDestinationCrs(self.crs)
-            # set the sampling over the layer to view
-            self.canvas.setLayers([layer])
-            # set init extent from other view if any is activated else set layer extent
-            from pca4cd.gui.change_analysis_dialog import ChangeAnalysisDialog
-            others_view = [view_widget.render_widget.canvas.extent() for view_widget in ChangeAnalysisDialog.view_widgets
-                           if not view_widget.render_widget.canvas.extent().isEmpty()]
-            if others_view:
-                extent = others_view[0]
-                self.update_canvas_to(extent)
-            else:
-                self.canvas.setExtent(layer.extent())
-
-            self.canvas.refresh()
-            self.layer = layer
-
-    def update_canvas_to(self, new_extent):
-        with block_signals_to(self.canvas):
-            self.canvas.setExtent(new_extent)
-            self.canvas.refresh()
-
-    def set_detection_layer(self, detection_layer):
-        self.detection_layer = detection_layer
-        self.show_detection_layer()
-
-    def show_detection_layer(self):
-        if self.detection_layer and self.layer:
-            self.canvas.setLayers([self.detection_layer, self.layer])
-            self.canvas.refresh()
-
-    def hide_detection_layer(self):
-        if self.layer:
-            self.canvas.setLayers([self.layer])
-            self.canvas.refresh()
-
-    def layer_style_editor(self):
-        style_editor_dlg = StyleEditorDialog(self.layer, self.canvas, self.parent())
-        if style_editor_dlg.exec_():
-            style_editor_dlg.apply()
-
-
-# plugin path
-plugin_folder = os.path.dirname(os.path.dirname(__file__))
-FORM_CLASS, _ = uic.loadUiType(os.path.join(
-    plugin_folder, 'ui', 'change_analysis_view_widget.ui'))
-
-
-class ChangeAnalysisViewWidget(QWidget, FORM_CLASS):
-    def __init__(self, parent=None):
-        QWidget.__init__(self, parent)
-        self.id = None
-        self.pc_id = None
-        self.is_active = False
-        self.setupUi(self)
-        self.component_analysis_dialog = None
-        # init as unactivated render widget for new instances
-        self.disable()
-
-    def setup_view_widget(self, crs):
-        self.render_widget.parent_view = self
-        self.render_widget.crs = crs
-        self.detection_layers = None
-        # set properties to QgsMapLayerComboBox
-        self.QCBox_RenderFile.setCurrentIndex(-1)
-        # handle connect layer selection with render canvas
-        self.QCBox_RenderFile.currentIndexChanged.connect(lambda: self.set_render_layer(self.QCBox_RenderFile.currentLayer()))
-        # call to browse the render file
-        self.QCBox_browseRenderFile.clicked.connect(lambda: self.fileDialog_browse(
-            self.QCBox_RenderFile,
-            dialog_title=self.tr("Select the file for this view"),
-            dialog_types=self.tr("Raster or vector files (*.tif *.img *.gpkg *.shp);;All files (*.*)"),
-            layer_type="any"))
-        # edit layer properties
-        self.layerStyleEditor.clicked.connect(self.render_widget.layer_style_editor)
-        # active/deactive
-        self.EnableChangeDetection.toggled.connect(self.detection_layer_toggled)
-        # disable enter action
-        self.QCBox_browseRenderFile.setAutoDefault(False)
-
-        # component analysis layer
-        self.QPBtn_ComponentAnalysisDialog.clicked.connect(self.open_component_analysis_dialog)
-
-    def enable(self):
-        with block_signals_to(self.render_widget):
-            # activate some parts of this view
-            self.QLabel_ViewName.setEnabled(True)
-            self.render_widget.setEnabled(True)
-            self.layerStyleEditor.setEnabled(True)
-            self.render_widget.canvas.setCanvasColor(QColor(255, 255, 255))
-            # set status for view widget
-            self.is_active = True
-
-    def disable(self):
-        with block_signals_to(self.render_widget):
-            self.render_widget.canvas.setLayers([])
-            self.render_widget.canvas.clearCache()
-            self.render_widget.canvas.refresh()
-            self.render_widget.layer = None
-            # deactivate some parts of this view
-            self.QLabel_ViewName.setDisabled(True)
-            self.render_widget.setDisabled(True)
-            self.layerStyleEditor.setDisabled(True)
-            self.render_widget.canvas.setCanvasColor(QColor(245, 245, 245))
-            # set status for view widget
-            self.is_active = False
-
-    def set_render_layer(self, layer):
-        if not layer:
-            self.disable()
-            return
-
-        self.enable()
-        self.render_widget.render_layer(layer)
-
-    @pyqtSlot()
-    def fileDialog_browse(self, combo_box, dialog_title, dialog_types, layer_type):
-        file_path, _ = QFileDialog.getOpenFileName(self, dialog_title, "", dialog_types)
-        if file_path != '' and os.path.isfile(file_path):
-            # load to qgis and update combobox list
-            load_and_select_filepath_in(combo_box, file_path, layer_type)
-
-            self.set_render_layer(combo_box.currentLayer())
-
-    @pyqtSlot()
-    def canvas_changed(self):
-        if self.is_active:
-            new_extent = self.render_widget.canvas.extent()
-            # update canvas for all view activated except this view
-            from pca4cd.gui.change_analysis_dialog import ChangeAnalysisDialog
-            for view_widget in ChangeAnalysisDialog.view_widgets:
-                if view_widget.is_active and view_widget != self:
-                    view_widget.render_widget.update_canvas_to(new_extent)
-
-    @pyqtSlot()
-    def detection_layer_toggled(self):
-        if self.EnableChangeDetection.isChecked():
-            self.render_widget.show_detection_layer()
-        else:
-            self.render_widget.hide_detection_layer()
-
-    @pyqtSlot()
-    def open_component_analysis_dialog(self):
-        if not self.component_analysis_dialog:
-            self.component_analysis_dialog = ComponentAnalysisDialog(parent_view_widget=self)
-        if self.component_analysis_dialog.is_opened:
-            self.component_analysis_dialog.activateWindow()
-            return
-        self.component_analysis_dialog.show()
-        # synchronize extent canvas for the component analysis dialog respect to parent view widget
-        new_extent = self.render_widget.canvas.extent()
-        self.component_analysis_dialog.render_widget.update_canvas_to(new_extent)
-
-
-# #### component analysis dialog
+from pca4cd.utils.qgis_utils import get_file_path_of_layer, load_layer_in_qgis, apply_symbology
+from pca4cd.utils.system_utils import wait_process, block_signals_to
 
 
 class PickerPixelPointTool(QgsMapTool):
@@ -402,8 +196,8 @@ class ComponentAnalysisDialog(QWidget, FORM_CLASS):
     def canvas_changed(self):
         new_extent = self.render_widget.canvas.extent()
         # update canvas for all view activated except this view
-        from pca4cd.gui.change_analysis_dialog import ChangeAnalysisDialog
-        for view_widget in ChangeAnalysisDialog.view_widgets:
+        from pca4cd.gui.main_analysis_dialog import MainAnalysisDialog
+        for view_widget in MainAnalysisDialog.view_widgets:
             if view_widget.is_active and view_widget != self:
                 view_widget.render_widget.update_canvas_to(new_extent)
 
@@ -441,8 +235,8 @@ class ComponentAnalysisDialog(QWidget, FORM_CLASS):
     @wait_process()
     def set_statistics(self, stats_for=None):
         if stats_for == self.pc_name:
-            from pca4cd.gui.change_analysis_dialog import ChangeAnalysisDialog
-            self.statistics(self.pc_data, ChangeAnalysisDialog.pca_stats)
+            from pca4cd.gui.main_analysis_dialog import MainAnalysisDialog
+            self.statistics(self.pc_data, MainAnalysisDialog.pca_stats)
             self.histogram_plot(self.pc_data)
             with block_signals_to(self.QCBox_StatsLayer):
                 self.QCBox_StatsLayer.setCurrentIndex(0)

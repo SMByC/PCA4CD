@@ -25,15 +25,14 @@ import webbrowser
 
 from qgis.PyQt import uic
 from qgis.PyQt.QtCore import pyqtSignal, pyqtSlot
-from qgis.PyQt.QtWidgets import QMessageBox, QFileDialog, QDockWidget
-from qgis.core import QgsProject, QgsVectorFileWriter, QgsMapLayerProxyModel, Qgis, QgsUnitTypes
+from qgis.PyQt.QtWidgets import QFileDialog, QDockWidget
+from qgis.core import QgsMapLayerProxyModel, Qgis
 from qgis.utils import iface
 
 from pca4cd.core.pca import pca
 from pca4cd.gui.about_dialog import AboutDialog
-from pca4cd.gui.change_analysis_dialog import ChangeAnalysisDialog
-from pca4cd.utils.qgis_utils import load_and_select_filepath_in, load_layer_in_qgis, get_file_path_of_layer, \
-    get_layer_by_name
+from pca4cd.gui.main_analysis_dialog import MainAnalysisDialog
+from pca4cd.utils.qgis_utils import load_and_select_filepath_in, load_layer_in_qgis, get_file_path_of_layer
 from pca4cd.utils.system_utils import error_handler
 
 # plugin path
@@ -103,7 +102,7 @@ class PCA4CDDockWidget(QDockWidget, FORM_CLASS):
         self.QPBtn_runPCA.clicked.connect(self.generate_principal_components)
 
         # ######### Change Detection Analysis ######### #
-        self.QPBtn_OpenChangeAnalysisDialog.clicked.connect(self.open_change_analysis_dialog)
+        self.QPBtn_OpenChangeAnalysisDialog.clicked.connect(self.open_main_analysis_dialog)
 
 
     @pyqtSlot()
@@ -147,9 +146,9 @@ class PCA4CDDockWidget(QDockWidget, FORM_CLASS):
                                            level=Qgis.Warning)
 
     @pyqtSlot()
-    def open_change_analysis_dialog(self):
-        if ChangeAnalysisDialog.is_opened:
-            self.change_analysis_dialog.activateWindow()
+    def open_main_analysis_dialog(self):
+        if MainAnalysisDialog.is_opened:
+            self.main_analysis_dialog.activateWindow()
             return
         if not self.pca_layers:
             iface.messageBar().pushMessage("PCA4CD", "Error, first generate the principal components",
@@ -158,6 +157,6 @@ class PCA4CDDockWidget(QDockWidget, FORM_CLASS):
 
         current_layer_A = self.QCBox_InputData_A.currentLayer()
         current_layer_B = self.QCBox_InputData_B.currentLayer()
-        self.change_analysis_dialog = ChangeAnalysisDialog(current_layer_A, current_layer_B, self.pca_layers, self.pca_stats)
+        self.main_analysis_dialog = MainAnalysisDialog(current_layer_A, current_layer_B, self.pca_layers, self.pca_stats)
         # open dialog
-        self.change_analysis_dialog.show()
+        self.main_analysis_dialog.show()

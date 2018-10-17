@@ -686,7 +686,7 @@
   <customwidget>
    <class>RenderWidget</class>
    <extends>QWidget</extends>
-   <header>pca4cd.gui.change_analysis_view_widget</header>
+   <header>pca4cd.gui.render_widget</header>
    <container>1</container>
   </customwidget>
   <customwidget>
