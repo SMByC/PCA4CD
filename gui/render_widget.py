@@ -18,7 +18,7 @@
  *                                                                         *
  ***************************************************************************/
 """
-from PyQt5.QtCore import Qt, QTimer, QSettings
+from PyQt5.QtCore import Qt, QTimer, QSettings, pyqtSlot
 from PyQt5.QtGui import QColor
 from PyQt5.QtWidgets import QWidget, QGridLayout
 from qgis.gui import QgsMapToolPan, QgsMapCanvas
@@ -111,6 +111,7 @@ class RenderWidget(QWidget):
             self.canvas.setLayers([self.layer])
             self.canvas.refresh()
 
+    @pyqtSlot()
     def layer_style_editor(self):
         style_editor_dlg = StyleEditorDialog(self.layer, self.canvas, self.parent())
         if style_editor_dlg.exec_():

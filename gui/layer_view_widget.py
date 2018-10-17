@@ -49,7 +49,6 @@ class LayerViewWidget(QWidget, FORM_CLASS):
     def setup_view_widget(self, crs):
         self.render_widget.parent_view = self
         self.render_widget.crs = crs
-        self.detection_layers = None
         # set properties to QgsMapLayerComboBox
         self.QCBox_RenderFile.setCurrentIndex(-1)
         # handle connect layer selection with render canvas

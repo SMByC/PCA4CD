@@ -198,8 +198,12 @@ class ComponentAnalysisDialog(QWidget, FORM_CLASS):
         # update canvas for all view activated except this view
         from pca4cd.gui.main_analysis_dialog import MainAnalysisDialog
         for view_widget in MainAnalysisDialog.view_widgets:
+            # for layer view widget in main analysis dialog
             if view_widget.is_active and view_widget != self:
                 view_widget.render_widget.update_canvas_to(new_extent)
+                # for components analysis opened
+                if view_widget.component_analysis_dialog and view_widget.component_analysis_dialog.is_opened:
+                    view_widget.component_analysis_dialog.render_widget.update_canvas_to(new_extent)
 
     @pyqtSlot()
     def detection_layer_toggled(self):
