@@ -8,7 +8,7 @@ from subprocess import call
 from pca4cd.utils.system_utils import wait_process
 
 
-@wait_process()
+@wait_process
 def pca(A, B, n_pc, estimator_matrix, out_dir):
     """Calculate the principal components for the vertical stack A or with
     combinations of the stack B

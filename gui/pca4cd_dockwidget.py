@@ -125,7 +125,7 @@ class PCA4CDDockWidget(QDockWidget, FORM_CLASS):
             self.QCBox_nComponents.setCurrentIndex(number_components-1)
 
     @pyqtSlot()
-    @error_handler()
+    @error_handler
     def generate_principal_components(self):
         from pca4cd.pca4cd import PCA4CD as pca4cd
         path_layer_A = get_file_path_of_layer(self.QCBox_InputData_A.currentLayer())

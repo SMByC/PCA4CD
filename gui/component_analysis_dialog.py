@@ -133,7 +133,7 @@ FORM_CLASS, _ = uic.loadUiType(os.path.join(
 
 
 class ComponentAnalysisDialog(QWidget, FORM_CLASS):
-    @wait_process()
+    @wait_process
     def __init__(self, parent_view_widget, parent=None):
         QWidget.__init__(self, parent)
         self.setupUi(self)
@@ -213,7 +213,7 @@ class ComponentAnalysisDialog(QWidget, FORM_CLASS):
         self.render_widget.canvas.setMapTool(PickerPixelPointTool(self.render_widget, picker_widget), clean=True)
 
     @pyqtSlot()
-    @wait_process()
+    @wait_process
     def generate_detection_layer(self):
         from pca4cd.pca4cd import PCA4CD as pca4cd
         detection_from = self.RangeChangeFrom.value()
@@ -232,7 +232,7 @@ class ComponentAnalysisDialog(QWidget, FORM_CLASS):
         self.ShowHideChangeDetection.setEnabled(True)
         self.ShowHideChangeDetection.setChecked(True)
 
-    @wait_process()
+    @wait_process
     def set_statistics(self, stats_for=None):
         if stats_for == self.pc_name:
             from pca4cd.gui.main_analysis_dialog import MainAnalysisDialog
@@ -271,7 +271,7 @@ class ComponentAnalysisDialog(QWidget, FORM_CLASS):
         self.HistogramPlot.plot(x, y, stepMode=True, fillLevel=0, brush=(80, 80, 80))
         self.HistogramPlot.autoRange()
 
-    @wait_process()
+    @wait_process
     def aoi_changes(self, new_feature):
         """Actions after added each polygon in the AOI"""
         from pca4cd.pca4cd import PCA4CD as pca4cd
@@ -301,7 +301,7 @@ class ComponentAnalysisDialog(QWidget, FORM_CLASS):
             os.remove(pc_aoi)
 
     @pyqtSlot()
-    @wait_process()
+    @wait_process
     def delete_all_aoi(self):
         # clear/reset all rubber bands
         for rubber_band in self.rubber_bands:
