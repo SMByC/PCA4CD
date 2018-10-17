@@ -233,8 +233,15 @@ class ComponentAnalysisDialog(QWidget, FORM_CLASS):
 
         self.render_widget.set_detection_layer(detection_layer)
         self.parent_view_widget.render_widget.set_detection_layer(detection_layer)
+        self.parent_view_widget.EnableChangeDetection.setChecked(True)
         self.ShowHideChangeDetection.setEnabled(True)
         self.ShowHideChangeDetection.setChecked(True)
+
+        # update visibility of change layer in all PC in main analysis dialog
+        from pca4cd.gui.main_analysis_dialog import MainAnalysisDialog
+        for view_widget in MainAnalysisDialog.view_widgets:
+            if view_widget.is_active and view_widget.pc_id is not None:
+                view_widget.detection_layer_toggled()
 
     @wait_process
     def set_statistics(self, stats_for=None):
