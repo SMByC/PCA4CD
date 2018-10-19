@@ -33,7 +33,6 @@ FORM_CLASS, _ = uic.loadUiType(os.path.join(
 
 
 class MainAnalysisDialog(QDialog, FORM_CLASS):
-    is_opened = False
     view_widgets = []
     pca_stats = None
     current_sample = None
@@ -51,9 +50,8 @@ class MainAnalysisDialog(QDialog, FORM_CLASS):
 
         # dialog buttons box
         self.closeButton.rejected.connect(self.closing)
-        # disable enter action
-        self.closeButton.button(QDialogButtonBox.Ok).setAutoDefault(False)
-        self.closeButton.button(QDialogButtonBox.Discard).setAutoDefault(False)
+        # return
+        self.ReturnToMainDialog.clicked.connect(self.return_to_main_dialog)
 
         # size of the grid with view render widgets windows
         if len(pca_layers) <= 4:
@@ -116,11 +114,8 @@ class MainAnalysisDialog(QDialog, FORM_CLASS):
 
     def show(self):
         from pca4cd.pca4cd import PCA4CD as pca4cd
-        MainAnalysisDialog.is_opened = True
-        # adjust some objects in the dockwidget
-        pca4cd.dockwidget.QGBox_InputData.setDisabled(True)
-        pca4cd.dockwidget.QGBox_PrincipalComponents.setDisabled(True)
-        pca4cd.dockwidget.QPBtn_OpenChangeAnalysisDialog.setText("Analysis dialog is opened, click to show")
+        # hide main dialog
+        pca4cd.dialog.hide()
         # show dialog
         super(MainAnalysisDialog, self).show()
 
@@ -128,17 +123,21 @@ class MainAnalysisDialog(QDialog, FORM_CLASS):
         self.closing()
         event.ignore()
 
+    def return_to_main_dialog(self):
+        from pca4cd.pca4cd import PCA4CD as pca4cd
+        self.reject(is_ok_to_close=True)
+        self.deleteLater()
+        # recover the main dialog
+        pca4cd.dialog.show()
+
     def closing(self):
         """
         Do this before close the dialog
         """
         from pca4cd.pca4cd import PCA4CD as pca4cd
 
-        MainAnalysisDialog.is_opened = False
-        # adjust some objects in the dockwidget
-        pca4cd.dockwidget.QGBox_InputData.setEnabled(True)
-        pca4cd.dockwidget.QGBox_PrincipalComponents.setEnabled(True)
-        pca4cd.dockwidget.QPBtn_OpenChangeAnalysisDialog.setText("Components Analysis")
+        # clear and close main dialog
+        pca4cd.dialog.close()
         self.reject(is_ok_to_close=True)
 
     def reject(self, is_ok_to_close=False):

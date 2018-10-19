@@ -25,7 +25,7 @@ import webbrowser
 
 from qgis.PyQt import uic
 from qgis.PyQt.QtCore import pyqtSignal, pyqtSlot
-from qgis.PyQt.QtWidgets import QFileDialog, QDockWidget
+from qgis.PyQt.QtWidgets import QFileDialog, QDialog
 from qgis.core import QgsMapLayerProxyModel, Qgis
 from qgis.utils import iface
 
@@ -38,7 +38,7 @@ from pca4cd.utils.system_utils import error_handler
 # plugin path
 plugin_folder = os.path.dirname(os.path.dirname(__file__))
 FORM_CLASS, _ = uic.loadUiType(os.path.join(
-    plugin_folder, 'ui', 'pca4cd_dockwidget.ui'))
+    plugin_folder, 'ui', 'pca4cd_dialog.ui'))
 
 cfg = configparser.ConfigParser()
 cfg.read(os.path.join(plugin_folder, 'metadata.txt'))
@@ -46,12 +46,12 @@ VERSION = cfg.get('general', 'version')
 HOMEPAGE = cfg.get('general', 'homepage')
 
 
-class PCA4CDDockWidget(QDockWidget, FORM_CLASS):
+class PCA4CDDialog(QDialog, FORM_CLASS):
     closingPlugin = pyqtSignal()
 
     def __init__(self, parent=None):
         """Constructor."""
-        super(PCA4CDDockWidget, self).__init__(parent)
+        super(PCA4CDDialog, self).__init__(parent)
         # Set up the user interface from Designer.
         # After setupUI you can access any designer object by doing
         # self.<objectname>, and you can use autoconnect slots - see
@@ -101,10 +101,6 @@ class PCA4CDDockWidget(QDockWidget, FORM_CLASS):
         # ######### Principal Components ######### #
         self.QPBtn_runPCA.clicked.connect(self.generate_principal_components)
 
-        # ######### Change Detection Analysis ######### #
-        self.QPBtn_OpenChangeAnalysisDialog.clicked.connect(self.open_main_analysis_dialog)
-
-
     @pyqtSlot()
     def fileDialog_browse(self, combo_box, dialog_title, dialog_types, layer_type):
         file_path, _ = QFileDialog.getOpenFileName(self, dialog_title, "", dialog_types)
@@ -141,19 +137,16 @@ class PCA4CDDockWidget(QDockWidget, FORM_CLASS):
 
             iface.messageBar().pushMessage("PCA4CD", "{} principal components were generated successfully".format(n_pc),
                                            level=Qgis.Success)
+            # then, open main analysis dialog
+            self.open_main_analysis_dialog()
         else:
             iface.messageBar().pushMessage("PCA4CD", "Error generating the principal components, check the log",
                                            level=Qgis.Warning)
 
     @pyqtSlot()
     def open_main_analysis_dialog(self):
-        if MainAnalysisDialog.is_opened:
-            self.main_analysis_dialog.activateWindow()
-            return
-        if not self.pca_layers:
-            iface.messageBar().pushMessage("PCA4CD", "Error, first generate the principal components",
-                                           level=Qgis.Warning)
-            return
+        if MainAnalysisDialog.instance is not None:
+            MainAnalysisDialog.instance = None
 
         current_layer_A = self.QCBox_InputData_A.currentLayer()
         current_layer_B = self.QCBox_InputData_B.currentLayer()

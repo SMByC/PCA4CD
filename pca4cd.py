@@ -30,15 +30,14 @@ from qgis.PyQt.QtGui import QIcon
 # Initialize Qt resources from file resources.py
 from .resources import *
 
-# Import the code for the DockWidget
-from pca4cd.gui.pca4cd_dockwidget import PCA4CDDockWidget
+from pca4cd.gui.pca4cd_dialog import PCA4CDDialog
 from pca4cd.gui.about_dialog import AboutDialog
 from pca4cd.utils.qgis_utils import unload_layer_in_qgis
 
 
 class PCA4CD:
     """QGIS Plugin Implementation."""
-    dockwidget = None
+    dialog = None
     tmp_dir = None
 
     def __init__(self, iface):
@@ -71,7 +70,7 @@ class PCA4CD:
 
         self.menu_name_plugin = self.tr("PCA4CD - PCA for change detection")
         self.pluginIsActive = False
-        PCA4CD.dockwidget = None
+        PCA4CD.dialog = None
 
         self.about_dialog = AboutDialog()
 
@@ -92,7 +91,7 @@ class PCA4CD:
         return QCoreApplication.translate('PCA4CD', message)
 
     def initGui(self):
-        ### Main dockwidget menu
+        ### Main dialog menu
         # Create action that will start plugin configuration
         icon_path = ':/plugins/pca4cd/icons/pca4cd.svg'
         self.dockable_action = QAction(QIcon(icon_path), "PCA4CD", self.iface.mainWindow())
@@ -122,41 +121,45 @@ class PCA4CD:
         if not self.pluginIsActive:
             self.pluginIsActive = True
 
-            # dockwidget may not exist if:
+            # dialog may not exist if:
             #    first run of plugin
             #    removed on close (see self.onClosePlugin method)
-            if PCA4CD.dockwidget == None:
-                # Create the dockwidget (after translation) and keep reference
-                PCA4CD.dockwidget = PCA4CDDockWidget()
+            if PCA4CD.dialog is None:
+                PCA4CD.dialog = PCA4CDDialog()
 
             # init tmp dir for all process and intermediate files
             PCA4CD.tmp_dir = tempfile.mkdtemp()
-            # connect to provide cleanup on closing of dockwidget
-            PCA4CD.dockwidget.closingPlugin.connect(self.onClosePlugin)
+            # connect to provide cleanup on closing of dialog
+            PCA4CD.dialog.closingPlugin.connect(self.onClosePlugin)
             # reload
-            PCA4CD.dockwidget.QPBtn_PluginClearReload.clicked.connect(self.clear_reload_plugin)
+            PCA4CD.dialog.QPBtn_PluginClearReload.clicked.connect(self.clear_reload_plugin)
 
-            # show the dockwidget
-            # TODO: fix to allow choice of dock location
-            self.iface.addDockWidget(Qt.RightDockWidgetArea, PCA4CD.dockwidget)
-            PCA4CD.dockwidget.show()
+            # show the dialog
+            PCA4CD.dialog.show()
+            # Run the dialog event loop
+            result = PCA4CD.dialog.exec_()
+            # See if OK was pressed
+            if result:
+                # Do something useful here - delete the line containing pass and
+                # substitute with your code.
+                pass
 
     #--------------------------------------------------------------------------
 
     def onClosePlugin(self):
-        """Cleanup necessary items here when plugin dockwidget is closed"""
+        """Cleanup necessary items here when plugin is closed"""
 
         self.removes_temporary_files()
 
         # disconnects
-        PCA4CD.dockwidget.closingPlugin.disconnect(self.onClosePlugin)
+        PCA4CD.dialog.closingPlugin.disconnect(self.onClosePlugin)
 
-        # remove this statement if dockwidget is to remain
+        # remove this statement if dialog is to remain
         # for reuse if plugin is reopened
         # Commented next statement since it causes QGIS crashe
         # when closing the docked window:
-        PCA4CD.dockwidget.deleteLater()
-        PCA4CD.dockwidget = None
+        PCA4CD.dialog.close()
+        PCA4CD.dialog = None
 
         self.pluginIsActive = False
 
@@ -171,13 +174,13 @@ class PCA4CD:
         self.iface.removePluginMenu(self.menu_name_plugin, self.about_action)
         self.iface.removeToolBarIcon(self.dockable_action)
 
-        if PCA4CD.dockwidget:
-            self.iface.removeDockWidget(PCA4CD.dockwidget)
+        if PCA4CD.dialog:
+            PCA4CD.dialog.close()
 
     def clear_reload_plugin(self):
         # first prompt
         quit_msg = "Are you sure you want to: clean tmp files, delete all unsaved files, and reload plugin?"
-        reply = QMessageBox.question(PCA4CD.dockwidget, 'Clear all and reload the PCA4CD plugin.',
+        reply = QMessageBox.question(PCA4CD.dialog, 'Clear all and reload the PCA4CD plugin.',
                                      quit_msg, QMessageBox.Yes, QMessageBox.No)
         if reply == QMessageBox.No:
             return
@@ -187,7 +190,7 @@ class PCA4CD:
         plugins["pca4cd"].run()
 
     def removes_temporary_files(self):
-        if not PCA4CD.dockwidget:
+        if not PCA4CD.dialog:
             return
         # unload all layers instances from Qgis saved in tmp dir
         try:
