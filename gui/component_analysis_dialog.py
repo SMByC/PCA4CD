@@ -20,6 +20,7 @@
 """
 import os
 import numpy as np
+import pyqtgraph as pg
 from PyQt5.QtCore import QTimer, Qt, pyqtSlot
 from PyQt5.QtGui import QColor
 from PyQt5.QtWidgets import QWidget
@@ -168,6 +169,16 @@ class ComponentAnalysisDialog(QWidget, FORM_CLASS):
         self.QCBox_StatsLayer.addItems([self.pc_name, "Areas Of Interest"])
         self.QCBox_StatsLayer.currentIndexChanged[str].connect(self.set_statistics)
 
+        # init histogram plot
+        self.HistogramPlot.setTitle('Histogram')
+        self.HistogramPlot.setBackground('w')
+        self.HistogramPlot.showGrid(x=True, y=True, alpha=0.3)
+        # init region and synchronize the region on plot with range values
+        self.linear_region = pg.LinearRegionItem(brush=(255, 255, 0, 40))
+        self.HistogramPlot.addItem(self.linear_region)
+        self.linear_region.sigRegionChanged.connect(self.update_region_from_plot)
+        self.RangeChangeFrom.valueChanged.connect(self.update_region_from_values)
+        self.RangeChangeTo.valueChanged.connect(self.update_region_from_values)
         # statistics for current principal component
         gdal.AllRegister()
         dataset = gdal.Open(get_file_path_of_layer(self.pc_layer), GA_ReadOnly)
@@ -176,10 +187,6 @@ class ComponentAnalysisDialog(QWidget, FORM_CLASS):
         self.set_statistics(stats_for=self.pc_name)
         # init aoi data
         self.aoi_data = np.array([np.nan])
-        # init histogram plot
-        self.HistogramPlot.setTitle('Histogram')
-        self.HistogramPlot.setBackground('w')
-        self.HistogramPlot.showGrid(x=True, y=True, alpha=0.3)
 
     @pyqtSlot()
     def show(self):
@@ -281,6 +288,20 @@ class ComponentAnalysisDialog(QWidget, FORM_CLASS):
         self.HistogramPlot.clear()
         self.HistogramPlot.plot(x, y, stepMode=True, fillLevel=0, brush=(80, 80, 80))
         self.HistogramPlot.autoRange()
+
+        self.HistogramPlot.addItem(self.linear_region)
+
+    @pyqtSlot()
+    def update_region_from_plot(self):
+        lower, upper = self.linear_region.getRegion()
+        self.RangeChangeFrom.setValue(lower)
+        self.RangeChangeTo.setValue(upper)
+
+    @pyqtSlot()
+    def update_region_from_values(self):
+        lower = self.RangeChangeFrom.value()
+        upper = self.RangeChangeTo.value()
+        self.linear_region.setRegion((lower, upper))
 
     @wait_process
     def aoi_changes(self, new_feature):
