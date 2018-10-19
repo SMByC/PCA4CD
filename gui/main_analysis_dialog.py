@@ -19,6 +19,7 @@
  ***************************************************************************/
 """
 import os
+import tempfile
 
 from qgis.PyQt import uic
 from qgis.PyQt.QtCore import Qt
@@ -126,7 +127,8 @@ class MainAnalysisDialog(QDialog, FORM_CLASS):
     def return_to_main_dialog(self):
         from pca4cd.pca4cd import PCA4CD as pca4cd
         self.reject(is_ok_to_close=True)
-        self.deleteLater()
+        pca4cd.removes_temporary_files()
+        pca4cd.tmp_dir = tempfile.mkdtemp()
         # recover the main dialog
         pca4cd.dialog.show()
 

@@ -189,7 +189,8 @@ class PCA4CD:
         from qgis.utils import plugins
         plugins["pca4cd"].run()
 
-    def removes_temporary_files(self):
+    @staticmethod
+    def removes_temporary_files():
         if not PCA4CD.dialog:
             return
         # unload all layers instances from Qgis saved in tmp dir

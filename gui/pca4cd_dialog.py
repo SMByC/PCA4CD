@@ -60,9 +60,6 @@ class PCA4CDDialog(QDialog, FORM_CLASS):
         self.setupUi(self)
         self.setup_gui()
 
-        self.pca_layers = []
-        self.pca_stats = None
-
     def closeEvent(self, event):
         self.closingPlugin.emit()
         event.accept()
@@ -124,32 +121,35 @@ class PCA4CDDialog(QDialog, FORM_CLASS):
     @error_handler
     def generate_principal_components(self):
         from pca4cd.pca4cd import PCA4CD as pca4cd
+        # clear if exist instance of main dialog
+        if MainAnalysisDialog.instance is not None:
+            MainAnalysisDialog.instance.deleteLater()
+            MainAnalysisDialog.instance = None
+
         path_layer_A = get_file_path_of_layer(self.QCBox_InputData_A.currentLayer())
         path_layer_B = get_file_path_of_layer(self.QCBox_InputData_B.currentLayer())
         n_pc = int(self.QCBox_nComponents.currentText())
         estimator_matrix = self.QCBox_EstimatorMatrix.currentText()
 
-        pca_files, self.pca_stats = pca(path_layer_A, path_layer_B, n_pc, estimator_matrix, pca4cd.tmp_dir)
+        pca_files, pca_stats = pca(path_layer_A, path_layer_B, n_pc, estimator_matrix, pca4cd.tmp_dir)
 
+        pca_layers = []
         if pca_files:
             for pca_file in pca_files:
-                self.pca_layers.append(load_layer_in_qgis(pca_file, "raster", False))
+                pca_layers.append(load_layer_in_qgis(pca_file, "raster", False))
 
             iface.messageBar().pushMessage("PCA4CD", "{} principal components were generated successfully".format(n_pc),
                                            level=Qgis.Success)
             # then, open main analysis dialog
-            self.open_main_analysis_dialog()
+            self.open_main_analysis_dialog(pca_layers, pca_stats)
         else:
             iface.messageBar().pushMessage("PCA4CD", "Error generating the principal components, check the log",
                                            level=Qgis.Warning)
 
     @pyqtSlot()
-    def open_main_analysis_dialog(self):
-        if MainAnalysisDialog.instance is not None:
-            MainAnalysisDialog.instance = None
-
+    def open_main_analysis_dialog(self, pca_layers, pca_stats):
         current_layer_A = self.QCBox_InputData_A.currentLayer()
         current_layer_B = self.QCBox_InputData_B.currentLayer()
-        self.main_analysis_dialog = MainAnalysisDialog(current_layer_A, current_layer_B, self.pca_layers, self.pca_stats)
+        self.main_analysis_dialog = MainAnalysisDialog(current_layer_A, current_layer_B, pca_layers, pca_stats)
         # open dialog
         self.main_analysis_dialog.show()
