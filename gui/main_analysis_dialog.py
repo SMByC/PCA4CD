@@ -23,7 +23,7 @@ import tempfile
 
 from qgis.PyQt import uic
 from qgis.PyQt.QtCore import Qt
-from qgis.PyQt.QtWidgets import QDialog, QDialogButtonBox, QGridLayout
+from qgis.PyQt.QtWidgets import QDialog, QGridLayout
 
 from pca4cd.gui.layer_view_widget import LayerViewWidget
 
@@ -37,7 +37,6 @@ class MainAnalysisDialog(QDialog, FORM_CLASS):
     view_widgets = []
     pca_stats = None
     current_sample = None
-    instance = None
 
     def __init__(self, layer_a, layer_b, pca_layers, pca_stats):
         QDialog.__init__(self)
@@ -47,7 +46,6 @@ class MainAnalysisDialog(QDialog, FORM_CLASS):
         MainAnalysisDialog.pca_stats = pca_stats
 
         self.setupUi(self)
-        MainAnalysisDialog.instance = self
 
         # dialog buttons box
         self.closeButton.rejected.connect(self.closing)
@@ -127,6 +125,7 @@ class MainAnalysisDialog(QDialog, FORM_CLASS):
     def return_to_main_dialog(self):
         from pca4cd.pca4cd import PCA4CD as pca4cd
         self.reject(is_ok_to_close=True)
+        self.deleteLater()
         pca4cd.removes_temporary_files()
         pca4cd.tmp_dir = tempfile.mkdtemp()
         # recover the main dialog

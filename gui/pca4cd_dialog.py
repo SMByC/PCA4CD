@@ -121,10 +121,6 @@ class PCA4CDDialog(QDialog, FORM_CLASS):
     @error_handler
     def generate_principal_components(self):
         from pca4cd.pca4cd import PCA4CD as pca4cd
-        # clear if exist instance of main dialog
-        if MainAnalysisDialog.instance is not None:
-            MainAnalysisDialog.instance.deleteLater()
-            MainAnalysisDialog.instance = None
 
         path_layer_A = get_file_path_of_layer(self.QCBox_InputData_A.currentLayer())
         path_layer_B = get_file_path_of_layer(self.QCBox_InputData_B.currentLayer())
