@@ -94,7 +94,7 @@ class MainAnalysisDialog(QDialog, FORM_CLASS):
                 view_widget.QLabel_ViewName.setText("Layer A")
                 file_index = view_widget.QCBox_RenderFile.findText(self.layer_a.name(), Qt.MatchFixedString)
                 view_widget.QCBox_RenderFile.setCurrentIndex(file_index)
-            if num_view == 3:
+            if num_view == 3 and self.layer_b is not None:
                 view_widget.QLabel_ViewName.setText("Layer B")
                 file_index = view_widget.QCBox_RenderFile.findText(self.layer_b.name(), Qt.MatchFixedString)
                 view_widget.QCBox_RenderFile.setCurrentIndex(file_index)
