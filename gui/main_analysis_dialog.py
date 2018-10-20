@@ -110,6 +110,8 @@ class MainAnalysisDialog(QDialog, FORM_CLASS):
             else:
                 view_widget.EnableChangeDetection.setToolTip("Only for principal components")
                 view_widget.QPBtn_ComponentAnalysisDialog.setToolTip("Only for principal components")
+            if not view_widget.QLabel_ViewName.text():
+                view_widget.QLabel_ViewName.setPlaceholderText("Auxiliary View")
 
     def show(self):
         from pca4cd.pca4cd import PCA4CD as pca4cd
