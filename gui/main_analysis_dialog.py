@@ -53,21 +53,41 @@ class MainAnalysisDialog(QDialog, FORM_CLASS):
         self.ReturnToMainDialog.clicked.connect(self.return_to_main_dialog)
 
         # size of the grid with view render widgets windows
-        if len(pca_layers) <= 4:
-            grid_rows = 2
-            grid_columns = 4
-        elif len(pca_layers) <= 8:
-            grid_rows = 3
-            grid_columns = 4
-        elif len(pca_layers) <= 12:
-            grid_rows = 4
-            grid_columns = 4
-        elif len(pca_layers) <= 16:
-            grid_rows = 5
-            grid_columns = 4
-        elif len(pca_layers) <= 20:
-            grid_rows = 5
-            grid_columns = 5
+        if self.layer_b is not None:
+            if len(pca_layers) <= 4:
+                grid_rows = 2
+                grid_columns = 4
+            elif len(pca_layers) <= 8:
+                grid_rows = 3
+                grid_columns = 4
+            elif len(pca_layers) <= 12:
+                grid_rows = 4
+                grid_columns = 4
+            elif len(pca_layers) <= 16:
+                grid_rows = 5
+                grid_columns = 4
+            elif len(pca_layers) <= 20:
+                grid_rows = 5
+                grid_columns = 5
+        if self.layer_b is None:
+            if len(pca_layers) <= 3:
+                grid_rows = 2
+                grid_columns = 3
+            elif len(pca_layers) <= 6:
+                grid_rows = 3
+                grid_columns = 3
+            elif len(pca_layers) <= 9:
+                grid_rows = 4
+                grid_columns = 3
+            elif len(pca_layers) <= 12:
+                grid_rows = 4
+                grid_columns = 4
+            elif len(pca_layers) <= 16:
+                grid_rows = 5
+                grid_columns = 4
+            elif len(pca_layers) <= 20:
+                grid_rows = 5
+                grid_columns = 5
 
         # configure the views layout
         views_layout = QGridLayout()
