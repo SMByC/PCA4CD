@@ -6,8 +6,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>855</width>
-    <height>722</height>
+    <width>590</width>
+    <height>635</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -20,6 +20,19 @@
       <string>Input Rasters Data</string>
      </property>
      <layout class="QVBoxLayout" name="verticalLayout_3">
+      <item>
+       <widget class="QLabel" name="label_5">
+        <property name="text">
+         <string>Select one or two (as reference and target) input layer, each band in A (and B) is a variable for the PCA:</string>
+        </property>
+        <property name="alignment">
+         <set>Qt::AlignJustify|Qt::AlignVCenter</set>
+        </property>
+        <property name="wordWrap">
+         <bool>true</bool>
+        </property>
+       </widget>
+      </item>
       <item>
        <widget class="QWidget" name="widget_0" native="true">
         <layout class="QHBoxLayout" name="horizontalLayout_11">
@@ -36,45 +49,76 @@
           <number>0</number>
          </property>
          <item>
-          <widget class="QLabel" name="label_3">
+          <widget class="QRadioButton" name="EnableInputData_A">
+           <property name="enabled">
+            <bool>true</bool>
+           </property>
            <property name="text">
-            <string>A:</string>
+            <string/>
+           </property>
+           <property name="checkable">
+            <bool>true</bool>
+           </property>
+           <property name="checked">
+            <bool>true</bool>
            </property>
           </widget>
          </item>
          <item>
-          <widget class="QgsMapLayerComboBox" name="QCBox_InputData_A">
-           <property name="sizePolicy">
-            <sizepolicy hsizetype="Expanding" vsizetype="Fixed">
-             <horstretch>0</horstretch>
-             <verstretch>0</verstretch>
-            </sizepolicy>
-           </property>
-           <property name="focusPolicy">
-            <enum>Qt::StrongFocus</enum>
-           </property>
-           <property name="frame">
-            <bool>true</bool>
-           </property>
-           <property name="allowEmptyLayer">
-            <bool>true</bool>
-           </property>
-           <property name="showCrs">
-            <bool>false</bool>
-           </property>
-          </widget>
-         </item>
-         <item>
-          <widget class="QPushButton" name="QPBtn_browseData_A">
-           <property name="sizePolicy">
-            <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
-             <horstretch>0</horstretch>
-             <verstretch>0</verstretch>
-            </sizepolicy>
-           </property>
-           <property name="text">
-            <string>Browse</string>
-           </property>
+          <widget class="QWidget" name="widget_4" native="true">
+           <layout class="QHBoxLayout" name="horizontalLayout_4">
+            <property name="leftMargin">
+             <number>0</number>
+            </property>
+            <property name="topMargin">
+             <number>0</number>
+            </property>
+            <property name="rightMargin">
+             <number>0</number>
+            </property>
+            <property name="bottomMargin">
+             <number>0</number>
+            </property>
+            <item>
+             <widget class="QLabel" name="label_3">
+              <property name="text">
+               <string>A:</string>
+              </property>
+             </widget>
+            </item>
+            <item>
+             <widget class="QgsMapLayerComboBox" name="QCBox_InputData_A">
+              <property name="sizePolicy">
+               <sizepolicy hsizetype="Expanding" vsizetype="Fixed">
+                <horstretch>0</horstretch>
+                <verstretch>0</verstretch>
+               </sizepolicy>
+              </property>
+              <property name="focusPolicy">
+               <enum>Qt::StrongFocus</enum>
+              </property>
+              <property name="frame">
+               <bool>true</bool>
+              </property>
+              <property name="allowEmptyLayer">
+               <bool>true</bool>
+              </property>
+             </widget>
+            </item>
+            <item>
+             <widget class="QPushButton" name="QPBtn_browseData_A">
+              <property name="sizePolicy">
+               <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
+                <horstretch>0</horstretch>
+                <verstretch>0</verstretch>
+               </sizepolicy>
+              </property>
+              <property name="text">
+               <string>Browse</string>
+              </property>
+             </widget>
+            </item>
+           </layout>
           </widget>
          </item>
         </layout>
@@ -96,45 +140,73 @@
           <number>0</number>
          </property>
          <item>
-          <widget class="QLabel" name="label_4">
+          <widget class="QRadioButton" name="EnableInputData_B">
            <property name="text">
-            <string>B:</string>
+            <string/>
            </property>
           </widget>
          </item>
          <item>
-          <widget class="QgsMapLayerComboBox" name="QCBox_InputData_B">
-           <property name="sizePolicy">
-            <sizepolicy hsizetype="Expanding" vsizetype="Fixed">
-             <horstretch>0</horstretch>
-             <verstretch>0</verstretch>
-            </sizepolicy>
-           </property>
-           <property name="focusPolicy">
-            <enum>Qt::StrongFocus</enum>
-           </property>
-           <property name="frame">
-            <bool>true</bool>
-           </property>
-           <property name="allowEmptyLayer">
-            <bool>true</bool>
-           </property>
-           <property name="showCrs">
+          <widget class="QWidget" name="widget_3" native="true">
+           <property name="enabled">
             <bool>false</bool>
            </property>
-          </widget>
-         </item>
-         <item>
-          <widget class="QPushButton" name="QPBtn_browseData_B">
-           <property name="sizePolicy">
-            <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
-             <horstretch>0</horstretch>
-             <verstretch>0</verstretch>
-            </sizepolicy>
-           </property>
-           <property name="text">
-            <string>Browse</string>
-           </property>
+           <layout class="QHBoxLayout" name="horizontalLayout_3">
+            <property name="leftMargin">
+             <number>0</number>
+            </property>
+            <property name="topMargin">
+             <number>0</number>
+            </property>
+            <property name="rightMargin">
+             <number>0</number>
+            </property>
+            <property name="bottomMargin">
+             <number>0</number>
+            </property>
+            <item>
+             <widget class="QLabel" name="label_4">
+              <property name="text">
+               <string>B:</string>
+              </property>
+             </widget>
+            </item>
+            <item>
+             <widget class="QgsMapLayerComboBox" name="QCBox_InputData_B">
+              <property name="sizePolicy">
+               <sizepolicy hsizetype="Expanding" vsizetype="Fixed">
+                <horstretch>0</horstretch>
+                <verstretch>0</verstretch>
+               </sizepolicy>
+              </property>
+              <property name="focusPolicy">
+               <enum>Qt::StrongFocus</enum>
+              </property>
+              <property name="frame">
+               <bool>true</bool>
+              </property>
+              <property name="allowEmptyLayer">
+               <bool>true</bool>
+              </property>
+              <property name="showCrs">
+               <bool>false</bool>
+              </property>
+             </widget>
+            </item>
+            <item>
+             <widget class="QPushButton" name="QPBtn_browseData_B">
+              <property name="sizePolicy">
+               <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
+                <horstretch>0</horstretch>
+                <verstretch>0</verstretch>
+               </sizepolicy>
+              </property>
+              <property name="text">
+               <string>Browse</string>
+              </property>
+             </widget>
+            </item>
+           </layout>
           </widget>
          </item>
         </layout>
@@ -219,7 +291,7 @@
       <item>
        <widget class="QGroupBox" name="groupBox_2">
         <property name="title">
-         <string>Process Sett&amp;ings</string>
+         <string>Process Se&amp;ttings</string>
         </property>
         <property name="checkable">
          <bool>true</bool>
@@ -385,8 +457,40 @@
      <y>339</y>
     </hint>
     <hint type="destinationlabel">
-     <x>217</x>
-     <y>375</y>
+     <x>239</x>
+     <y>393</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>EnableInputData_B</sender>
+   <signal>clicked(bool)</signal>
+   <receiver>widget_3</receiver>
+   <slot>setEnabled(bool)</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>29</x>
+     <y>139</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>75</x>
+     <y>114</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>EnableInputData_A</sender>
+   <signal>clicked(bool)</signal>
+   <receiver>widget_4</receiver>
+   <slot>setEnabled(bool)</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>26</x>
+     <y>83</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>71</x>
+     <y>62</y>
     </hint>
    </hints>
   </connection>
