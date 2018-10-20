@@ -83,6 +83,7 @@ class PCA4CDDialog(QDialog, FORM_CLASS):
             dialog_types=self.tr("Raster files (*.tif *.img);;All files (*.*)"),
             layer_type="raster"))
         self.QCBox_InputData_A.currentIndexChanged.connect(self.set_number_components)
+        self.EnableInputData_A.toggled.connect(lambda: self.EnableInputData_A.setChecked(True))
         ## B
         # set properties to QgsMapLayerComboBox
         self.QCBox_InputData_B.setCurrentIndex(-1)
@@ -94,6 +95,7 @@ class PCA4CDDialog(QDialog, FORM_CLASS):
             dialog_types=self.tr("Raster files (*.tif *.img);;All files (*.*)"),
             layer_type="raster"))
         self.QCBox_InputData_B.currentIndexChanged.connect(self.set_number_components)
+        self.EnableInputData_B.toggled.connect(lambda: self.QCBox_InputData_B.setCurrentIndex(-1))
 
         # ######### Principal Components ######### #
         self.QPBtn_runPCA.clicked.connect(self.generate_principal_components)
@@ -110,8 +112,14 @@ class PCA4CDDialog(QDialog, FORM_CLASS):
         current_layer_A = self.QCBox_InputData_A.currentLayer()
         current_layer_B = self.QCBox_InputData_B.currentLayer()
         self.QCBox_nComponents.clear()
-        if current_layer_A is not None and current_layer_B is not None:
-            number_components = current_layer_A.bandCount() + current_layer_B.bandCount()
+
+        number_components = 0
+        if current_layer_A is not None:
+            number_components += current_layer_A.bandCount()
+        if current_layer_B is not None:
+            number_components += current_layer_B.bandCount()
+
+        if number_components != 0:
             # set number of components to combobox
             self.QCBox_nComponents.addItems([str(x) for x in range(1, number_components + 1)])
             # select the last item

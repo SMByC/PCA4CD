@@ -454,11 +454,11 @@
    <hints>
     <hint type="sourcelabel">
      <x>194</x>
-     <y>339</y>
+     <y>445</y>
     </hint>
     <hint type="destinationlabel">
      <x>239</x>
-     <y>393</y>
+     <y>494</y>
     </hint>
    </hints>
   </connection>
@@ -470,27 +470,11 @@
    <hints>
     <hint type="sourcelabel">
      <x>29</x>
-     <y>139</y>
+     <y>245</y>
     </hint>
     <hint type="destinationlabel">
      <x>75</x>
-     <y>114</y>
-    </hint>
-   </hints>
-  </connection>
-  <connection>
-   <sender>EnableInputData_A</sender>
-   <signal>clicked(bool)</signal>
-   <receiver>widget_4</receiver>
-   <slot>setEnabled(bool)</slot>
-   <hints>
-    <hint type="sourcelabel">
-     <x>26</x>
-     <y>83</y>
-    </hint>
-    <hint type="destinationlabel">
-     <x>71</x>
-     <y>62</y>
+     <y>220</y>
     </hint>
    </hints>
   </connection>
