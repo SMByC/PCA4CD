@@ -26,6 +26,7 @@ import tempfile
 from qgis.PyQt.QtCore import QSettings, QTranslator, qVersion, QCoreApplication, Qt
 from qgis.PyQt.QtWidgets import QAction, QMessageBox
 from qgis.PyQt.QtGui import QIcon
+from qgis.utils import iface
 
 # Initialize Qt resources from file resources.py
 from .resources import *
@@ -207,4 +208,8 @@ class PCA4CD:
         if PCA4CD.tmp_dir and os.path.isdir(PCA4CD.tmp_dir):
             shutil.rmtree(PCA4CD.tmp_dir, ignore_errors=True)
         PCA4CD.tmp_dir = None
+
+        # clear qgis main canvas
+        iface.mapCanvas().clearCache()
+        iface.mapCanvas().refresh()
 
