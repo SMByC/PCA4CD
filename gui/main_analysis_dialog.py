@@ -161,6 +161,11 @@ class MainAnalysisDialog(QDialog, FORM_CLASS):
 
         # clear and close main dialog
         pca4cd.dialog.close()
+        # for components analysis opened
+        for view_widget in MainAnalysisDialog.view_widgets:
+            if view_widget.component_analysis_dialog and view_widget.component_analysis_dialog.is_opened:
+                view_widget.component_analysis_dialog.deleteLater()
+
         self.reject(is_ok_to_close=True)
 
     def reject(self, is_ok_to_close=False):
