@@ -23,7 +23,7 @@ import tempfile
 
 from qgis.PyQt import uic
 from qgis.PyQt.QtCore import Qt
-from qgis.PyQt.QtWidgets import QDialog, QGridLayout, QMessageBox
+from qgis.PyQt.QtWidgets import QDialog, QGridLayout, QMessageBox, QSpacerItem, QSizePolicy
 
 from pca4cd.gui.layer_view_widget import LayerViewWidget
 
@@ -95,10 +95,17 @@ class MainAnalysisDialog(QDialog, FORM_CLASS):
         views_layout.setMargin(0)
         view_widgets = []
         for row in range(grid_rows):
-            for column in range(grid_columns):
-                new_view_widget = LayerViewWidget()
-                views_layout.addWidget(new_view_widget, row, column)
-                view_widgets.append(new_view_widget)
+            if row == 0:
+                for column in range(grid_columns):
+                    new_view_widget = LayerViewWidget()
+                    views_layout.addWidget(new_view_widget, row, column)
+                    view_widgets.append(new_view_widget)
+            else:
+                for column in range(grid_columns):
+                    if (row-1)*grid_columns + column < len(pca_layers):
+                        new_view_widget = LayerViewWidget()
+                        views_layout.addWidget(new_view_widget, row, column)
+                        view_widgets.append(new_view_widget)
 
         # add to change analysis dialog
         self.widget_view_windows.setLayout(views_layout)
