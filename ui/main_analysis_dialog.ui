@@ -44,13 +44,10 @@
       <property name="bottomMargin">
        <number>3</number>
       </property>
-      <property name="horizontalSpacing">
+      <property name="spacing">
        <number>3</number>
       </property>
-      <property name="verticalSpacing">
-       <number>0</number>
-      </property>
-      <item row="2" column="0">
+      <item row="3" column="0">
        <widget class="QWidget" name="widget" native="true">
         <property name="sizePolicy">
          <sizepolicy hsizetype="Preferred" vsizetype="Maximum">
@@ -76,12 +73,59 @@
            <property name="text">
             <string>Return</string>
            </property>
+           <property name="icon">
+            <iconset>
+             <normaloff>:/plugins/pca4cd/icons/return.svg</normaloff>:/plugins/pca4cd/icons/return.svg</iconset>
+           </property>
+           <property name="toolButtonStyle">
+            <enum>Qt::ToolButtonTextBesideIcon</enum>
+           </property>
+          </widget>
+         </item>
+         <item>
+          <spacer name="horizontalSpacer_2">
+           <property name="orientation">
+            <enum>Qt::Horizontal</enum>
+           </property>
+           <property name="sizeHint" stdset="0">
+            <size>
+             <width>40</width>
+             <height>20</height>
+            </size>
+           </property>
+          </spacer>
+         </item>
+         <item>
+          <widget class="QToolButton" name="toolButton_2">
+           <property name="text">
+            <string>Save PCA</string>
+           </property>
+           <property name="icon">
+            <iconset>
+             <normaloff>:/plugins/pca4cd/icons/save.svg</normaloff>:/plugins/pca4cd/icons/save.svg</iconset>
+           </property>
+           <property name="toolButtonStyle">
+            <enum>Qt::ToolButtonTextBesideIcon</enum>
+           </property>
+           <property name="autoRaise">
+            <bool>true</bool>
+           </property>
           </widget>
          </item>
          <item>
           <widget class="QToolButton" name="CombinedChangeLayer">
            <property name="text">
             <string>Generate the Combined Change Layer</string>
+           </property>
+           <property name="icon">
+            <iconset>
+             <normaloff>:/plugins/pca4cd/icons/combine_layers.svg</normaloff>:/plugins/pca4cd/icons/combine_layers.svg</iconset>
+           </property>
+           <property name="toolButtonStyle">
+            <enum>Qt::ToolButtonTextBesideIcon</enum>
+           </property>
+           <property name="autoRaise">
+            <bool>true</bool>
            </property>
           </widget>
          </item>
@@ -99,9 +143,16 @@
           </spacer>
          </item>
          <item>
-          <widget class="QDialogButtonBox" name="closeButton">
-           <property name="standardButtons">
-            <set>QDialogButtonBox::Close</set>
+          <widget class="QToolButton" name="CloseButton">
+           <property name="text">
+            <string>Close</string>
+           </property>
+           <property name="icon">
+            <iconset>
+             <normaloff>:/plugins/pca4cd/icons/close.svg</normaloff>:/plugins/pca4cd/icons/close.svg</iconset>
+           </property>
+           <property name="toolButtonStyle">
+            <enum>Qt::ToolButtonTextBesideIcon</enum>
            </property>
           </widget>
          </item>
@@ -110,6 +161,13 @@
       </item>
       <item row="0" column="0" rowspan="2">
        <widget class="QWidget" name="widget_view_windows" native="true"/>
+      </item>
+      <item row="2" column="0">
+       <widget class="Line" name="line">
+        <property name="orientation">
+         <enum>Qt::Horizontal</enum>
+        </property>
+       </widget>
       </item>
      </layout>
     </widget>
@@ -141,22 +199,5 @@
   </customwidget>
  </customwidgets>
  <resources/>
- <connections>
-  <connection>
-   <sender>closeButton</sender>
-   <signal>rejected()</signal>
-   <receiver>Dialog</receiver>
-   <slot>reject()</slot>
-   <hints>
-    <hint type="sourcelabel">
-     <x>1315</x>
-     <y>821</y>
-    </hint>
-    <hint type="destinationlabel">
-     <x>1478</x>
-     <y>651</y>
-    </hint>
-   </hints>
-  </connection>
- </connections>
+ <connections/>
 </ui>

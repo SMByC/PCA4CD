@@ -10,5 +10,9 @@
         <file>icons/run.svg</file>
         <file>icons/aoi_picker.svg</file>
         <file>icons/visibility.svg</file>
+        <file>icons/return.svg</file>
+        <file>icons/combine_layers.svg</file>
+        <file>icons/close.svg</file>
+        <file>icons/save.svg</file>
     </qresource>
 </RCC>

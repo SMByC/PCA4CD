@@ -48,7 +48,7 @@ class MainAnalysisDialog(QDialog, FORM_CLASS):
         self.setupUi(self)
 
         # dialog buttons box
-        self.closeButton.rejected.connect(self.closing)
+        self.CloseButton.clicked.connect(self.closing)
         # return
         self.ReturnToMainDialog.clicked.connect(self.return_to_main_dialog)
 
