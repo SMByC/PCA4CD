@@ -98,7 +98,7 @@
          <item>
           <widget class="QToolButton" name="toolButton_2">
            <property name="toolTip">
-            <string>Save all the principal components generated in a stack</string>
+            <string>(Optional) Save all the principal components generated in a stack</string>
            </property>
            <property name="text">
             <string>Save PCA</string>

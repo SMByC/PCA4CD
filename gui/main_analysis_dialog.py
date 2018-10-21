@@ -135,8 +135,11 @@ class MainAnalysisDialog(QDialog, FORM_CLASS):
                 view_widget.QCBox_RenderFile.setEnabled(False)
                 view_widget.QCBox_browseRenderFile.setEnabled(False)
             else:
-                view_widget.EnableChangeDetection.setToolTip("Only for principal components")
-                view_widget.QPBtn_ComponentAnalysisDialog.setToolTip("Only for principal components")
+                view_widget.EnableChangeDetection.setToolTip("Show/hide the combined change layer")
+                view_widget.QPBtn_ComponentAnalysisDialog.setText("Combined change layer")
+                view_widget.QPBtn_ComponentAnalysisDialog.setToolTip("")
+                # disconnect button action
+                view_widget.QPBtn_ComponentAnalysisDialog.clicked.disconnect()
             if not view_widget.QLabel_ViewName.text():
                 view_widget.QLabel_ViewName.setPlaceholderText("Auxiliary View")
 
