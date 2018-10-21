@@ -97,6 +97,9 @@
          </item>
          <item>
           <widget class="QToolButton" name="toolButton_2">
+           <property name="toolTip">
+            <string>Save all the principal components generated in a stack</string>
+           </property>
            <property name="text">
             <string>Save PCA</string>
            </property>
@@ -114,6 +117,9 @@
          </item>
          <item>
           <widget class="QToolButton" name="CombinedChangeLayer">
+           <property name="toolTip">
+            <string>Merge all activated change layers and save the final change layer</string>
+           </property>
            <property name="text">
             <string>Generate the Combined Change Layer</string>
            </property>
