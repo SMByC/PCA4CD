@@ -23,7 +23,7 @@ import tempfile
 
 from qgis.PyQt import uic
 from qgis.PyQt.QtCore import Qt
-from qgis.PyQt.QtWidgets import QDialog, QGridLayout
+from qgis.PyQt.QtWidgets import QDialog, QGridLayout, QMessageBox
 
 from pca4cd.gui.layer_view_widget import LayerViewWidget
 
@@ -145,6 +145,13 @@ class MainAnalysisDialog(QDialog, FORM_CLASS):
         event.ignore()
 
     def return_to_main_dialog(self):
+        # first prompt
+        quit_msg = "Are you sure you want to return to the main dialog? you will lose all the products generated"
+        reply = QMessageBox.question(None, 'Return to Compute the Principal Components',
+                                     quit_msg, QMessageBox.Yes, QMessageBox.No)
+        if reply == QMessageBox.No:
+            return
+
         from pca4cd.pca4cd import PCA4CD as pca4cd
         self.reject(is_ok_to_close=True)
         self.deleteLater()
@@ -157,6 +164,13 @@ class MainAnalysisDialog(QDialog, FORM_CLASS):
         """
         Do this before close the dialog
         """
+        # first prompt
+        quit_msg = "Are you sure you want close the PCA4CD plugin?"
+        reply = QMessageBox.question(None, 'Closing the PCA4CD plugin',
+                                     quit_msg, QMessageBox.Yes, QMessageBox.No)
+        if reply == QMessageBox.No:
+            return
+
         from pca4cd.pca4cd import PCA4CD as pca4cd
 
         # clear and close main dialog

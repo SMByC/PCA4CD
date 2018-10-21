@@ -180,7 +180,7 @@ class PCA4CD:
     def clear_reload_plugin(self):
         # first prompt
         quit_msg = "Are you sure you want to: clean tmp files, delete all unsaved files, and reload plugin?"
-        reply = QMessageBox.question(PCA4CD.dialog, 'Clear all and reload the PCA4CD plugin.',
+        reply = QMessageBox.question(None, 'Clear all and reload the PCA4CD plugin.',
                                      quit_msg, QMessageBox.Yes, QMessageBox.No)
         if reply == QMessageBox.No:
             return
