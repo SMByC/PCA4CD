@@ -140,6 +140,7 @@ class MainAnalysisDialog(QDialog, FORM_CLASS):
                 view_widget.QCBox_RenderFile.setEnabled(False)
                 view_widget.QCBox_browseRenderFile.setEnabled(False)
             else:
+                view_widget.QCBox_RenderFile.setExceptedLayerList(self.pca_layers)  # hide pca layers in combobox menu
                 view_widget.EnableChangeDetection.setToolTip("Show/hide the combined change layer")
                 view_widget.QPBtn_ComponentAnalysisDialog.setText("Combined change layer")
                 view_widget.QPBtn_ComponentAnalysisDialog.setToolTip("The combined layer has not been generated yet")
