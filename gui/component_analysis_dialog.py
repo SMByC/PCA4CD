@@ -244,7 +244,7 @@ class ComponentAnalysisDialog(QWidget, FORM_CLASS):
         self.ShowHideChangeDetection.setEnabled(True)
         self.ShowHideChangeDetection.setChecked(True)
 
-        # update visibility of change layer in all PC in main analysis dialog
+        # update visibility of change layer in all PC in main analysis dialog Fixme: this should not be necessary
         from pca4cd.gui.main_analysis_dialog import MainAnalysisDialog
         for view_widget in MainAnalysisDialog.view_widgets:
             if view_widget.is_active and view_widget.pc_id is not None:

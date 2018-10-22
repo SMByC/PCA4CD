@@ -21,11 +21,15 @@
 import os
 import tempfile
 
+from qgis.core import Qgis
 from qgis.PyQt import uic
-from qgis.PyQt.QtCore import Qt
-from qgis.PyQt.QtWidgets import QDialog, QGridLayout, QMessageBox, QSpacerItem, QSizePolicy
+from qgis.PyQt.QtCore import Qt, pyqtSlot
+from qgis.PyQt.QtWidgets import QDialog, QGridLayout, QMessageBox
 
 from pca4cd.gui.layer_view_widget import LayerViewWidget
+from pca4cd.utils.qgis_utils import load_layer_in_qgis, apply_symbology, get_file_path_of_layer
+from pca4cd.libs import gdal_merge
+from pca4cd.utils.system_utils import wait_process
 
 # plugin path
 plugin_folder = os.path.dirname(os.path.dirname(__file__))
@@ -51,6 +55,8 @@ class MainAnalysisDialog(QDialog, FORM_CLASS):
         self.CloseButton.clicked.connect(self.closing)
         # return
         self.ReturnToMainDialog.clicked.connect(self.return_to_main_dialog)
+        # combined change layer
+        self.CombinedChangeLayer.clicked.connect(self.generate_combined_change_layer)
 
         # size of the grid with view render widgets windows
         if self.layer_b is not None:
@@ -126,9 +132,8 @@ class MainAnalysisDialog(QDialog, FORM_CLASS):
                 file_index = view_widget.QCBox_RenderFile.findText(self.layer_b.name(), Qt.MatchFixedString)
                 view_widget.QCBox_RenderFile.setCurrentIndex(file_index)
             if grid_columns < num_view <= len(self.pca_layers)+grid_columns:
-                pc_id = num_view-grid_columns
-                view_widget.pc_id = pc_id
-                view_widget.QLabel_ViewName.setText("Principal Component {}".format(pc_id))
+                view_widget.pc_id = num_view-grid_columns
+                view_widget.QLabel_ViewName.setText("Principal Component {}".format(view_widget.pc_id))
                 file_index = view_widget.QCBox_RenderFile.findText(self.pca_layers[num_view-grid_columns-1].name(), Qt.MatchFixedString)
                 view_widget.WidgetDetectionLayer.setEnabled(True)
                 view_widget.QCBox_RenderFile.setCurrentIndex(file_index)
@@ -137,7 +142,7 @@ class MainAnalysisDialog(QDialog, FORM_CLASS):
             else:
                 view_widget.EnableChangeDetection.setToolTip("Show/hide the combined change layer")
                 view_widget.QPBtn_ComponentAnalysisDialog.setText("Combined change layer")
-                view_widget.QPBtn_ComponentAnalysisDialog.setToolTip("")
+                view_widget.QPBtn_ComponentAnalysisDialog.setToolTip("The combined layer has not been generated yet")
                 # disconnect button action
                 view_widget.QPBtn_ComponentAnalysisDialog.clicked.disconnect()
             if not view_widget.QLabel_ViewName.text():
@@ -195,4 +200,47 @@ class MainAnalysisDialog(QDialog, FORM_CLASS):
     def reject(self, is_ok_to_close=False):
         if is_ok_to_close:
             super(MainAnalysisDialog, self).reject()
+
+    @pyqtSlot()
+    @wait_process
+    def generate_combined_change_layer(self):
+        from pca4cd.pca4cd import PCA4CD as pca4cd
+        # select all activated change layers
+        activated_ids = []
+        activated_change_layers = []
+        for view_widget in MainAnalysisDialog.view_widgets:
+            if view_widget.pc_id is not None and view_widget.render_widget.detection_layer is not None \
+                    and view_widget.EnableChangeDetection.isChecked():
+                activated_ids.append("PC{}".format(view_widget.pc_id))
+                activated_change_layers.append(view_widget.render_widget.detection_layer)
+
+        if len(activated_change_layers) == 0:
+            self.MsgBar.pushMessage(
+                "There is not change detection layers activated/generated in the principal components view", level=Qgis.Warning)
+            return
+
+        combined_change_layer = os.path.join(pca4cd.tmp_dir, "combined_change_layer.tif")
+        gdal_merge.main(["", "-of", "GTiff", "-o", combined_change_layer, "-n", "0", "-a_nodata", "0", "-ot", "Byte"] +
+                        [get_file_path_of_layer(layer) for layer in activated_change_layers])
+
+        detection_layer = load_layer_in_qgis(combined_change_layer, "raster", True)
+        apply_symbology(detection_layer, [("detection", 1, (255, 255, 0, 255))])
+
+        # add the combined layer to input and auxiliary view
+        for view_widget in MainAnalysisDialog.view_widgets:
+            if view_widget.pc_id is None:
+                view_widget.WidgetDetectionLayer.setEnabled(True)
+                view_widget.QPBtn_ComponentAnalysisDialog.setToolTip("")
+                view_widget.render_widget.set_detection_layer(detection_layer)
+                if view_widget.is_active:
+                    view_widget.EnableChangeDetection.setChecked(True)
+                    view_widget.QPBtn_ComponentAnalysisDialog.setEnabled(True)
+
+            # update visibility of change layer in all PC in main analysis dialog Fixme: this should not be necessary
+            if view_widget.is_active and view_widget.pc_id is not None:
+                view_widget.detection_layer_toggled()
+
+        self.MsgBar.pushMessage(
+            "All change detection layers activated combined successfully, using: {}".format(
+                ", ".join(activated_ids)), level=Qgis.Success)
 
