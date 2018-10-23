@@ -125,10 +125,28 @@ class PCA4CDDialog(QDialog, FORM_CLASS):
             # select the last item
             self.QCBox_nComponents.setCurrentIndex(number_components-1)
 
+    def check_input_layers(self, layer_A, layer_B):
+        if layer_B is None:
+            return True
+        if layer_A.crs() != layer_B.crs():
+            self.MsgBar.pushMessage("The layers don't have the same projection", level=Qgis.Warning)
+            return False
+        if layer_A.extent() != layer_B.extent():
+            self.MsgBar.pushMessage("The layers don't have the same extent", level=Qgis.Warning)
+            return False
+        if layer_A.rasterUnitsPerPixelX() != layer_B.rasterUnitsPerPixelX() or \
+           layer_A.rasterUnitsPerPixelY() != layer_B.rasterUnitsPerPixelY():
+            self.MsgBar.pushMessage("The layers don't have the same pixel size", level=Qgis.Warning)
+            return False
+        return True
+
     @pyqtSlot()
     @error_handler
     def generate_principal_components(self):
         from pca4cd.pca4cd import PCA4CD as pca4cd
+
+        if not self.check_input_layers(self.QCBox_InputData_A.currentLayer(), self.QCBox_InputData_B.currentLayer()):
+            return
 
         path_layer_A = get_file_path_of_layer(self.QCBox_InputData_A.currentLayer())
         path_layer_B = get_file_path_of_layer(self.QCBox_InputData_B.currentLayer())
