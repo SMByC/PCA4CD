@@ -172,7 +172,7 @@ class ComponentAnalysisDialog(QWidget, FORM_CLASS):
         # init histogram plot
         self.hist_data = None
         self.hist_bins = {"pc": {"type": "auto", "bins": None}, "aoi": {"type": "auto", "bins": None}}
-        self.HistogramPlot.setTitle('Histogram')
+        self.HistogramPlot.setTitle('Histogram', size='9pt')
         self.HistogramPlot.setBackground('w')
         self.HistogramPlot.showGrid(x=True, y=True, alpha=0.3)
         self.HistogramTypeBins.currentIndexChanged[str].connect(lambda value: self.histogram_plot(bins=value))
