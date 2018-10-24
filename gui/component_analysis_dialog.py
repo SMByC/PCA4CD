@@ -170,9 +170,14 @@ class ComponentAnalysisDialog(QWidget, FORM_CLASS):
         self.QCBox_StatsLayer.currentIndexChanged[str].connect(self.set_statistics)
 
         # init histogram plot
+        self.hist_data = None
+        self.hist_bins = {"pc": {"type": "auto", "bins": None}, "aoi": {"type": "auto", "bins": None}}
         self.HistogramPlot.setTitle('Histogram')
         self.HistogramPlot.setBackground('w')
         self.HistogramPlot.showGrid(x=True, y=True, alpha=0.3)
+        self.HistogramTypeBins.currentIndexChanged[str].connect(lambda value: self.histogram_plot(bins=value))
+        self.HistogramCustomBins.hide()
+        self.HistogramCustomBins.valueChanged.connect(lambda value: self.histogram_plot(bins=value))
         # init region and synchronize the region on plot with range values
         self.linear_region = pg.LinearRegionItem(brush=(255, 255, 0, 40))
         self.HistogramPlot.addItem(self.linear_region)
@@ -250,20 +255,20 @@ class ComponentAnalysisDialog(QWidget, FORM_CLASS):
             if view_widget.is_active and view_widget.pc_id is not None:
                 view_widget.detection_layer_toggled()
 
-    @wait_process
     def set_statistics(self, stats_for=None):
         if stats_for == self.pc_name:
             from pca4cd.gui.main_analysis_dialog import MainAnalysisDialog
-            self.statistics(self.pc_data, MainAnalysisDialog.pca_stats)
-            self.histogram_plot(self.pc_data)
             with block_signals_to(self.QCBox_StatsLayer):
                 self.QCBox_StatsLayer.setCurrentIndex(0)
+            self.statistics(self.pc_data, MainAnalysisDialog.pca_stats)
+            self.histogram_plot(data=self.pc_data)
         if stats_for == "Areas Of Interest":
-            self.statistics(self.aoi_data)
-            self.histogram_plot(self.aoi_data)
             with block_signals_to(self.QCBox_StatsLayer):
                 self.QCBox_StatsLayer.setCurrentIndex(1)
+            self.statistics(self.aoi_data)
+            self.histogram_plot(data=self.aoi_data)
 
+    @wait_process
     def statistics(self, data, pca_stats=None):
         if pca_stats:  # for pca
             self.stats_header.setText("Eigenvalue: {} ({}%)".format(round(pca_stats["eigenvals"][self.pc_id-1], 2),
@@ -280,16 +285,53 @@ class ComponentAnalysisDialog(QWidget, FORM_CLASS):
         self.stats_p50.setText(str(round(np.percentile(data, 50), 2)))
         self.stats_p75.setText(str(round(np.percentile(data, 75), 2)))
 
-    def histogram_plot(self, data):
-        if data.size <= 1:
+    @pyqtSlot()
+    @wait_process
+    def histogram_plot(self, data=None, bins=None):
+        # check and set data
+        if data is not None:
+            self.hist_data = data
+        if self.hist_data is None or self.hist_data.size <= 1:
             self.HistogramPlot.clear()
             return
-        y, x = np.histogram(data, bins=80)
+        # histogram bins
+        stats_for = self.QCBox_StatsLayer.currentText()
+        if stats_for == self.pc_name:
+            hist_bins = self.hist_bins["pc"]
+        if stats_for == "Areas Of Interest":
+            hist_bins = self.hist_bins["aoi"]
+        if bins is not None:
+            if isinstance(bins, int):
+                set_bins = bins
+            elif bins == "custom":
+                hist_bins["type"] = bins
+                self.HistogramCustomBins.show()
+                self.HistogramCustomBins.setValue(hist_bins["bins"])
+                return
+            else:
+                self.HistogramCustomBins.hide()
+                hist_bins["type"] = bins
+                set_bins = bins
+        else:  # from set_statistics functions
+            if hist_bins["type"] == "custom":
+                set_bins = hist_bins["bins"]
+                self.HistogramCustomBins.show()
+                with block_signals_to(self.HistogramTypeBins):
+                    self.HistogramTypeBins.setCurrentIndex(self.HistogramTypeBins.findText("custom"))
+                with block_signals_to(self.HistogramCustomBins):
+                    self.HistogramCustomBins.setValue(hist_bins["bins"])
+            else:
+                set_bins = hist_bins["type"]
+                self.HistogramCustomBins.hide()
+                with block_signals_to(self.HistogramTypeBins):
+                    self.HistogramTypeBins.setCurrentIndex(self.HistogramTypeBins.findText(hist_bins["type"]))
+        # plot
+        y, x = np.histogram(self.hist_data, bins=set_bins)
         self.HistogramPlot.clear()
         self.HistogramPlot.plot(x, y, stepMode=True, fillLevel=0, brush=(80, 80, 80))
         self.HistogramPlot.autoRange()
-
         self.HistogramPlot.addItem(self.linear_region)
+        hist_bins["bins"] = len(y)  # store bins
 
     @pyqtSlot()
     def update_region_from_plot(self):
