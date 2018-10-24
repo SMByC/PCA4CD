@@ -116,7 +116,7 @@
           </widget>
          </item>
          <item>
-          <widget class="QToolButton" name="CombinedChangeLayer">
+          <widget class="QToolButton" name="OpenMergeChangeLayers">
            <property name="toolTip">
             <string>Merge all activated change layers and save the final change layer</string>
            </property>

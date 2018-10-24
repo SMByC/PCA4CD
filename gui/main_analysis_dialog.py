@@ -27,6 +27,7 @@ from qgis.PyQt.QtCore import Qt, pyqtSlot
 from qgis.PyQt.QtWidgets import QDialog, QGridLayout, QMessageBox
 
 from pca4cd.gui.layer_view_widget import LayerViewWidget
+from pca4cd.gui.merge_change_layers_dialog import MergeChangeLayersDialog
 from pca4cd.utils.qgis_utils import load_layer_in_qgis, apply_symbology, get_file_path_of_layer
 from pca4cd.libs import gdal_merge
 from pca4cd.utils.system_utils import wait_process
@@ -56,7 +57,7 @@ class MainAnalysisDialog(QDialog, FORM_CLASS):
         # return
         self.ReturnToMainDialog.clicked.connect(self.return_to_main_dialog)
         # combined change layer
-        self.CombinedChangeLayer.clicked.connect(self.generate_combined_change_layer)
+        self.OpenMergeChangeLayers.clicked.connect(self.open_merge_change_layers)
 
         # size of the grid with view render widgets windows
         if self.layer_b is not None:
@@ -202,37 +203,46 @@ class MainAnalysisDialog(QDialog, FORM_CLASS):
         if is_ok_to_close:
             super(MainAnalysisDialog, self).reject()
 
-    @pyqtSlot()
-    @wait_process
-    def generate_combined_change_layer(self):
-        from pca4cd.pca4cd import PCA4CD as pca4cd
+    def open_merge_change_layers(self):
         # select all activated change layers
-        activated_ids = []
-        activated_change_layers = []
+        self.activated_ids = []
+        self.activated_change_layers = []
         for view_widget in MainAnalysisDialog.view_widgets:
             if view_widget.pc_id is not None and view_widget.render_widget.detection_layer is not None \
                     and view_widget.EnableChangeDetection.isChecked():
-                activated_ids.append("PC{}".format(view_widget.pc_id))
-                activated_change_layers.append(view_widget.render_widget.detection_layer)
-
-        if len(activated_change_layers) == 0:
+                self.activated_ids.append("PC{}".format(view_widget.pc_id))
+                self.activated_change_layers.append(view_widget.render_widget.detection_layer)
+        if len(self.activated_change_layers) == 0:
             self.MsgBar.pushMessage(
-                "There is not change detection layers activated/generated in the principal components view", level=Qgis.Warning)
+                "There is not change detection layers activated/generated in the Principal Components view",
+                level=Qgis.Warning)
             return
+        # suggested filename
+        path, filename = os.path.split(get_file_path_of_layer(self.layer_a))
+        suggested_filename = os.path.splitext(os.path.join(path, filename))[0] + "_pca4cd.tif"
+        # merge dialog
+        merge_dialog = MergeChangeLayersDialog(self.activated_ids, suggested_filename)
+        if merge_dialog.exec_():
+            self.do_merge_change_layers(merge_dialog)
 
-        combined_change_layer = os.path.join(pca4cd.tmp_dir, "combined_change_layer.tif")
-        gdal_merge.main(["", "-of", "GTiff", "-o", combined_change_layer, "-n", "0", "-a_nodata", "0", "-ot", "Byte"] +
-                        [get_file_path_of_layer(layer) for layer in activated_change_layers])
+    @pyqtSlot()
+    @wait_process
+    def do_merge_change_layers(self, merge_dialog):
+        merged_change_layer = merge_dialog.MergedFileWidget.filePath()
+        MergeChangeLayersDialog.merged_file_path = merged_change_layer
 
-        detection_layer = load_layer_in_qgis(combined_change_layer, "raster", True)
-        apply_symbology(detection_layer, [("detection", 1, (255, 255, 0, 255))])
+        gdal_merge.main(["", "-of", "GTiff", "-o", merged_change_layer, "-n", "0", "-a_nodata", "0", "-ot", "Byte"] +
+                        [get_file_path_of_layer(layer) for layer in self.activated_change_layers])
 
-        # add the combined layer to input and auxiliary view
+        merged_layer = load_layer_in_qgis(merged_change_layer, "raster", True if merge_dialog.LoadInQgis.isChecked() else False)
+        apply_symbology(merged_layer, [("detection", 1, (255, 255, 0, 255))])
+
+        # add the merged layer to input and auxiliary view
         for view_widget in MainAnalysisDialog.view_widgets:
             if view_widget.pc_id is None:
                 view_widget.WidgetDetectionLayer.setEnabled(True)
                 view_widget.QPBtn_ComponentAnalysisDialog.setToolTip("")
-                view_widget.render_widget.set_detection_layer(detection_layer)
+                view_widget.render_widget.set_detection_layer(merged_layer)
                 if view_widget.is_active:
                     view_widget.EnableChangeDetection.setChecked(True)
                     view_widget.QPBtn_ComponentAnalysisDialog.setEnabled(True)
@@ -241,7 +251,12 @@ class MainAnalysisDialog(QDialog, FORM_CLASS):
             if view_widget.is_active and view_widget.pc_id is not None:
                 view_widget.detection_layer_toggled()
 
-        self.MsgBar.pushMessage(
-            "All change detection layers activated combined successfully, using: {}".format(
-                ", ".join(activated_ids)), level=Qgis.Success)
+        if len(self.activated_ids) == 1:
+            self.MsgBar.pushMessage(
+                "The change detection for {} was saved and loaded successfully".format(
+                    self.activated_ids[0]), level=Qgis.Success)
+        else:
+            self.MsgBar.pushMessage(
+                "The change detection for {} were merged, saved and loaded successfully".format(
+                    ", ".join(self.activated_ids)), level=Qgis.Success)
 
