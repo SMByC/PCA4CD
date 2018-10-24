@@ -38,16 +38,16 @@ class MergeChangeLayersDialog(QDialog, FORM_CLASS):
         QDialog.__init__(self)
         self.setupUi(self)
         self.LayersToProcess.setText(" - ".join(activated_ids))
-        self.MergedFileWidget.setDialogTitle("Save the merged layer")
-        self.MergedFileWidget.setFilter("Raster files (*.tif)")
-        self.MergedFileWidget.setStorageMode(QgsFileWidget.SaveFile)
+        self.MergeFileWidget.setDialogTitle("Save the merged layer")
+        self.MergeFileWidget.setFilter("Raster files (*.tif)")
+        self.MergeFileWidget.setStorageMode(QgsFileWidget.SaveFile)
         if MergeChangeLayersDialog.merged_file_path is not None:
-            self.MergedFileWidget.setFilePath(MergeChangeLayersDialog.merged_file_path)
+            self.MergeFileWidget.setFilePath(MergeChangeLayersDialog.merged_file_path)
         else:
-            self.MergedFileWidget.setFilePath(suggested_filename)
+            self.MergeFileWidget.setFilePath(suggested_filename)
 
         if len(activated_ids) == 1:
-            self.LabelMergedMethod.setEnabled(False)
-            self.MergedMethod.setEnabled(False)
-            self.LabelMergedFileWidget.setText("Save the change layer")
-            self.MergedFileWidget.setDialogTitle("Save the change layer")
+            self.LabelMergeMethod.setEnabled(False)
+            self.MergeMethod.setEnabled(False)
+            self.LabelMergeFileWidget.setText("Save the change layer")
+            self.MergeFileWidget.setDialogTitle("Save the change layer")

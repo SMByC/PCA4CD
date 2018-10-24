@@ -228,7 +228,7 @@ class MainAnalysisDialog(QDialog, FORM_CLASS):
     @pyqtSlot()
     @wait_process
     def do_merge_change_layers(self, merge_dialog):
-        merged_change_layer = merge_dialog.MergedFileWidget.filePath()
+        merged_change_layer = merge_dialog.MergeFileWidget.filePath()
         MergeChangeLayersDialog.merged_file_path = merged_change_layer
 
         gdal_merge.main(["", "-of", "GTiff", "-o", merged_change_layer, "-n", "0", "-a_nodata", "0", "-ot", "Byte"] +
