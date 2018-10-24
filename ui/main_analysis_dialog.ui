@@ -121,11 +121,11 @@
             <string>Merge all activated change layers and save the final change layer</string>
            </property>
            <property name="text">
-            <string>Generate the Combined Change Layer</string>
+            <string>Generate/Save the Merged Change Layer</string>
            </property>
            <property name="icon">
             <iconset>
-             <normaloff>:/plugins/pca4cd/icons/combine_layers.svg</normaloff>:/plugins/pca4cd/icons/combine_layers.svg</iconset>
+             <normaloff>:/plugins/pca4cd/icons/merge_layers.svg</normaloff>:/plugins/pca4cd/icons/merge_layers.svg</iconset>
            </property>
            <property name="toolButtonStyle">
             <enum>Qt::ToolButtonTextBesideIcon</enum>

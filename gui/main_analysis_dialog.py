@@ -56,7 +56,7 @@ class MainAnalysisDialog(QDialog, FORM_CLASS):
         self.CloseButton.clicked.connect(self.closing)
         # return
         self.ReturnToMainDialog.clicked.connect(self.return_to_main_dialog)
-        # combined change layer
+        # merge change layer
         self.OpenMergeChangeLayers.clicked.connect(self.open_merge_change_layers)
 
         # size of the grid with view render widgets windows
@@ -142,9 +142,9 @@ class MainAnalysisDialog(QDialog, FORM_CLASS):
                 view_widget.QCBox_browseRenderFile.setEnabled(False)
             else:
                 view_widget.QCBox_RenderFile.setExceptedLayerList(self.pca_layers)  # hide pca layers in combobox menu
-                view_widget.EnableChangeDetection.setToolTip("Show/hide the combined change layer")
-                view_widget.QPBtn_ComponentAnalysisDialog.setText("Combined change layer")
-                view_widget.QPBtn_ComponentAnalysisDialog.setToolTip("The combined layer has not been generated yet")
+                view_widget.EnableChangeDetection.setToolTip("Show/hide the merged change layer")
+                view_widget.QPBtn_ComponentAnalysisDialog.setText("Merged change layer")
+                view_widget.QPBtn_ComponentAnalysisDialog.setToolTip("The merged change layer has not been generated yet")
                 # disconnect button action
                 view_widget.QPBtn_ComponentAnalysisDialog.clicked.disconnect()
             if not view_widget.QLabel_ViewName.text():
