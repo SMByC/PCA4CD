@@ -288,6 +288,12 @@ class ComponentAnalysisDialog(QWidget, FORM_CLASS):
     @pyqtSlot()
     @wait_process
     def histogram_plot(self, data=None, bins=None):
+        # which plot
+        stats_for = self.QCBox_StatsLayer.currentText()
+        if stats_for == self.pc_name:
+            hist_bins = self.hist_bins["pc"]
+        if stats_for == "Areas Of Interest":
+            hist_bins = self.hist_bins["aoi"]
         # check and set data
         if data is not None:
             self.hist_data = data
@@ -295,11 +301,6 @@ class ComponentAnalysisDialog(QWidget, FORM_CLASS):
             self.HistogramPlot.clear()
             return
         # histogram bins
-        stats_for = self.QCBox_StatsLayer.currentText()
-        if stats_for == self.pc_name:
-            hist_bins = self.hist_bins["pc"]
-        if stats_for == "Areas Of Interest":
-            hist_bins = self.hist_bins["aoi"]
         if bins is not None:
             if isinstance(bins, int):
                 set_bins = bins
