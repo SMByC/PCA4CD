@@ -238,7 +238,7 @@ class ComponentAnalysisDialog(QWidget, FORM_CLASS):
 
         gdal_calc.Calc(calc="0*logical_and(A<{range_from},A>{range_to})+1*logical_and(A>={range_from},A<={range_to})"
                        .format(range_from=detection_from, range_to=detection_to), A=get_file_path_of_layer(self.pc_layer),
-                       outfile=output_change_layer, type="Byte", NoDataValue=0)
+                       outfile=output_change_layer, type="Byte")
 
         detection_layer = load_layer_in_qgis(output_change_layer, "raster", False)
         apply_symbology(detection_layer, [("detection", 1, (255, 255, 0, 255))])
