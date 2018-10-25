@@ -1,7 +1,28 @@
+# -*- coding: utf-8 -*-
+"""
+/***************************************************************************
+ PCA4CD
+                                 A QGIS plugin
+ Principal components analysis for change detection
+                              -------------------
+        copyright            : (C) 2018 by Xavier Corredor Llano, SMByC
+        email                : xcorredorl@ideam.gov.co
+ ***************************************************************************/
+
+/***************************************************************************
+ *                                                                         *
+ *   This program is free software; you can redistribute it and/or modify  *
+ *   it under the terms of the GNU General Public License as published by  *
+ *   the Free Software Foundation; either version 2 of the License, or     *
+ *   (at your option) any later version.                                   *
+ *                                                                         *
+ ***************************************************************************/
+"""
 import os
 import numpy as np
 import dask
 import rasterio
+from multiprocessing.pool import ThreadPool
 from dask_rasterio import read_raster, write_raster
 from subprocess import call
 
@@ -9,7 +30,7 @@ from pca4cd.utils.system_utils import wait_process
 
 
 @wait_process
-def pca(A, B, n_pc, estimator_matrix, out_dir):
+def pca(A, B, n_pc, estimator_matrix, out_dir, n_threads, block_size):
     """Calculate the principal components for the vertical stack A or with
     combinations of the stack B
 
@@ -21,7 +42,7 @@ def pca(A, B, n_pc, estimator_matrix, out_dir):
     :return: pca files list and statistics
     """
     # init dask as threads (shared memory is required)
-    dask.config.set(scheduler='threads')
+    dask.config.set(pool=ThreadPool(n_threads))
 
     def get_profile(path):
         """Get geospatial metadata profile such as projections, pixel sizes, etc"""
@@ -29,11 +50,11 @@ def pca(A, B, n_pc, estimator_matrix, out_dir):
             return src.profile.copy()
 
     if B is not None:
-        raw_image_a = read_raster(A, block_size=1000)
-        raw_image_b = read_raster(B, block_size=1000)
+        raw_image_a = read_raster(A, block_size=block_size)
+        raw_image_b = read_raster(B, block_size=block_size)
         raw_image = dask.array.vstack((raw_image_a, raw_image_b))
     else:
-        raw_image = read_raster(A, block_size=1000)
+        raw_image = read_raster(A, block_size=block_size)
 
     # flat each dimension (bands)
     flat_dims = raw_image.reshape((raw_image.shape[0], raw_image.shape[1] * raw_image.shape[2]))

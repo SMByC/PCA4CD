@@ -22,6 +22,7 @@
 import os
 import configparser
 import webbrowser
+from multiprocessing import cpu_count
 
 from qgis.PyQt import uic
 from qgis.PyQt.QtCore import pyqtSignal, pyqtSlot
@@ -99,6 +100,9 @@ class PCA4CDDialog(QDialog, FORM_CLASS):
 
         # ######### Principal Components ######### #
         self.QPBtn_runPCA.clicked.connect(self.generate_principal_components)
+        # process settings
+        self.group_ProcessSettings.setVisible(False)
+        self.nThreads.setValue(cpu_count())
 
     @pyqtSlot()
     def fileDialog_browse(self, combo_box, dialog_title, dialog_types, layer_type):
@@ -153,7 +157,8 @@ class PCA4CDDialog(QDialog, FORM_CLASS):
         n_pc = int(self.QCBox_nComponents.currentText())
         estimator_matrix = self.QCBox_EstimatorMatrix.currentText()
 
-        pca_files, pca_stats = pca(path_layer_A, path_layer_B, n_pc, estimator_matrix, pca4cd.tmp_dir)
+        pca_files, pca_stats = pca(path_layer_A, path_layer_B, n_pc, estimator_matrix, pca4cd.tmp_dir,
+                                   self.nThreads.value(), self.BlockSize.value())
 
         pca_layers = []
         if pca_files:
