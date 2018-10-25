@@ -24,7 +24,7 @@ import tempfile
 from qgis.core import Qgis
 from qgis.PyQt import uic
 from qgis.PyQt.QtCore import Qt, pyqtSlot
-from qgis.PyQt.QtWidgets import QDialog, QGridLayout, QMessageBox
+from qgis.PyQt.QtWidgets import QDialog, QGridLayout, QMessageBox, QFileDialog
 
 from pca4cd.gui.layer_view_widget import LayerViewWidget
 from pca4cd.gui.merge_change_layers_dialog import MergeChangeLayersDialog
@@ -56,6 +56,8 @@ class MainAnalysisDialog(QDialog, FORM_CLASS):
         self.CloseButton.clicked.connect(self.closing)
         # return
         self.ReturnToMainDialog.clicked.connect(self.return_to_main_dialog)
+        # save all components in a stack
+        self.SavePCA.clicked.connect(self.save_pca)
         # merge change layer
         self.OpenMergeChangeLayers.clicked.connect(self.open_merge_change_layers)
 
@@ -203,6 +205,21 @@ class MainAnalysisDialog(QDialog, FORM_CLASS):
         if is_ok_to_close:
             super(MainAnalysisDialog, self).reject()
 
+    @pyqtSlot()
+    def save_pca(self):
+        # suggested filename
+        path, filename = os.path.split(get_file_path_of_layer(self.layer_a))
+        suggested_filename = os.path.splitext(os.path.join(path, filename))[0] + "_pca.tif"
+        # filesave dialog
+        file_out, _ = QFileDialog.getSaveFileName(self, self.tr("Save the PCA stack"),
+                                                  suggested_filename,
+                                                  self.tr("GeoTiff files (*.tif);;All files (*.*)"))
+        if file_out != '':
+            gdal_merge.main(["", "-separate", "-of", "GTiff", "-o", file_out] +
+                            [get_file_path_of_layer(layer) for layer in self.pca_layers])
+            self.MsgBar.pushMessage("PCA stack saved successfully: \"{}\"".format(os.path.basename(file_out)), level=Qgis.Success)
+
+    @pyqtSlot()
     def open_merge_change_layers(self):
         # select all activated change layers
         self.activated_ids = []

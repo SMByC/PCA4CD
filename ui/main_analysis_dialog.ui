@@ -102,7 +102,7 @@
           </spacer>
          </item>
          <item>
-          <widget class="QToolButton" name="toolButton_2">
+          <widget class="QToolButton" name="SavePCA">
            <property name="toolTip">
             <string>(Optional) Save all the principal components generated in a stack</string>
            </property>
