@@ -46,6 +46,17 @@
       </property>
       <item>
        <widget class="QLineEdit" name="QLabel_ViewName">
+        <property name="maximumSize">
+         <size>
+          <width>16777215</width>
+          <height>26</height>
+         </size>
+        </property>
+        <property name="font">
+         <font>
+          <pointsize>8</pointsize>
+         </font>
+        </property>
         <property name="frame">
          <bool>false</bool>
         </property>
@@ -109,7 +120,7 @@
       <item>
        <widget class="QgsMapLayerComboBox" name="QCBox_RenderFile">
         <property name="sizePolicy">
-         <sizepolicy hsizetype="Ignored" vsizetype="Maximum">
+         <sizepolicy hsizetype="Expanding" vsizetype="Fixed">
           <horstretch>0</horstretch>
           <verstretch>0</verstretch>
          </sizepolicy>
@@ -140,7 +151,7 @@
         </property>
         <property name="maximumSize">
          <size>
-          <width>76</width>
+          <width>32</width>
           <height>22</height>
          </size>
         </property>
@@ -150,7 +161,7 @@
          </font>
         </property>
         <property name="text">
-         <string>Browse</string>
+         <string>...</string>
         </property>
        </widget>
       </item>
@@ -200,6 +211,17 @@
       </item>
       <item>
        <widget class="QRadioButton" name="EnableChangeDetection">
+        <property name="maximumSize">
+         <size>
+          <width>16777215</width>
+          <height>26</height>
+         </size>
+        </property>
+        <property name="font">
+         <font>
+          <pointsize>8</pointsize>
+         </font>
+        </property>
         <property name="toolTip">
          <string>Enable/Disable the change layer</string>
         </property>
@@ -212,6 +234,17 @@
        <widget class="QToolButton" name="QPBtn_ComponentAnalysisDialog">
         <property name="enabled">
          <bool>false</bool>
+        </property>
+        <property name="maximumSize">
+         <size>
+          <width>16777215</width>
+          <height>26</height>
+         </size>
+        </property>
+        <property name="font">
+         <font>
+          <pointsize>8</pointsize>
+         </font>
         </property>
         <property name="toolTip">
          <string>Generate the change layer for this component</string>
