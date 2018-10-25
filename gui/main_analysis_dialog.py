@@ -29,7 +29,7 @@ from qgis.PyQt.QtWidgets import QDialog, QGridLayout, QMessageBox
 from pca4cd.gui.layer_view_widget import LayerViewWidget
 from pca4cd.gui.merge_change_layers_dialog import MergeChangeLayersDialog
 from pca4cd.utils.qgis_utils import load_layer_in_qgis, apply_symbology, get_file_path_of_layer
-from pca4cd.libs import gdal_merge
+from pca4cd.libs import gdal_merge, gdal_calc
 from pca4cd.utils.system_utils import wait_process
 
 # plugin path
@@ -231,8 +231,22 @@ class MainAnalysisDialog(QDialog, FORM_CLASS):
         merged_change_layer = merge_dialog.MergeFileWidget.filePath()
         MergeChangeLayersDialog.merged_file_path = merged_change_layer
 
-        gdal_merge.main(["", "-of", "GTiff", "-o", merged_change_layer, "-n", "0", "-a_nodata", "0", "-ot", "Byte"] +
-                        [get_file_path_of_layer(layer) for layer in self.activated_change_layers])
+        merge_method = merge_dialog.MergeMethod.currentText()
+
+        if merge_method == "Union":
+            gdal_merge.main(["", "-of", "GTiff", "-o", merged_change_layer, "-a_nodata", "0", "-ot", "Byte"] +
+                            [get_file_path_of_layer(layer) for layer in self.activated_change_layers])
+
+        if merge_method == "Intersection":
+            alpha_list = ["A", "B", "C", "D", "E", "F", "G", "H", "I", "J", "K", "L", "M", "N", "O", "P", "Q", "R", "S",
+                          "T", "U", "V", "W", "X", "Y", "Z"]
+            input_files = {alpha_list[x]: get_file_path_of_layer(f) for x, f in enumerate(self.activated_change_layers)}
+            filter_ones = ",".join([alpha_list[x] + "==1" for x in range(len(self.activated_change_layers))])
+            filter_zeros = ",".join([alpha_list[x] + "==0" for x in range(len(self.activated_change_layers))])
+
+            gdal_calc.Calc(calc="0*(numpy.any([{filter_zeros}], axis=0)) + 1*(numpy.all([{filter_ones}], axis=0))"
+                           .format(filter_zeros=filter_zeros, filter_ones=filter_ones), outfile=merged_change_layer,
+                           type="Byte", NoDataValue=0, **input_files)
 
         merged_layer = load_layer_in_qgis(merged_change_layer, "raster", True if merge_dialog.LoadInQgis.isChecked() else False)
         apply_symbology(merged_layer, [("detection", 1, (255, 255, 0, 255))])
