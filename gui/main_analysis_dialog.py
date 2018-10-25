@@ -234,7 +234,7 @@ class MainAnalysisDialog(QDialog, FORM_CLASS):
         merge_method = merge_dialog.MergeMethod.currentText()
 
         if merge_method == "Union":
-            gdal_merge.main(["", "-of", "GTiff", "-o", merged_change_layer, "-a_nodata", "0", "-ot", "Byte"] +
+            gdal_merge.main(["", "-of", "GTiff", "-o", merged_change_layer, "-n", "0", "-a_nodata", "0", "-ot", "Byte"] +
                             [get_file_path_of_layer(layer) for layer in self.activated_change_layers])
 
         if merge_method == "Intersection":
