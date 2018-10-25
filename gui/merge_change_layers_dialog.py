@@ -37,7 +37,7 @@ class MergeChangeLayersDialog(QDialog, FORM_CLASS):
     def __init__(self, activated_ids, suggested_filename):
         QDialog.__init__(self)
         self.setupUi(self)
-        self.LayersToProcess.setText(" - ".join(activated_ids))
+        self.LayersToProcess.setText(", ".join(activated_ids))
         self.MergeFileWidget.setDialogTitle("Save the merged layer")
         self.MergeFileWidget.setFilter("Raster files (*.tif)")
         self.MergeFileWidget.setStorageMode(QgsFileWidget.SaveFile)
