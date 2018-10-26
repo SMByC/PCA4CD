@@ -21,6 +21,7 @@
 import os
 import numpy as np
 import dask
+from dask import array as da
 import rasterio
 from multiprocessing.pool import ThreadPool
 from dask_rasterio import read_raster, write_raster
@@ -52,7 +53,7 @@ def pca(A, B, n_pc, estimator_matrix, out_dir, n_threads, block_size):
     if B is not None:
         raw_image_a = read_raster(A, block_size=block_size)
         raw_image_b = read_raster(B, block_size=block_size)
-        raw_image = dask.array.vstack((raw_image_a, raw_image_b))
+        raw_image = da.vstack((raw_image_a, raw_image_b))
     else:
         raw_image = read_raster(A, block_size=block_size)
 
