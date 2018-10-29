@@ -30,7 +30,7 @@ from qgis.PyQt.QtWidgets import QFileDialog, QDialog
 from qgis.core import QgsMapLayerProxyModel, Qgis
 from qgis.utils import iface
 
-from pca4cd.core.pca import pca
+from pca4cd.core.pca_dask_gdal import pca
 from pca4cd.gui.about_dialog import AboutDialog
 from pca4cd.gui.main_analysis_dialog import MainAnalysisDialog
 from pca4cd.utils.qgis_utils import load_and_select_filepath_in, load_layer_in_qgis, get_file_path_of_layer
