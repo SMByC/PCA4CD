@@ -117,6 +117,8 @@ def pca(A, B, n_pc, estimator_matrix, out_dir, n_threads, block_size):
             out_pc.SetGeoTransform(src_ds_A.GetGeoTransform())
         if src_ds_A.GetProjection() is not None:
             out_pc.SetProjection(src_ds_A.GetProjection())
+        out_pc.FlushCache()
+        del pcband, out_pc
 
         pca_files.append(tmp_pca_file)
 
@@ -125,7 +127,7 @@ def pca(A, B, n_pc, estimator_matrix, out_dir, n_threads, block_size):
     def pyramids(pca_file):
         call("gdaladdo --config BIGTIFF_OVERVIEW YES {}".format(pca_file), shell=True)
 
-    dask.compute(*[pyramids(pca_file) for pca_file in pca_files], num_workers=2)
+    # dask.compute(*[pyramids(pca_file) for pca_file in pca_files], num_workers=2)
 
     ########
     # pca statistics
