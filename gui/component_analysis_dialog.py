@@ -185,7 +185,6 @@ class ComponentAnalysisDialog(QWidget, FORM_CLASS):
         self.RangeChangeFrom.valueChanged.connect(self.update_region_from_values)
         self.RangeChangeTo.valueChanged.connect(self.update_region_from_values)
         # statistics for current principal component
-        gdal.AllRegister()
         dataset = gdal.Open(get_file_path_of_layer(self.pc_layer), GA_ReadOnly)
         band = dataset.GetRasterBand(1).ReadAsArray()
         self.pc_data = band.flatten()
@@ -356,7 +355,6 @@ class ComponentAnalysisDialog(QWidget, FORM_CLASS):
         # clip the raster component in AOI for get only the pixel values inside it
         pc_aoi = os.path.join(pca4cd.tmp_dir, self.pc_layer.name() + "_clip_aoi.tif")
         clip_raster_with_shape(self.pc_layer, self.aoi_features, pc_aoi)
-        gdal.AllRegister()
         dataset = gdal.Open(pc_aoi, GA_ReadOnly)
         band = dataset.GetRasterBand(1).ReadAsArray()
         self.aoi_data = band.flatten()
