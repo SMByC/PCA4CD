@@ -117,7 +117,22 @@ def external_deps(deps):
         for dependency in deps_not_installed:
             msg_info.setText("installing python dependencies: {}".format(dependency))
             QApplication.processEvents()
-            status = subprocess.call([sys.executable, '-m', 'pip', 'install', dependency, '--user'])
+
+            if dependency == "rasterio" and os.name == "nt":
+                from osgeo import gdal
+                gdal_version = gdal.__version__
+                is_64bits = sys.maxsize > 2 ** 32
+                python_version = "{}{}".format(sys.version_info[0], sys.version_info[1])
+                plugin_folder = os.path.dirname(os.path.dirname(__file__))
+                wheels_path = os.path.join(plugin_folder, 'libs', 'rasterio_wheels')
+                rasterio_wheel = os.path.join(wheels_path, "rasterio-1.0.8-cp{pv}-cp{pv}m-{win}.whl"
+                                              .format(pv=python_version, win="win_amd64" if is_64bits else "win32"))
+                status = subprocess.call(['python3', '-m', 'pip', 'install', rasterio_wheel, '--user', '--no-deps'], shell=True)
+            elif dependency == "dask":
+                status = subprocess.call(['python3', '-m', 'pip', 'install', 'dask[array]', '--user'], shell=True)
+            else:
+                status = subprocess.call(['python3', '-m', 'pip', 'install', dependency, '--user', '--no-deps'], shell=True)
+
             if status != 0:
                 msg_info.close()
                 QMessageBox.warning(None, "PCA4CD plugin", "Error installing python dependencies for PCA4CD plugin: {}"
