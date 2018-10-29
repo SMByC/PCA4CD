@@ -21,6 +21,7 @@
 import functools
 import traceback
 import os, sys, subprocess
+from importlib import reload
 
 from qgis.PyQt.QtCore import Qt
 from qgis.PyQt.QtWidgets import QApplication, QMessageBox
@@ -118,17 +119,7 @@ def external_deps(deps):
             msg_info.setText("installing python dependencies: {}".format(dependency))
             QApplication.processEvents()
 
-            if dependency == "rasterio" and os.name == "nt":
-                from osgeo import gdal
-                gdal_version = gdal.__version__
-                is_64bits = sys.maxsize > 2 ** 32
-                python_version = "{}{}".format(sys.version_info[0], sys.version_info[1])
-                plugin_folder = os.path.dirname(os.path.dirname(__file__))
-                wheels_path = os.path.join(plugin_folder, 'libs', 'rasterio_wheels')
-                rasterio_wheel = os.path.join(wheels_path, "rasterio-1.0.8-cp{pv}-cp{pv}m-{win}.whl"
-                                              .format(pv=python_version, win="win_amd64" if is_64bits else "win32"))
-                status = subprocess.call(['python3', '-m', 'pip', 'install', rasterio_wheel, '--user', '--no-deps'], shell=True)
-            elif dependency == "dask":
+            if dependency == "dask":
                 status = subprocess.call(['python3', '-m', 'pip', 'install', 'dask[array]', '--user'], shell=True)
             else:
                 status = subprocess.call(['python3', '-m', 'pip', 'install', dependency, '--user', '--no-deps'], shell=True)
@@ -140,5 +131,9 @@ def external_deps(deps):
                 return False
 
         msg_info.close()
+
+        # reload libs
+        import site
+        reload(site)
 
     return True

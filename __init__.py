@@ -30,7 +30,7 @@ def classFactory(iface):  # pylint: disable=invalid-name
     """
     # install external dependencies
     from pca4cd.utils.system_utils import external_deps
-    status_deps = external_deps(["affine", "attrs", "dask", "rasterio", "dask_rasterio", "pyqtgraph"])
+    status_deps = external_deps(["dask", "pyqtgraph"])
 
     #
     from .pca4cd import PCA4CD

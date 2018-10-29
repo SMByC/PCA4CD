@@ -23,7 +23,7 @@ import os.path
 import shutil
 import tempfile
 
-from qgis.PyQt.QtCore import QSettings, QTranslator, qVersion, QCoreApplication, Qt
+from qgis.PyQt.QtCore import QSettings, QTranslator, qVersion, QCoreApplication
 from qgis.PyQt.QtWidgets import QAction, QMessageBox
 from qgis.PyQt.QtGui import QIcon
 from qgis.utils import iface
