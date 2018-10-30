@@ -50,7 +50,7 @@ def clip_raster_with_shape(target_layer, shape_layer, out_path, dst_nodata=None)
     # check if the shape is a memory layer, then save and used it
     if get_file_path_of_layer(shape_layer).startswith("memory"):
         tmp_memory_file = Path(tempfile.gettempdir(), "memory_layer_aoi.gpkg")
-        QgsVectorFileWriter.writeAsVectorFormat(shape_layer, tmp_memory_file, "System", shape_layer.crs(), "GPKG")
+        QgsVectorFileWriter.writeAsVectorFormat(shape_layer, str(tmp_memory_file), "System", shape_layer.crs(), "GPKG")
         shape_file = tmp_memory_file
     else:
         shape_file = get_file_path_of_layer(shape_layer)
@@ -61,7 +61,7 @@ def clip_raster_with_shape(target_layer, shape_layer, out_path, dst_nodata=None)
                        shell=True)
 
     # clean tmp file
-    if get_file_path_of_layer(shape_layer).startswith("memory") and os.path.isfile(tmp_memory_file):
+    if get_file_path_of_layer(shape_layer).startswith("memory") and tmp_memory_file.is_file():
         os.remove(tmp_memory_file)
 
     if return_code == 0:  # successfully

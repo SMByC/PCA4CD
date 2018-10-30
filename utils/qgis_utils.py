@@ -84,6 +84,7 @@ def load_and_select_filepath_in(combo_box, file_path, layer_type="any"):
 
 
 def load_layer_in_qgis(file_path, layer_type, add_to_legend=True):
+    file_path = str(file_path)
     # first unload layer from qgis if exists
     unload_layer_in_qgis(file_path)
     # create layer

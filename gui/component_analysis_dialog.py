@@ -238,7 +238,7 @@ class ComponentAnalysisDialog(QWidget, FORM_CLASS):
 
         gdal_calc.Calc(calc="0*logical_and(A<{range_from},A>{range_to})+1*logical_and(A>={range_from},A<={range_to})"
                        .format(range_from=detection_from, range_to=detection_to), A=get_file_path_of_layer(self.pc_layer),
-                       outfile=output_change_layer, type="Byte")
+                       outfile=str(output_change_layer), type="Byte")
 
         detection_layer = load_layer_in_qgis(output_change_layer, "raster", False)
         apply_symbology(detection_layer, [("detection", 1, (255, 255, 0, 255))])
@@ -355,8 +355,8 @@ class ComponentAnalysisDialog(QWidget, FORM_CLASS):
             self.aoi_features.addFeature(new_feature)
         # clip the raster component in AOI for get only the pixel values inside it
         pc_aoi = Path(pca4cd.tmp_dir, self.pc_layer.name() + "_clip_aoi.tif")
-        clip_raster_with_shape(self.pc_layer, self.aoi_features, pc_aoi)
-        dataset = gdal.Open(pc_aoi, GA_ReadOnly)
+        clip_raster_with_shape(self.pc_layer, self.aoi_features, str(pc_aoi))
+        dataset = gdal.Open(str(pc_aoi), GA_ReadOnly)
         band = dataset.GetRasterBand(1).ReadAsArray()
         self.aoi_data = band.flatten()
         self.aoi_data = np.delete(self.aoi_data, np.where(self.aoi_data == 0))
@@ -371,7 +371,7 @@ class ComponentAnalysisDialog(QWidget, FORM_CLASS):
         self.generate_detection_layer()
 
         del dataset, band
-        if os.path.isfile(pc_aoi):
+        if pc_aoi.is_file():
             os.remove(pc_aoi)
 
     @pyqtSlot()

@@ -196,7 +196,7 @@ class PCA4CD:
         try:
             d = PCA4CD.tmp_dir
             files_in_tmp_dir = [Path(d, f) for f in os.listdir(d)
-                                if os.path.isfile(Path(d, f))]
+                                if Path(d, f).is_file()]
         except: files_in_tmp_dir = []
 
         for file_tmp in files_in_tmp_dir:
