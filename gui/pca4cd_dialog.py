@@ -164,14 +164,10 @@ class PCA4CDDialog(QDialog, FORM_CLASS):
         if pca_files:
             for pca_file in pca_files:
                 pca_layers.append(load_layer_in_qgis(pca_file, "raster", False))
-
-            iface.messageBar().pushMessage("PCA4CD", "{} principal components were generated successfully".format(n_pc),
-                                           level=Qgis.Success)
             # then, open main analysis dialog
             self.open_main_analysis_dialog(pca_layers, pca_stats)
         else:
-            iface.messageBar().pushMessage("PCA4CD", "Error generating the principal components, check the log",
-                                           level=Qgis.Warning)
+            self.MsgBar.pushMessage("Error while generating the principal components, check the Qgis log", level=Qgis.Critical)
 
     @pyqtSlot()
     def open_main_analysis_dialog(self, pca_layers, pca_stats):

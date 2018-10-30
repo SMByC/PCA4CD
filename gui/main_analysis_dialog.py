@@ -152,6 +152,9 @@ class MainAnalysisDialog(QDialog, FORM_CLASS):
             if not view_widget.QLabel_ViewName.text():
                 view_widget.QLabel_ViewName.setPlaceholderText("Auxiliary View")
 
+        self.MsgBar.pushMessage("{} principal components were generated and loaded successfully".format(len(self.pca_layers)),
+                                level=Qgis.Success)
+
     def show(self):
         from pca4cd.pca4cd import PCA4CD as pca4cd
         # hide main dialog
