@@ -56,9 +56,8 @@ def clip_raster_with_shape(target_layer, shape_layer, out_path, dst_nodata=None)
         shape_file = get_file_path_of_layer(shape_layer)
 
     # clipping in shape
-    return_code = call('gdalwarp -multi -wo NUM_THREADS=ALL_CPUS --config GDALWARP_IGNORE_BAD_CUTLINE YES'
-                       ' -cutline "{}" {} "{}" "{}"'.format(shape_file, dst_nodata, target_file, out_path),
-                       shell=True)
+    return_code = call('gdalwarp --config GDALWARP_IGNORE_BAD_CUTLINE YES -cutline "{}" {} "{}" "{}"'
+                       .format(shape_file, dst_nodata, target_file, out_path), shell=True)
 
     # clean tmp file
     if get_file_path_of_layer(shape_layer).startswith("memory") and tmp_memory_file.is_file():
