@@ -19,6 +19,7 @@
  ***************************************************************************/
 """
 import os
+from pathlib import Path
 
 from PyQt5.QtWidgets import QDialog, QDialogButtonBox
 from qgis.PyQt import uic
@@ -115,8 +116,7 @@ def unload_layer_in_qgis(layer_path):
 
 # plugin path
 plugin_folder = os.path.dirname(os.path.dirname(__file__))
-FORM_CLASS, _ = uic.loadUiType(os.path.join(
-    plugin_folder, 'ui', 'style_editor.ui'))
+FORM_CLASS, _ = uic.loadUiType(Path(plugin_folder, 'ui', 'style_editor.ui'))
 
 
 class StyleEditorDialog(QDialog, FORM_CLASS):

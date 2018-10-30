@@ -23,6 +23,7 @@ import os
 import configparser
 import webbrowser
 from multiprocessing import cpu_count
+from pathlib import Path
 
 from qgis.PyQt import uic
 from qgis.PyQt.QtCore import pyqtSignal, pyqtSlot
@@ -38,11 +39,10 @@ from pca4cd.utils.system_utils import error_handler
 
 # plugin path
 plugin_folder = os.path.dirname(os.path.dirname(__file__))
-FORM_CLASS, _ = uic.loadUiType(os.path.join(
-    plugin_folder, 'ui', 'pca4cd_dialog.ui'))
+FORM_CLASS, _ = uic.loadUiType(Path(plugin_folder, 'ui', 'pca4cd_dialog.ui'))
 
 cfg = configparser.ConfigParser()
-cfg.read(os.path.join(plugin_folder, 'metadata.txt'))
+cfg.read(Path(plugin_folder, 'metadata.txt'))
 VERSION = cfg.get('general', 'version')
 HOMEPAGE = cfg.get('general', 'homepage')
 

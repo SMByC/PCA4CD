@@ -18,7 +18,8 @@
  *                                                                         *
  ***************************************************************************/
 """
-import os
+from pathlib import Path
+
 import numpy as np
 import dask
 from osgeo import gdal
@@ -107,7 +108,7 @@ def pca(A, B, n_pc, estimator_matrix, out_dir, n_threads, block_size):
         pc = dask.delayed(sum)([get_principal_component(i, j) for j in range(n_bands)])
         pc = pc.astype(np.float32)
         # save component as file
-        tmp_pca_file = os.path.join(out_dir, 'pc_{}.tif'.format(i+1))
+        tmp_pca_file = Path(out_dir) / 'pc_{}.tif'.format(i+1)
         driver = gdal.GetDriverByName("GTiff")
         out_pc = driver.Create(tmp_pca_file, src_ds_A.RasterXSize, src_ds_A.RasterYSize, 1, gdal.GDT_Float32)
         pcband = out_pc.GetRasterBand(1)

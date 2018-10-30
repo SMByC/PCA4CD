@@ -19,6 +19,8 @@
  ***************************************************************************/
 """
 import os
+from pathlib import Path
+
 import numpy as np
 import pyqtgraph as pg
 from PyQt5.QtCore import QTimer, Qt, pyqtSlot
@@ -129,8 +131,7 @@ class PickerAOIPointTool(QgsMapTool):
 
 # plugin path
 plugin_folder = os.path.dirname(os.path.dirname(__file__))
-FORM_CLASS, _ = uic.loadUiType(os.path.join(
-    plugin_folder, 'ui', 'component_analysis_dialog.ui'))
+FORM_CLASS, _ = uic.loadUiType(Path(plugin_folder, 'ui', 'component_analysis_dialog.ui'))
 
 
 class ComponentAnalysisDialog(QWidget, FORM_CLASS):
@@ -233,7 +234,7 @@ class ComponentAnalysisDialog(QWidget, FORM_CLASS):
         from pca4cd.pca4cd import PCA4CD as pca4cd
         detection_from = self.RangeChangeFrom.value()
         detection_to = self.RangeChangeTo.value()
-        output_change_layer = os.path.join(pca4cd.tmp_dir, self.pc_layer.name()+"_detection.tif")
+        output_change_layer = Path(pca4cd.tmp_dir, self.pc_layer.name()+"_detection.tif")
 
         gdal_calc.Calc(calc="0*logical_and(A<{range_from},A>{range_to})+1*logical_and(A>={range_from},A<={range_to})"
                        .format(range_from=detection_from, range_to=detection_to), A=get_file_path_of_layer(self.pc_layer),
@@ -353,7 +354,7 @@ class ComponentAnalysisDialog(QWidget, FORM_CLASS):
         with edit(self.aoi_features):
             self.aoi_features.addFeature(new_feature)
         # clip the raster component in AOI for get only the pixel values inside it
-        pc_aoi = os.path.join(pca4cd.tmp_dir, self.pc_layer.name() + "_clip_aoi.tif")
+        pc_aoi = Path(pca4cd.tmp_dir, self.pc_layer.name() + "_clip_aoi.tif")
         clip_raster_with_shape(self.pc_layer, self.aoi_features, pc_aoi)
         dataset = gdal.Open(pc_aoi, GA_ReadOnly)
         band = dataset.GetRasterBand(1).ReadAsArray()

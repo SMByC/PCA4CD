@@ -19,6 +19,7 @@
  ***************************************************************************/
 """
 import os
+from pathlib import Path
 
 from qgis.PyQt import uic
 from qgis.PyQt.QtGui import QColor
@@ -31,8 +32,7 @@ from pca4cd.utils.system_utils import block_signals_to
 
 # plugin path
 plugin_folder = os.path.dirname(os.path.dirname(__file__))
-FORM_CLASS, _ = uic.loadUiType(os.path.join(
-    plugin_folder, 'ui', 'layer_view_widget.ui'))
+FORM_CLASS, _ = uic.loadUiType(Path(plugin_folder, 'ui', 'layer_view_widget.ui'))
 
 
 class LayerViewWidget(QWidget, FORM_CLASS):

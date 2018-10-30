@@ -22,6 +22,7 @@
 import os.path
 import shutil
 import tempfile
+from pathlib import Path
 
 from qgis.PyQt.QtCore import QSettings, QTranslator, qVersion, QCoreApplication
 from qgis.PyQt.QtWidgets import QAction, QMessageBox
@@ -57,10 +58,7 @@ class PCA4CD:
 
         # initialize locale
         locale = QSettings().value('locale/userLocale')[0:2]
-        locale_path = os.path.join(
-            self.plugin_dir,
-            'i18n',
-            'PCA4CD_{}.qm'.format(locale))
+        locale_path = Path(self.plugin_dir, 'i18n', 'PCA4CD_{}.qm'.format(locale))
 
         if os.path.exists(locale_path):
             self.translator = QTranslator()
@@ -197,8 +195,8 @@ class PCA4CD:
         # unload all layers instances from Qgis saved in tmp dir
         try:
             d = PCA4CD.tmp_dir
-            files_in_tmp_dir = [os.path.join(d, f) for f in os.listdir(d)
-                                if os.path.isfile(os.path.join(d, f))]
+            files_in_tmp_dir = [Path(d, f) for f in os.listdir(d)
+                                if os.path.isfile(Path(d, f))]
         except: files_in_tmp_dir = []
 
         for file_tmp in files_in_tmp_dir:

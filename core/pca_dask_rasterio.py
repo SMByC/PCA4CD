@@ -18,7 +18,8 @@
  *                                                                         *
  ***************************************************************************/
 """
-import os
+from pathlib import Path
+
 import numpy as np
 import dask
 from dask import array as da
@@ -114,7 +115,7 @@ def pca(A, B, n_pc, estimator_matrix, out_dir, n_threads, block_size):
         pc = dask.delayed(sum)([get_principal_component(i, j) for j in range(n_bands)])
         pc = pc.astype(np.float32)
         # save component as file
-        tmp_pca_file = os.path.join(out_dir, 'pc_{}.tif'.format(i+1))
+        tmp_pca_file = Path(out_dir, 'pc_{}.tif'.format(i+1))
         write_raster(tmp_pca_file, pc.compute(), **prof)
         pca_files.append(tmp_pca_file)
 

@@ -20,6 +20,7 @@
 """
 import os
 import tempfile
+from pathlib import Path
 
 from qgis.core import Qgis
 from qgis.PyQt import uic
@@ -34,8 +35,7 @@ from pca4cd.utils.system_utils import wait_process
 
 # plugin path
 plugin_folder = os.path.dirname(os.path.dirname(__file__))
-FORM_CLASS, _ = uic.loadUiType(os.path.join(
-    plugin_folder, 'ui', 'main_analysis_dialog.ui'))
+FORM_CLASS, _ = uic.loadUiType(Path(plugin_folder, 'ui', 'main_analysis_dialog.ui'))
 
 
 class MainAnalysisDialog(QDialog, FORM_CLASS):
@@ -209,7 +209,7 @@ class MainAnalysisDialog(QDialog, FORM_CLASS):
     def save_pca(self):
         # suggested filename
         path, filename = os.path.split(get_file_path_of_layer(self.layer_a))
-        suggested_filename = os.path.splitext(os.path.join(path, filename))[0] + "_pca.tif"
+        suggested_filename = os.path.splitext(Path(path, filename))[0] + "_pca.tif"
         # filesave dialog
         file_out, _ = QFileDialog.getSaveFileName(self, self.tr("Save the PCA stack"),
                                                   suggested_filename,
@@ -236,7 +236,7 @@ class MainAnalysisDialog(QDialog, FORM_CLASS):
             return
         # suggested filename
         path, filename = os.path.split(get_file_path_of_layer(self.layer_a))
-        suggested_filename = os.path.splitext(os.path.join(path, filename))[0] + "_pca4cd.tif"
+        suggested_filename = os.path.splitext(Path(path, filename))[0] + "_pca4cd.tif"
         # merge dialog
         merge_dialog = MergeChangeLayersDialog(self.activated_ids, suggested_filename)
         if merge_dialog.exec_():

@@ -20,6 +20,7 @@
 """
 import os
 import tempfile
+from pathlib import Path
 from subprocess import call
 
 from qgis.core import QgsVectorFileWriter
@@ -48,9 +49,8 @@ def clip_raster_with_shape(target_layer, shape_layer, out_path, dst_nodata=None)
     # set the file path for the area of interest
     # check if the shape is a memory layer, then save and used it
     if get_file_path_of_layer(shape_layer).startswith("memory"):
-        tmp_memory_fd, tmp_memory_file = tempfile.mkstemp(prefix='memory_layer_', suffix='.gpkg')
+        tmp_memory_file = Path(tempfile.gettempdir(), "memory_layer_aoi.gpkg")
         QgsVectorFileWriter.writeAsVectorFormat(shape_layer, tmp_memory_file, "System", shape_layer.crs(), "GPKG")
-        os.close(tmp_memory_fd)
         shape_file = tmp_memory_file
     else:
         shape_file = get_file_path_of_layer(shape_layer)

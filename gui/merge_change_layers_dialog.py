@@ -20,6 +20,7 @@
 """
 
 import os
+from pathlib import Path
 
 from qgis.gui import QgsFileWidget
 from qgis.PyQt import uic
@@ -27,8 +28,7 @@ from qgis.PyQt.QtWidgets import QDialog
 
 # plugin path
 plugin_folder = os.path.dirname(os.path.dirname(__file__))
-FORM_CLASS, _ = uic.loadUiType(os.path.join(
-    plugin_folder, 'ui', 'merge_change_layers_dialog.ui'))
+FORM_CLASS, _ = uic.loadUiType(Path(plugin_folder, 'ui', 'merge_change_layers_dialog.ui'))
 
 
 class MergeChangeLayersDialog(QDialog, FORM_CLASS):
