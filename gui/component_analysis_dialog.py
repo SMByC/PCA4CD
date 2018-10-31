@@ -69,30 +69,44 @@ class PickerAOIPointTool(QgsMapTool):
     def __init__(self, cad):
         QgsMapTool.__init__(self, cad.render_widget.canvas)
         self.cad = cad
-        # create the polygon rubber band associated to the current canvas
-        self.rubber_band = QgsRubberBand(cad.render_widget.canvas, QgsWkbTypes.PolygonGeometry)
         # set rubber band style
         color = QColor("red")
-        color.setAlpha(90)
+        color.setAlpha(70)
+        # create the main polygon rubber band
+        self.rubber_band = QgsRubberBand(cad.render_widget.canvas, QgsWkbTypes.PolygonGeometry)
         self.rubber_band.setColor(color)
         self.rubber_band.setWidth(3)
+        # create the mouse/tmp polygon rubber band, this is main rubber band + current mouse position
+        self.tmp_rubber_band = QgsRubberBand(cad.render_widget.canvas, QgsWkbTypes.PolygonGeometry)
+        self.tmp_rubber_band.setColor(color)
+        self.tmp_rubber_band.setWidth(3)
+        self.tmp_rubber_band.setLineStyle(Qt.DotLine)
 
     def finish_drawing(self):
         self.rubber_band = None
+        self.tmp_rubber_band = None
         # restart point tool
         self.clean()
         QTimer.singleShot(180, lambda:
             self.cad.render_widget.canvas.setMapTool(self.cad.render_widget.pan_zoom_tool, clean=True))
 
     def canvasMoveEvent(self, event):
-        if self.rubber_band is None:
+        if self.tmp_rubber_band is None:
             return
-        if self.rubber_band and self.rubber_band.numberOfVertices():
+        if self.tmp_rubber_band and self.tmp_rubber_band.numberOfVertices():
             x = event.pos().x()
             y = event.pos().y()
             point = self.cad.render_widget.canvas.getCoordinateTransform().toMapCoordinates(x, y)
+            self.tmp_rubber_band.removeLastPoint()
+            self.tmp_rubber_band.addPoint(point)
+
+    def keyPressEvent(self, event):
+        if event.key() == Qt.Key_Backspace or event.key() == Qt.Key_Delete:
             self.rubber_band.removeLastPoint()
-            self.rubber_band.addPoint(point)
+            self.tmp_rubber_band.removeLastPoint()
+        if event.key() == Qt.Key_Escape:
+            self.rubber_band.reset(QgsWkbTypes.PolygonGeometry)
+            self.tmp_rubber_band.reset(QgsWkbTypes.PolygonGeometry)
 
     def canvasPressEvent(self, event):
         if self.rubber_band is None:
@@ -104,29 +118,21 @@ class PickerAOIPointTool(QgsMapTool):
             y = event.pos().y()
             point = self.cad.render_widget.canvas.getCoordinateTransform().toMapCoordinates(x, y)
             self.rubber_band.addPoint(point)
-        # delete the last point
+            self.tmp_rubber_band.addPoint(point)
+        # save polygon
         if event.button() == Qt.RightButton:
             if self.rubber_band and self.rubber_band.numberOfVertices():
-                self.rubber_band.removeLastPoint()
-                self.canvasMoveEvent(event)
-
-    def canvasDoubleClickEvent(self, event):
-        if self.rubber_band is None:
-            self.finish_drawing()
-            return
-        # save polygon
-        if event.button() == Qt.LeftButton:
-            if self.rubber_band.numberOfVertices() < 3:
+                if self.rubber_band.numberOfVertices() < 3:
+                    self.finish_drawing()
+                    return
+                self.tmp_rubber_band.removeLastPoint()
+                new_feature = QgsFeature()
+                new_feature.setGeometry(self.rubber_band.asGeometry())
+                self.cad.rubber_bands.append(self.rubber_band)
+                self.rubber_band = None
                 self.finish_drawing()
-                return
-            self.rubber_band.removeLastPoint()
-            new_feature = QgsFeature()
-            new_feature.setGeometry(self.rubber_band.asGeometry())
-            self.cad.rubber_bands.append(self.rubber_band)
-            self.rubber_band = None
-            # add the new feature and update the statistics
-            self.cad.aoi_changes(new_feature)
-            self.finish_drawing()
+                # add the new feature and update the statistics
+                self.cad.aoi_changes(new_feature)
 
 
 # plugin path
