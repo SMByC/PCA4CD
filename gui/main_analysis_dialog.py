@@ -195,9 +195,8 @@ class MainAnalysisDialog(QDialog, FORM_CLASS):
         if reply == QMessageBox.No:
             return
 
-        from pca4cd.pca4cd import PCA4CD as pca4cd
-
         # clear and close main dialog
+        from pca4cd.pca4cd import PCA4CD as pca4cd
         pca4cd.dialog.close()
         # for components analysis opened
         for view_widget in MainAnalysisDialog.view_widgets:
