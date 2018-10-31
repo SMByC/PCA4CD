@@ -40,6 +40,7 @@ FORM_CLASS, _ = uic.loadUiType(Path(plugin_folder, 'ui', 'main_analysis_dialog.u
 
 class MainAnalysisDialog(QDialog, FORM_CLASS):
     view_widgets = []
+    pca_layers = None
     pca_stats = None
     current_sample = None
 
@@ -48,6 +49,7 @@ class MainAnalysisDialog(QDialog, FORM_CLASS):
         self.layer_a = layer_a
         self.layer_b = layer_b
         self.pca_layers = pca_layers
+        MainAnalysisDialog.pca_layers = pca_layers
         MainAnalysisDialog.pca_stats = pca_stats
 
         self.setupUi(self)

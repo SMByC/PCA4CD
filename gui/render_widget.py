@@ -102,14 +102,17 @@ class RenderWidget(QWidget):
         self.show_detection_layer()
         # hide the detection layer in combobox menu
         from pca4cd.gui.main_analysis_dialog import MainAnalysisDialog
+        detection_layers = [view_widget.render_widget.detection_layer for view_widget in MainAnalysisDialog.view_widgets
+                            if view_widget.pc_id is not None and view_widget.render_widget.detection_layer is not None
+                            and view_widget.id != self.parent_view.id] + [self.detection_layer]
         for view_widget in MainAnalysisDialog.view_widgets:
             if view_widget.pc_id is None:
-                view_widget.QCBox_RenderFile.setExceptedLayerList(view_widget.QCBox_RenderFile.exceptedLayerList() + [detection_layer])
+                view_widget.QCBox_RenderFile.setExceptedLayerList(MainAnalysisDialog.pca_layers + detection_layers)
 
     def show_detection_layer(self):
         if self.detection_layer and self.layer:
             self.canvas.setLayers([self.detection_layer, self.layer])
-            self.canvas.refresh()
+            self.canvas.refreshAllLayers()
 
     def hide_detection_layer(self):
         if self.layer:

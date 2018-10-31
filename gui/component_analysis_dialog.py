@@ -144,6 +144,7 @@ class ComponentAnalysisDialog(QWidget, FORM_CLASS):
         self.render_widget.parent_view = self
         self.render_widget.crs = parent_view_widget.render_widget.crs
         # principal component ID
+        self.id = parent_view_widget.id
         self.pc_id = parent_view_widget.pc_id
         # edit layer properties
         self.layerStyleEditor.clicked.connect(self.render_widget.layer_style_editor)
@@ -346,6 +347,7 @@ class ComponentAnalysisDialog(QWidget, FORM_CLASS):
         upper = self.RangeChangeTo.value()
         self.linear_region.setRegion((lower, upper))
 
+    @pyqtSlot()
     @wait_process
     def aoi_changes(self, new_feature):
         """Actions after added each polygon in the AOI"""
