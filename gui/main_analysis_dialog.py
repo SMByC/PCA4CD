@@ -220,7 +220,8 @@ class MainAnalysisDialog(QDialog, FORM_CLASS):
                                                   suggested_filename,
                                                   self.tr("GeoTiff files (*.tif);;All files (*.*)"))
         if file_out != '':
-            gdal_merge.main(["", "-separate", "-of", "GTiff", "-o", file_out] +
+            nodata = ["-a_nodata", "0"] if MainAnalysisDialog.nodata is not None else []
+            gdal_merge.main(["", "-separate", "-of", "GTiff", "-o", file_out] + nodata +
                             [get_file_path_of_layer(layer) for layer in self.pca_layers])
             self.MsgBar.pushMessage("PCA stack saved successfully: \"{}\"".format(os.path.basename(file_out)), level=Qgis.Success)
 
