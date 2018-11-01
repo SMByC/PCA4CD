@@ -358,6 +358,7 @@ class ComponentAnalysisDialog(QWidget, FORM_CLASS):
     def aoi_changes(self, new_feature):
         """Actions after added each polygon in the AOI"""
         from pca4cd.pca4cd import PCA4CD as pca4cd
+        from pca4cd.gui.main_analysis_dialog import MainAnalysisDialog
         # update AOI
         with edit(self.aoi_features):
             self.aoi_features.addFeature(new_feature)
@@ -368,6 +369,8 @@ class ComponentAnalysisDialog(QWidget, FORM_CLASS):
         band = dataset.GetRasterBand(1).ReadAsArray()
         self.aoi_data = band.flatten()
         self.aoi_data = np.delete(self.aoi_data, np.where(self.aoi_data == 0))
+        if MainAnalysisDialog.nodata is not None:
+            self.aoi_data = np.delete(self.aoi_data, np.where(self.aoi_data == MainAnalysisDialog.nodata))
         if self.aoi_data.size == 0:
             self.aoi_data = np.array([np.nan])
         # update statistics and histogram plot

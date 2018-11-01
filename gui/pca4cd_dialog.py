@@ -179,14 +179,14 @@ class PCA4CDDialog(QDialog, FORM_CLASS):
             for pca_file in pca_files:
                 pca_layers.append(load_layer_in_qgis(pca_file, "raster", False))
             # then, open main analysis dialog
-            self.open_main_analysis_dialog(pca_layers, pca_stats)
+            self.open_main_analysis_dialog(pca_layers, pca_stats, nodata)
         else:
             self.MsgBar.pushMessage("Error while generating the principal components, check the Qgis log", level=Qgis.Critical)
 
     @pyqtSlot()
-    def open_main_analysis_dialog(self, pca_layers, pca_stats):
+    def open_main_analysis_dialog(self, pca_layers, pca_stats, nodata):
         current_layer_A = self.QCBox_InputData_A.currentLayer()
         current_layer_B = self.QCBox_InputData_B.currentLayer()
-        self.main_analysis_dialog = MainAnalysisDialog(current_layer_A, current_layer_B, pca_layers, pca_stats)
+        self.main_analysis_dialog = MainAnalysisDialog(current_layer_A, current_layer_B, pca_layers, pca_stats, nodata)
         # open dialog
         self.main_analysis_dialog.show()

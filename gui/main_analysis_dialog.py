@@ -42,15 +42,16 @@ class MainAnalysisDialog(QDialog, FORM_CLASS):
     view_widgets = []
     pca_layers = None
     pca_stats = None
-    current_sample = None
+    nodata = None
 
-    def __init__(self, layer_a, layer_b, pca_layers, pca_stats):
+    def __init__(self, layer_a, layer_b, pca_layers, pca_stats, nodata=None):
         QDialog.__init__(self)
         self.layer_a = layer_a
         self.layer_b = layer_b
         self.pca_layers = pca_layers
         MainAnalysisDialog.pca_layers = pca_layers
         MainAnalysisDialog.pca_stats = pca_stats
+        MainAnalysisDialog.nodata = nodata
 
         self.setupUi(self)
 
