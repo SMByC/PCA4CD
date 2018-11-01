@@ -196,6 +196,9 @@ class ComponentAnalysisDialog(QWidget, FORM_CLASS):
         dataset = gdal.Open(get_file_path_of_layer(self.pc_layer), GA_ReadOnly)
         band = dataset.GetRasterBand(1).ReadAsArray()
         self.pc_data = band.flatten()
+        from pca4cd.gui.main_analysis_dialog import MainAnalysisDialog
+        if MainAnalysisDialog.nodata is not None:
+            self.pc_data = np.delete(self.pc_data, np.where(self.pc_data == MainAnalysisDialog.nodata))
         self.set_statistics(stats_for=self.pc_name)
         # init aoi data
         self.aoi_data = np.array([np.nan])
