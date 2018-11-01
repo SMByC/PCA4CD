@@ -111,12 +111,13 @@ def external_deps(deps):
     if deps_not_installed:
         msg_info = QMessageBox()
         msg_info.setIcon(QMessageBox.Information)
+        msg_info.setStandardButtons(QMessageBox.Close)
         msg_info.setWindowTitle("PCA4CD plugin dependencies")
-        msg_info.setText("installing python dependencies")
+        msg_info.setText("installing python dependencies:\nPlease wait...")
         msg_info.open()
 
         for dependency in deps_not_installed:
-            msg_info.setText("installing python dependencies: {}".format(dependency))
+            msg_info.setText("installing python dependencies: {}\nPlease wait...".format(dependency))
             QApplication.processEvents()
 
             if dependency == "dask":
