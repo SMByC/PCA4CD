@@ -179,6 +179,11 @@ class MainAnalysisDialog(QDialog, FORM_CLASS):
         if reply == QMessageBox.No:
             return
 
+        # close components analysis opened
+        for view_widget in MainAnalysisDialog.view_widgets:
+            if view_widget.component_analysis_dialog and view_widget.component_analysis_dialog.is_opened:
+                view_widget.component_analysis_dialog.deleteLater()
+        # clear and recover
         from pca4cd.pca4cd import PCA4CD as pca4cd
         self.reject(is_ok_to_close=True)
         self.deleteLater()
@@ -198,13 +203,13 @@ class MainAnalysisDialog(QDialog, FORM_CLASS):
         if reply == QMessageBox.No:
             return
 
-        # clear and close main dialog
-        from pca4cd.pca4cd import PCA4CD as pca4cd
-        pca4cd.dialog.close()
-        # for components analysis opened
+        # close components analysis opened
         for view_widget in MainAnalysisDialog.view_widgets:
             if view_widget.component_analysis_dialog and view_widget.component_analysis_dialog.is_opened:
                 view_widget.component_analysis_dialog.deleteLater()
+        # clear and close main dialog
+        from pca4cd.pca4cd import PCA4CD as pca4cd
+        pca4cd.dialog.close()
 
         self.reject(is_ok_to_close=True)
 
