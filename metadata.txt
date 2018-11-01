@@ -3,7 +3,7 @@ name=PCA4CD - PCA for change detection
 description=Principal components analysis for change detection
 about=Principal components analysis for change detection
 
-version=18.x.x
+version=18.11.1
 qgisMinimumVersion=3.0
 qgisMaximumVersion=3.99
 
@@ -15,13 +15,15 @@ tracker=https://bitbucket.org/smbyc/qgisplugin-pca4cd/issues
 repository=https://bitbucket.org/smbyc/qgisplugin-pca4cd
 
 changelog=
+    18.11.1:
+    - First public and stable version
 
     Previous versions:
     - All commits in: https://bitbucket.org/smbyc/qgisplugin-pca4cd/commits/all
 
-tags=accuracy,accuracy assessment,thematic map,classification,sample,sampling design,points,remote sensing
+tags=pca,principal components analysis,analysis,change detection,raster,remote sensing
 
-external_deps=rasterio,dask,dask-rasterio
+external_deps=dask,pyqtgraph
 
 category=Plugins
 icon=icons/pca4cd.svg
