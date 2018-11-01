@@ -129,7 +129,9 @@ class PickerAOIPointTool(QgsMapTool):
                 new_feature = QgsFeature()
                 new_feature.setGeometry(self.rubber_band.asGeometry())
                 self.cad.rubber_bands.append(self.rubber_band)
+                self.cad.tmp_rubber_band.append(self.tmp_rubber_band)
                 self.rubber_band = None
+                self.tmp_rubber_band = None
                 self.finish_drawing()
                 # add the new feature and update the statistics
                 self.cad.aoi_changes(new_feature)
@@ -171,6 +173,7 @@ class ComponentAnalysisDialog(QWidget, FORM_CLASS):
         self.aoi_features = QgsVectorLayer("Polygon?crs=" + self.pc_layer.crs().toWkt(), "aoi", "memory")
         # aoi
         self.rubber_bands = []
+        self.tmp_rubber_band = []
         self.AOI_Picker.clicked.connect(lambda: self.render_widget.canvas.setMapTool(PickerAOIPointTool(self), clean=True))
         self.DeleteAllAOI.clicked.connect(self.delete_all_aoi)
         # set statistics from combobox
@@ -392,9 +395,10 @@ class ComponentAnalysisDialog(QWidget, FORM_CLASS):
     @wait_process
     def delete_all_aoi(self):
         # clear/reset all rubber bands
-        for rubber_band in self.rubber_bands:
+        for rubber_band in self.rubber_bands + self.tmp_rubber_band:
             rubber_band.reset(QgsWkbTypes.PolygonGeometry)
         self.rubber_bands = []
+        self.tmp_rubber_band = []
         # remove all features in aoi
         self.aoi_features.dataProvider().truncate()
         # update statistics and histogram plot
