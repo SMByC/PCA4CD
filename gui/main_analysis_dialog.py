@@ -145,6 +145,8 @@ class MainAnalysisDialog(QDialog, FORM_CLASS):
                 view_widget.QCBox_RenderFile.setCurrentIndex(file_index)
                 view_widget.QCBox_RenderFile.setEnabled(False)
                 view_widget.QCBox_browseRenderFile.setEnabled(False)
+                # disconnect set_render_layer signal
+                view_widget.QCBox_RenderFile.currentIndexChanged.disconnect()
             else:
                 view_widget.QCBox_RenderFile.setExceptedLayerList(self.pca_layers)  # hide pca layers in combobox menu
                 view_widget.EnableChangeDetection.setToolTip("Show/hide the merged change layer")
@@ -283,10 +285,6 @@ class MainAnalysisDialog(QDialog, FORM_CLASS):
                 if view_widget.is_active:
                     view_widget.EnableChangeDetection.setChecked(True)
                     view_widget.QPBtn_ComponentAnalysisDialog.setEnabled(True)
-
-            # update visibility of change layer in all PC in main analysis dialog Fixme: this should not be necessary
-            if view_widget.is_active and view_widget.pc_id is not None:
-                view_widget.detection_layer_toggled()
 
         if len(self.activated_ids) == 1:
             self.MsgBar.pushMessage(
