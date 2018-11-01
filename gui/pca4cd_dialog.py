@@ -29,7 +29,6 @@ from qgis.PyQt import uic
 from qgis.PyQt.QtCore import pyqtSignal, pyqtSlot
 from qgis.PyQt.QtWidgets import QFileDialog, QDialog
 from qgis.core import QgsMapLayerProxyModel, Qgis
-from qgis.utils import iface
 
 from pca4cd.core.pca_dask_gdal import pca
 from pca4cd.gui.about_dialog import AboutDialog
@@ -83,7 +82,8 @@ class PCA4CDDialog(QDialog, FORM_CLASS):
             dialog_title=self.tr("Select the first period of the raster image to analyze"),
             dialog_types=self.tr("Raster files (*.tif *.img);;All files (*.*)"),
             layer_type="raster"))
-        self.QCBox_InputData_A.currentIndexChanged.connect(self.set_number_components)
+        self.QCBox_InputData_A.currentIndexChanged.connect(self.set_number_of_components)
+        self.QCBox_InputData_A.currentIndexChanged.connect(self.set_nodata_value)
         self.EnableInputData_A.toggled.connect(lambda: self.EnableInputData_A.setChecked(True))
         ## B
         # set properties to QgsMapLayerComboBox
@@ -95,7 +95,7 @@ class PCA4CDDialog(QDialog, FORM_CLASS):
             dialog_title=self.tr("Select the second period of the raster image to analyze"),
             dialog_types=self.tr("Raster files (*.tif *.img);;All files (*.*)"),
             layer_type="raster"))
-        self.QCBox_InputData_B.currentIndexChanged.connect(self.set_number_components)
+        self.QCBox_InputData_B.currentIndexChanged.connect(self.set_number_of_components)
         self.EnableInputData_B.toggled.connect(lambda: self.QCBox_InputData_B.setCurrentIndex(-1))
 
         # ######### Principal Components ######### #
@@ -112,7 +112,13 @@ class PCA4CDDialog(QDialog, FORM_CLASS):
             load_and_select_filepath_in(combo_box, file_path, layer_type)
 
     @pyqtSlot()
-    def set_number_components(self):
+    def set_nodata_value(self):
+        current_layer_A = self.QCBox_InputData_A.currentLayer()
+        nodata_value = str(current_layer_A.dataProvider().sourceNoDataValue(1)) if current_layer_A is not None else ""
+        self.nodata_input.setText(nodata_value if nodata_value != "nan" else "None")
+
+    @pyqtSlot()
+    def set_number_of_components(self):
         current_layer_A = self.QCBox_InputData_A.currentLayer()
         current_layer_B = self.QCBox_InputData_B.currentLayer()
         self.QCBox_nComponents.clear()
@@ -148,9 +154,17 @@ class PCA4CDDialog(QDialog, FORM_CLASS):
     @error_handler
     def generate_principal_components(self):
         from pca4cd.pca4cd import PCA4CD as pca4cd
-
+        # check if exists the input stack
         if not self.check_input_layers(self.QCBox_InputData_A.currentLayer(), self.QCBox_InputData_B.currentLayer()):
             return
+        # check the nodata value
+        nodata = self.nodata_input.text() if self.nodata_input.text() not in ["", "None", "nan"] else None
+        if nodata is not None:
+            try:
+                nodata = float(nodata)
+            except:
+                self.MsgBar.pushMessage("The nodata value is not valid", level=Qgis.Warning)
+                return
 
         path_layer_A = get_file_path_of_layer(self.QCBox_InputData_A.currentLayer())
         path_layer_B = get_file_path_of_layer(self.QCBox_InputData_B.currentLayer())
@@ -158,7 +172,7 @@ class PCA4CDDialog(QDialog, FORM_CLASS):
         estimator_matrix = self.QCBox_EstimatorMatrix.currentText()
 
         pca_files, pca_stats = pca(path_layer_A, path_layer_B, n_pc, estimator_matrix, pca4cd.tmp_dir,
-                                   self.nThreads.value(), self.BlockSize.value())
+                                   self.nThreads.value(), self.BlockSize.value(), nodata)
 
         pca_layers = []
         if pca_files:

@@ -31,7 +31,7 @@ from pca4cd.utils.system_utils import wait_process
 
 
 @wait_process
-def pca(A, B, n_pc, estimator_matrix, out_dir, n_threads, block_size):
+def pca(A, B, n_pc, estimator_matrix, out_dir, n_threads, block_size, nodata=None):
     """Calculate the principal components for the vertical stack A or with
     combinations of the stack B
 
@@ -48,15 +48,23 @@ def pca(A, B, n_pc, estimator_matrix, out_dir, n_threads, block_size):
     raw_image = []
     src_ds_A = gdal.Open(A, gdal.GA_ReadOnly)
     for band in range(src_ds_A.RasterCount):
-        raw_image.append(src_ds_A.GetRasterBand(band + 1).ReadAsArray().flatten())
+        ds = src_ds_A.GetRasterBand(band + 1).ReadAsArray().flatten()
+        if nodata is not None:
+            ds = da.ma.masked_where(ds == nodata, ds)
+        raw_image.append(ds)
+        del ds
 
     if B is not None:
         src_ds_B = gdal.Open(B, gdal.GA_ReadOnly)
         for band in range(src_ds_B.RasterCount):
-            raw_image.append(src_ds_B.GetRasterBand(band + 1).ReadAsArray().flatten())
+            ds = src_ds_B.GetRasterBand(band + 1).ReadAsArray().flatten()
+            if nodata is not None:
+                ds = da.ma.masked_where(ds == nodata, ds)
+            raw_image.append(ds)
+            del ds
 
     # flat each dimension (bands)
-    flat_dims = da.from_array(raw_image, chunks=(1, block_size**2))
+    flat_dims = da.vstack(raw_image).rechunk((1, block_size**2))
 
     n_bands = flat_dims.shape[0]
 
@@ -64,7 +72,7 @@ def pca(A, B, n_pc, estimator_matrix, out_dir, n_threads, block_size):
     # subtract the mean of column i from column i, in order to center the matrix.
     band_mean = []
     for i in range(n_bands):
-        band_mean.append(dask.delayed(da.mean)(flat_dims[i]))
+        band_mean.append(dask.delayed(np.ma.mean)(flat_dims[i]))
     band_mean = dask.compute(*band_mean)
 
     ########
@@ -76,10 +84,10 @@ def pca(A, B, n_pc, estimator_matrix, out_dir, n_threads, block_size):
             deviation_scores_band_j = flat_dims[j] - band_mean[j]
             if estimator_matrix == "Correlation":
                 estimation_matrix[j][i] = estimation_matrix[i][j] = \
-                    da.corrcoef(deviation_scores_band_i, deviation_scores_band_j)[0][1]
+                    np.ma.corrcoef(deviation_scores_band_i, deviation_scores_band_j)[0][1]
             if estimator_matrix == "Covariance":
                 estimation_matrix[j][i] = estimation_matrix[i][j] = \
-                    da.cov(deviation_scores_band_i, deviation_scores_band_j)[0][1]
+                    np.ma.cov(deviation_scores_band_i, deviation_scores_band_j)[0][1]
 
     ########
     # calculate eigenvectors & eigenvalues of the matrix
@@ -112,6 +120,8 @@ def pca(A, B, n_pc, estimator_matrix, out_dir, n_threads, block_size):
         driver = gdal.GetDriverByName("GTiff")
         out_pc = driver.Create(str(tmp_pca_file), src_ds_A.RasterXSize, src_ds_A.RasterYSize, 1, gdal.GDT_Float32)
         pcband = out_pc.GetRasterBand(1)
+        if nodata is not None:
+            pcband.SetNoDataValue(0)
         pcband.WriteArray(np.array(pc.reshape((src_ds_A.RasterYSize, src_ds_A.RasterXSize)).compute()))
         # set projection and geotransform
         if src_ds_A.GetGeoTransform() is not None:
