@@ -61,8 +61,9 @@ class PickerPixelPointTool(QgsMapTool):
         self.update_pixel_value_to_widget(event)
         # restart point tool
         self.clean()
-        QTimer.singleShot(180, lambda:
-            self.render_widget.canvas.setMapTool(self.render_widget.pan_zoom_tool, clean=True))
+        self.render_widget.canvas.unsetMapTool(self)
+        # delay some ms before restore maptool
+        QTimer.singleShot(180, lambda: self.render_widget.canvas.setMapTool(self.render_widget.pan_zoom_tool))
 
 
 class PickerAOIPointTool(QgsMapTool):
@@ -87,8 +88,8 @@ class PickerAOIPointTool(QgsMapTool):
         self.tmp_rubber_band = None
         # restart point tool
         self.clean()
-        QTimer.singleShot(180, lambda:
-            self.cad.render_widget.canvas.setMapTool(self.cad.render_widget.pan_zoom_tool, clean=True))
+        self.cad.render_widget.canvas.unsetMapTool(self)
+        self.cad.render_widget.canvas.setMapTool(self.cad.render_widget.pan_zoom_tool)
 
     def canvasMoveEvent(self, event):
         if self.tmp_rubber_band is None:
