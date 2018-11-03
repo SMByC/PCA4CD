@@ -227,6 +227,7 @@ class MainAnalysisDialog(QDialog, FORM_CLASS):
             super(MainAnalysisDialog, self).reject()
 
     @pyqtSlot()
+    @wait_process
     def save_pca(self):
         # suggested filename
         path, filename = os.path.split(get_file_path_of_layer(self.layer_a))
