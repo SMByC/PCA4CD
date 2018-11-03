@@ -25,6 +25,7 @@ from qgis.PyQt import uic
 from qgis.PyQt.QtGui import QColor
 from qgis.PyQt.QtWidgets import QWidget, QFileDialog
 from qgis.PyQt.QtCore import pyqtSlot
+from qgis.core import QgsProject
 
 from pca4cd.gui.component_analysis_dialog import ComponentAnalysisDialog
 from pca4cd.utils.qgis_utils import load_and_select_filepath_in
@@ -68,6 +69,17 @@ class LayerViewWidget(QWidget, FORM_CLASS):
 
         # component analysis layer
         self.QPBtn_ComponentAnalysisDialog.clicked.connect(self.open_component_analysis_dialog)
+
+    def clean(self):
+        # clean first the component analysis dialog of this view widget
+        if self.component_analysis_dialog is not None:
+            self.component_analysis_dialog.clean()
+            del self.component_analysis_dialog
+        # clean this view widget and the layers loaded in PCs
+        if self.pc_id is not None:
+            for layer in self.render_widget.canvas.layers():
+                QgsProject.instance().removeMapLayer(layer.id())
+        self.disable()
 
     def enable(self):
         with block_signals_to(self.render_widget):

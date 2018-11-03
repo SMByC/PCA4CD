@@ -26,6 +26,7 @@ from qgis.core import Qgis
 from qgis.PyQt import uic
 from qgis.PyQt.QtCore import Qt, pyqtSlot
 from qgis.PyQt.QtWidgets import QDialog, QGridLayout, QMessageBox, QFileDialog
+from qgis.utils import iface
 
 from pca4cd.gui.layer_view_widget import LayerViewWidget
 from pca4cd.gui.merge_change_layers_dialog import MergeChangeLayersDialog
@@ -46,6 +47,7 @@ class MainAnalysisDialog(QDialog, FORM_CLASS):
 
     def __init__(self, layer_a, layer_b, pca_layers, pca_stats, nodata=None):
         QDialog.__init__(self)
+        self.setAttribute(Qt.WA_DeleteOnClose, True)
         self.layer_a = layer_a
         self.layer_b = layer_b
         self.pca_layers = pca_layers
@@ -179,16 +181,20 @@ class MainAnalysisDialog(QDialog, FORM_CLASS):
         if reply == QMessageBox.No:
             return
 
-        # close components analysis opened
+        # clear/close components analysis
         for view_widget in MainAnalysisDialog.view_widgets:
             if view_widget.component_analysis_dialog and view_widget.component_analysis_dialog.is_opened:
                 view_widget.component_analysis_dialog.deleteLater()
+            # clean view widget and its component analysis
+            view_widget.clean()
+
         # clear and recover
         from pca4cd.pca4cd import PCA4CD as pca4cd
         self.reject(is_ok_to_close=True)
         self.deleteLater()
         pca4cd.removes_temporary_files()
         pca4cd.tmp_dir = tempfile.mkdtemp()
+        iface.mapCanvas().clearCache()
         # recover the main dialog
         pca4cd.dialog.show()
 
@@ -207,10 +213,13 @@ class MainAnalysisDialog(QDialog, FORM_CLASS):
         for view_widget in MainAnalysisDialog.view_widgets:
             if view_widget.component_analysis_dialog and view_widget.component_analysis_dialog.is_opened:
                 view_widget.component_analysis_dialog.deleteLater()
+            # clean view widget and its component analysis
+            view_widget.clean()
+
         # clear and close main dialog
         from pca4cd.pca4cd import PCA4CD as pca4cd
         pca4cd.dialog.close()
-
+        iface.mapCanvas().clearCache()
         self.reject(is_ok_to_close=True)
 
     def reject(self, is_ok_to_close=False):

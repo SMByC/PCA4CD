@@ -30,7 +30,7 @@ from osgeo import gdal
 from osgeo.gdalconst import GA_ReadOnly
 
 from qgis.PyQt import uic
-from qgis.core import QgsRaster, QgsWkbTypes, QgsFeature, QgsVectorLayer
+from qgis.core import QgsRaster, QgsWkbTypes, QgsFeature, QgsVectorLayer, QgsProject
 from qgis.gui import QgsMapTool, QgsRubberBand
 from qgis.core import edit
 
@@ -206,6 +206,14 @@ class ComponentAnalysisDialog(QWidget, FORM_CLASS):
         self.set_statistics(stats_for=self.pc_name)
         # init aoi data
         self.aoi_data = np.array([np.nan])
+
+    def clean(self):
+        for layer in self.render_widget.canvas.layers():
+            QgsProject.instance().removeMapLayer(layer.id())
+        self.render_widget.canvas.setLayers([])
+        self.render_widget.canvas.clearCache()
+        self.delete_all_aoi()
+        del self.pc_data, self.aoi_data, self.HistogramPlot
 
     @pyqtSlot()
     def show(self):
