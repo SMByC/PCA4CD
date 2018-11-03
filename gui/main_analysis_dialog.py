@@ -227,20 +227,24 @@ class MainAnalysisDialog(QDialog, FORM_CLASS):
             super(MainAnalysisDialog, self).reject()
 
     @pyqtSlot()
-    @wait_process
     def save_pca(self):
         # suggested filename
         path, filename = os.path.split(get_file_path_of_layer(self.layer_a))
         suggested_filename = os.path.splitext(Path(path, filename))[0] + "_pca.tif"
         # filesave dialog
-        file_out, _ = QFileDialog.getSaveFileName(self, self.tr("Save the PCA stack"),
-                                                  suggested_filename,
+        file_out, _ = QFileDialog.getSaveFileName(self, self.tr("Save the PCA stack"), suggested_filename,
                                                   self.tr("GeoTiff files (*.tif);;All files (*.*)"))
-        if file_out != '':
+
+        @wait_process
+        def save():
             nodata = ["-a_nodata", "0"] if MainAnalysisDialog.nodata is not None else []
             gdal_merge.main(["", "-separate", "-of", "GTiff", "-o", file_out] + nodata +
                             [get_file_path_of_layer(layer) for layer in self.pca_layers])
             self.MsgBar.pushMessage("PCA stack saved successfully: \"{}\"".format(os.path.basename(file_out)), level=Qgis.Success)
+
+        if file_out != '':
+            save()
+
 
     @pyqtSlot()
     def open_merge_change_layers(self):
