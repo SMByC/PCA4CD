@@ -95,7 +95,7 @@ def pca(A, B, n_pc, estimator_matrix, out_dir, n_threads, block_size, nodata=Non
                 estimation_matrix[j][i] = estimation_matrix[i][j] = \
                     da.cov(deviation_scores_band_i, deviation_scores_band_j)[0][1]
     # free mem
-    del raw_image, flat_dims, nodata_mask, src_ds_A, src_ds_B, ds
+    del raw_image, flat_dims, src_ds_A, src_ds_B, ds
 
     ########
     # calculate eigenvectors & eigenvalues of the matrix
@@ -119,17 +119,11 @@ def pca(A, B, n_pc, estimator_matrix, out_dir, n_threads, block_size, nodata=Non
     src_ds_A = gdal.Open(A, gdal.GA_ReadOnly)
     src_ds_B = None
     for band in range(src_ds_A.RasterCount):
-        ds = src_ds_A.GetRasterBand(band + 1).ReadAsArray().flatten().astype(np.float32)
-        if nodata is not None:
-            ds[ds == nodata] = band_mean[band]
-        raw_image.append(ds)
+        raw_image.append(src_ds_A.GetRasterBand(band + 1).ReadAsArray().flatten().astype(np.float32))
     if B is not None:
         src_ds_B = gdal.Open(B, gdal.GA_ReadOnly)
         for band in range(src_ds_B.RasterCount):
-            ds = src_ds_B.GetRasterBand(band + 1).ReadAsArray().flatten().astype(np.float32)
-            if nodata is not None:
-                ds[ds == nodata] = band_mean[band]
-            raw_image.append(ds)
+            raw_image.append(src_ds_B.GetRasterBand(band + 1).ReadAsArray().flatten().astype(np.float32))
 
     @dask.delayed
     def get_principal_component(i, j):
@@ -139,6 +133,10 @@ def pca(A, B, n_pc, estimator_matrix, out_dir, n_threads, block_size, nodata=Non
     for i in range(n_pc):
         pc = dask.delayed(sum)([get_principal_component(i, j) for j in range(n_bands)])
         pc = pc.astype(np.float32)
+        pc = np.array(pc.compute())
+        if nodata is not None:
+            pc[nodata_mask] = 0
+        pc = pc.reshape((src_ds_A.RasterYSize, src_ds_A.RasterXSize))
         # save component as file
         tmp_pca_file = Path(out_dir) / 'pc_{}.tif'.format(i+1)
         driver = gdal.GetDriverByName("GTiff")
@@ -146,19 +144,19 @@ def pca(A, B, n_pc, estimator_matrix, out_dir, n_threads, block_size, nodata=Non
         pcband = out_pc.GetRasterBand(1)
         if nodata is not None:
             pcband.SetNoDataValue(0)
-        pcband.WriteArray(np.array(pc.reshape((src_ds_A.RasterYSize, src_ds_A.RasterXSize)).compute()))
+        pcband.WriteArray(pc)
         # set projection and geotransform
         if src_ds_A.GetGeoTransform() is not None:
             out_pc.SetGeoTransform(src_ds_A.GetGeoTransform())
         if src_ds_A.GetProjection() is not None:
             out_pc.SetProjection(src_ds_A.GetProjection())
         out_pc.FlushCache()
-        del pcband, out_pc
+        del pc, pcband, out_pc
 
         pca_files.append(tmp_pca_file)
 
     # free mem
-    del raw_image, src_ds_A, src_ds_B, ds
+    del raw_image, src_ds_A, src_ds_B, ds, nodata_mask
 
     # compute the pyramids for each pc image
     @dask.delayed
