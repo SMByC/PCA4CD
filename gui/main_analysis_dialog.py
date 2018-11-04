@@ -20,9 +20,12 @@
 """
 import os
 import tempfile
+import dask
+import numpy as np
 from pathlib import Path
+from osgeo import gdal
 
-from qgis.core import Qgis
+from qgis.core import Qgis, QgsSingleBandGrayRenderer, QgsContrastEnhancement
 from qgis.PyQt import uic
 from qgis.PyQt.QtCore import Qt, pyqtSlot
 from qgis.PyQt.QtWidgets import QDialog, QGridLayout, QMessageBox, QFileDialog
@@ -225,6 +228,29 @@ class MainAnalysisDialog(QDialog, FORM_CLASS):
     def reject(self, is_ok_to_close=False):
         if is_ok_to_close:
             super(MainAnalysisDialog, self).reject()
+
+    @wait_process
+    def update_pc_style(self):
+        """Update the grey style using mean+-5*std for all principal components
+        """
+        @dask.delayed
+        def set_style_to(view_widget):
+            src_ds = gdal.Open(get_file_path_of_layer(view_widget.render_widget.layer), gdal.GA_ReadOnly)
+            ds = src_ds.GetRasterBand(1).ReadAsArray().flatten().astype(np.float32)
+            ds = ds[ds != 0]
+            mean = np.mean(ds)
+            std = np.std(ds)
+            renderer = QgsSingleBandGrayRenderer(view_widget.render_widget.layer.dataProvider(), 1)
+            ce = QgsContrastEnhancement(view_widget.render_widget.layer.dataProvider().dataType(0))
+            ce.setContrastEnhancementAlgorithm(QgsContrastEnhancement.StretchToMinimumMaximum)
+            ce.setMinimumValue(mean - 5*std)
+            ce.setMaximumValue(mean + 5*std)
+            renderer.setContrastEnhancement(ce)
+            view_widget.render_widget.layer.setRenderer(renderer)
+            del src_ds, ds
+
+        dask.compute(*[set_style_to(view_widget) for view_widget in MainAnalysisDialog.view_widgets
+                       if view_widget.pc_id is not None], num_workers=2)
 
     @pyqtSlot()
     def save_pca(self):

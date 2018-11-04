@@ -190,3 +190,4 @@ class PCA4CDDialog(QDialog, FORM_CLASS):
         self.main_analysis_dialog = MainAnalysisDialog(current_layer_A, current_layer_B, pca_layers, pca_stats, nodata)
         # open dialog
         self.main_analysis_dialog.show()
+        self.main_analysis_dialog.update_pc_style()
