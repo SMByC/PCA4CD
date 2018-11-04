@@ -156,7 +156,7 @@ def pca(A, B, n_pc, estimator_matrix, out_dir, n_threads, block_size, nodata=Non
         pca_files.append(tmp_pca_file)
 
     # free mem
-    del raw_image, src_ds_A, src_ds_B, ds, nodata_mask
+    del raw_image, src_ds_A, src_ds_B, nodata_mask
 
     # compute the pyramids for each pc image
     @dask.delayed
