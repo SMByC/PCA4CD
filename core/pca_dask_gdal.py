@@ -95,7 +95,7 @@ def pca(A, B, n_pc, estimator_matrix, out_dir, n_threads, block_size, nodata=Non
                 estimation_matrix[j][i] = estimation_matrix[i][j] = \
                     da.cov(deviation_scores_band_i, deviation_scores_band_j)[0][1]
     # free mem
-    del raw_image, flat_dims, src_ds_A, src_ds_B, ds
+    del raw_image, flat_dims, src_ds_B, ds
 
     ########
     # calculate eigenvectors & eigenvalues of the matrix
@@ -115,19 +115,17 @@ def pca(A, B, n_pc, estimator_matrix, out_dir, n_threads, block_size, nodata=Non
     ########
     # save the principal components separated in tif images
 
-    raw_image = []
-    src_ds_A = gdal.Open(A, gdal.GA_ReadOnly)
-    src_ds_B = None
-    for band in range(src_ds_A.RasterCount):
-        raw_image.append(src_ds_A.GetRasterBand(band + 1).ReadAsArray().flatten().astype(np.float32))
-    if B is not None:
-        src_ds_B = gdal.Open(B, gdal.GA_ReadOnly)
-        for band in range(src_ds_B.RasterCount):
-            raw_image.append(src_ds_B.GetRasterBand(band + 1).ReadAsArray().flatten().astype(np.float32))
+    def get_raw_band_from_stack(band):
+        src_ds_A = gdal.Open(A, gdal.GA_ReadOnly)
+        if band < src_ds_A.RasterCount:
+            return src_ds_A.GetRasterBand(band + 1).ReadAsArray().flatten().astype(np.float32)
+        if band >= src_ds_A.RasterCount:
+            src_ds_B = gdal.Open(B, gdal.GA_ReadOnly)
+            return src_ds_B.GetRasterBand(band - src_ds_A.RasterCount + 1).ReadAsArray().flatten().astype(np.float32)
 
     @dask.delayed
     def get_principal_component(i, j):
-        return eigenvectors[j, i] * (raw_image[j] - band_mean[j])
+        return eigenvectors[j, i] * (get_raw_band_from_stack(j) - band_mean[j])
 
     pca_files = []
     for i in range(n_pc):
@@ -156,7 +154,7 @@ def pca(A, B, n_pc, estimator_matrix, out_dir, n_threads, block_size, nodata=Non
         pca_files.append(tmp_pca_file)
 
     # free mem
-    del raw_image, src_ds_A, src_ds_B, nodata_mask
+    del src_ds_A, nodata_mask
 
     # compute the pyramids for each pc image
     @dask.delayed
