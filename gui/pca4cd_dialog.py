@@ -41,7 +41,7 @@ plugin_folder = os.path.dirname(os.path.dirname(__file__))
 FORM_CLASS, _ = uic.loadUiType(Path(plugin_folder, 'ui', 'pca4cd_dialog.ui'))
 
 cfg = configparser.ConfigParser()
-cfg.read(Path(plugin_folder, 'metadata.txt'))
+cfg.read(str(Path(plugin_folder, 'metadata.txt')))
 VERSION = cfg.get('general', 'version')
 HOMEPAGE = cfg.get('general', 'homepage')
 
