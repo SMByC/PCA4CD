@@ -145,8 +145,8 @@ class PCA4CDDialog(QDialog, FORM_CLASS):
            layer_A.height() != layer_B.height():
             self.MsgBar.pushMessage("The layers don't have the same column/row", level=Qgis.Warning)
             return False
-        if layer_A.rasterUnitsPerPixelX() != layer_B.rasterUnitsPerPixelX() or \
-           layer_A.rasterUnitsPerPixelY() != layer_B.rasterUnitsPerPixelY():
+        if round(layer_A.rasterUnitsPerPixelX(), 6) != round(layer_B.rasterUnitsPerPixelX(), 6) or \
+           round(layer_A.rasterUnitsPerPixelY(), 6) != round(layer_B.rasterUnitsPerPixelY(), 6):
             self.MsgBar.pushMessage("The layers don't have the same pixel size", level=Qgis.Warning)
             return False
         return True
