@@ -123,15 +123,12 @@ def pca(A, B, n_pc, estimator_matrix, out_dir, n_threads, block_size, nodata=Non
             src_ds_B = gdal.Open(B, gdal.GA_ReadOnly)
             return src_ds_B.GetRasterBand(band - src_ds_A.RasterCount + 1).ReadAsArray().flatten().astype(np.float32)
 
-    @dask.delayed
-    def get_principal_component(i, j):
-        return eigenvectors[j, i] * (get_raw_band_from_stack(j) - band_mean[j])
-
     pca_files = []
     for i in range(n_pc):
-        pc = dask.delayed(sum)([get_principal_component(i, j) for j in range(n_bands)])
-        pc = pc.astype(np.float32)
-        pc = np.array(pc.compute())
+        pc = 0
+        for j in range(n_bands):
+            pc = pc + eigenvectors[j, i] * (get_raw_band_from_stack(j) - band_mean[j])
+
         if nodata is not None:
             pc[nodata_mask] = 0
         pc = pc.reshape((src_ds_A.RasterYSize, src_ds_A.RasterXSize))
