@@ -141,8 +141,9 @@ class PCA4CDDialog(QDialog, FORM_CLASS):
         if layer_A.crs() != layer_B.crs():
             self.MsgBar.pushMessage("The layers don't have the same projection", level=Qgis.Warning)
             return False
-        if layer_A.extent() != layer_B.extent():
-            self.MsgBar.pushMessage("The layers don't have the same extent", level=Qgis.Warning)
+        if layer_A.width() != layer_B.width() or \
+           layer_A.height() != layer_B.height():
+            self.MsgBar.pushMessage("The layers don't have the same column/row", level=Qgis.Warning)
             return False
         if layer_A.rasterUnitsPerPixelX() != layer_B.rasterUnitsPerPixelX() or \
            layer_A.rasterUnitsPerPixelY() != layer_B.rasterUnitsPerPixelY():
