@@ -313,7 +313,7 @@ class MainAnalysisDialog(QDialog, FORM_CLASS):
 
             gdal_calc.Calc(calc="0*(numpy.any([{filter_zeros}], axis=0)) + 1*(numpy.all([{filter_ones}], axis=0))"
                            .format(filter_zeros=filter_zeros, filter_ones=filter_ones), outfile=merged_change_layer,
-                           type="Byte", NoDataValue=0, **input_files)
+                           type="Byte", NoDataValue=0, quiet=True, **input_files)
 
         merged_layer = load_layer_in_qgis(merged_change_layer, "raster", True if merge_dialog.LoadInQgis.isChecked() else False)
         apply_symbology(merged_layer, [("detection", 1, (255, 255, 0, 255))])
