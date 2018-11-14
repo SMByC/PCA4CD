@@ -22,8 +22,10 @@
 import os
 import configparser
 import webbrowser
+import numpy as np
 from multiprocessing import cpu_count
 from pathlib import Path
+from osgeo import gdal
 
 from qgis.PyQt import uic
 from qgis.PyQt.QtCore import pyqtSignal, pyqtSlot
@@ -34,7 +36,7 @@ from pca4cd.core.pca_dask_gdal import pca
 from pca4cd.gui.about_dialog import AboutDialog
 from pca4cd.gui.main_analysis_dialog import MainAnalysisDialog
 from pca4cd.utils.qgis_utils import load_and_select_filepath_in, load_layer_in_qgis, get_file_path_of_layer
-from pca4cd.utils.system_utils import error_handler
+from pca4cd.utils.system_utils import error_handler, wait_process
 
 # plugin path
 plugin_folder = os.path.dirname(os.path.dirname(__file__))
@@ -103,6 +105,18 @@ class PCA4CDDialog(QDialog, FORM_CLASS):
         # process settings
         self.group_ProcessSettings.setVisible(False)
         self.nThreads.setValue(cpu_count())
+
+        # ######### Load External Principal Components ######### #
+        self.Widget_LoadStackPC.setVisible(False)
+        self.QCBox_LoadStackPCA.setCurrentIndex(-1)
+        # call to browse the principal components
+        self.QPBtn_browsePCA.clicked.connect(lambda: self.fileDialog_browse(
+            self.QCBox_LoadStackPCA,
+            dialog_title=self.tr("Select the stack file of the principal components"),
+            dialog_types=self.tr("Raster files (*.tif *.img);;All files (*.*)"),
+            layer_type="raster"))
+        # load
+        self.QPBtn_LoadStackPCA.clicked.connect(self.load_external_pc_in_main_analysis_dialog)
 
     @pyqtSlot()
     def fileDialog_browse(self, combo_box, dialog_title, dialog_types, layer_type):
@@ -189,6 +203,33 @@ class PCA4CDDialog(QDialog, FORM_CLASS):
         current_layer_A = self.QCBox_InputData_A.currentLayer()
         current_layer_B = self.QCBox_InputData_B.currentLayer()
         self.main_analysis_dialog = MainAnalysisDialog(current_layer_A, current_layer_B, pca_layers, pca_stats, nodata)
+        # open dialog
+        self.main_analysis_dialog.show()
+        self.main_analysis_dialog.update_pc_style()
+
+    @pyqtSlot()
+    @wait_process
+    def load_external_pc_in_main_analysis_dialog(self):
+        from pca4cd.pca4cd import PCA4CD as pca4cd
+        stack_pc = self.QCBox_LoadStackPCA.currentLayer()
+
+        # extract each band as component in tmp file
+        pca_layers = []
+        for component in range(stack_pc.bandCount()):
+            tmp_pca_file = Path(pca4cd.tmp_dir) / 'pc_{}.tif'.format(component + 1)
+            gdal.Translate(str(tmp_pca_file), get_file_path_of_layer(stack_pc), bandList=[component + 1])
+            pca_layers.append(load_layer_in_qgis(tmp_pca_file, "raster", False))
+
+        # pca statistics
+        pca_stats = {}
+        pca_stats["eigenvals"] = None
+
+        # get the nodata
+        nodata_value = stack_pc.dataProvider().sourceNoDataValue(1)
+        if np.isnan(nodata_value):
+            nodata_value = None
+
+        self.main_analysis_dialog = MainAnalysisDialog(None, None, pca_layers, pca_stats, nodata_value)
         # open dialog
         self.main_analysis_dialog.show()
         self.main_analysis_dialog.update_pc_style()

@@ -2,14 +2,6 @@
 <ui version="4.0">
  <class>PCA4CDDialogBase</class>
  <widget class="QDialog" name="PCA4CDDialogBase">
-  <property name="geometry">
-   <rect>
-    <x>0</x>
-    <y>0</y>
-    <width>664</width>
-    <height>728</height>
-   </rect>
-  </property>
   <property name="windowTitle">
    <string>PCA4CD - Compute the Principal Components</string>
   </property>
@@ -57,7 +49,7 @@
          <item>
           <widget class="QLabel" name="label_5">
            <property name="text">
-            <string>Select one or two (as reference and target) input layer, each band in A (and B) is a variable for the PCA:</string>
+            <string>Select one or two (as reference and target) input layer. Each band in A (and B) is a variable for the PCA:</string>
            </property>
            <property name="alignment">
             <set>Qt::AlignJustify|Qt::AlignVCenter</set>
@@ -465,6 +457,99 @@
        </spacer>
       </item>
       <item>
+       <widget class="QGroupBox" name="groupBox">
+        <property name="toolTip">
+         <string>Load the stack of the principal components externally</string>
+        </property>
+        <property name="title">
+         <string>&amp;Load principal components</string>
+        </property>
+        <property name="checkable">
+         <bool>true</bool>
+        </property>
+        <property name="checked">
+         <bool>false</bool>
+        </property>
+        <layout class="QVBoxLayout" name="verticalLayout_6">
+         <item>
+          <widget class="QWidget" name="Widget_LoadStackPC" native="true">
+           <layout class="QVBoxLayout" name="verticalLayout_7">
+            <property name="leftMargin">
+             <number>0</number>
+            </property>
+            <property name="topMargin">
+             <number>0</number>
+            </property>
+            <property name="rightMargin">
+             <number>0</number>
+            </property>
+            <property name="bottomMargin">
+             <number>0</number>
+            </property>
+            <item>
+             <widget class="QWidget" name="widget_8" native="true">
+              <layout class="QHBoxLayout" name="horizontalLayout_7">
+               <property name="leftMargin">
+                <number>0</number>
+               </property>
+               <property name="topMargin">
+                <number>0</number>
+               </property>
+               <property name="rightMargin">
+                <number>0</number>
+               </property>
+               <property name="bottomMargin">
+                <number>0</number>
+               </property>
+               <item>
+                <widget class="QgsMapLayerComboBox" name="QCBox_LoadStackPCA">
+                 <property name="sizePolicy">
+                  <sizepolicy hsizetype="Expanding" vsizetype="Fixed">
+                   <horstretch>0</horstretch>
+                   <verstretch>0</verstretch>
+                  </sizepolicy>
+                 </property>
+                 <property name="focusPolicy">
+                  <enum>Qt::StrongFocus</enum>
+                 </property>
+                 <property name="frame">
+                  <bool>true</bool>
+                 </property>
+                 <property name="allowEmptyLayer">
+                  <bool>true</bool>
+                 </property>
+                </widget>
+               </item>
+               <item>
+                <widget class="QPushButton" name="QPBtn_browsePCA">
+                 <property name="sizePolicy">
+                  <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
+                   <horstretch>0</horstretch>
+                   <verstretch>0</verstretch>
+                  </sizepolicy>
+                 </property>
+                 <property name="text">
+                  <string>Browse</string>
+                 </property>
+                </widget>
+               </item>
+              </layout>
+             </widget>
+            </item>
+            <item>
+             <widget class="QPushButton" name="QPBtn_LoadStackPCA">
+              <property name="text">
+               <string>Load the Principal Components</string>
+              </property>
+             </widget>
+            </item>
+           </layout>
+          </widget>
+         </item>
+        </layout>
+       </widget>
+      </item>
+      <item>
        <widget class="QWidget" name="widget_plugin_info" native="true">
         <layout class="QHBoxLayout" name="horizontalLayout_25">
          <property name="leftMargin">
@@ -619,6 +704,54 @@
     <hint type="destinationlabel">
      <x>75</x>
      <y>220</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>groupBox</sender>
+   <signal>clicked(bool)</signal>
+   <receiver>Widget_LoadStackPC</receiver>
+   <slot>setVisible(bool)</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>191</x>
+     <y>779</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>20</x>
+     <y>855</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>groupBox</sender>
+   <signal>clicked(bool)</signal>
+   <receiver>QGBox_InputData</receiver>
+   <slot>setDisabled(bool)</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>209</x>
+     <y>773</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>7</x>
+     <y>276</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>groupBox</sender>
+   <signal>clicked(bool)</signal>
+   <receiver>QGBox_PrincipalComponents</receiver>
+   <slot>setDisabled(bool)</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>232</x>
+     <y>759</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>225</x>
+     <y>638</y>
     </hint>
    </hints>
   </connection>

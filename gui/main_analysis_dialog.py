@@ -131,10 +131,10 @@ class MainAnalysisDialog(QDialog, FORM_CLASS):
         # setup view widget
         for idx, view_widget in enumerate(MainAnalysisDialog.view_widgets, start=1):
             view_widget.id = idx
-            view_widget.setup_view_widget(crs=self.layer_a.crs())
+            view_widget.setup_view_widget(crs=self.pca_layers[0].crs())
         # set views
         for num_view, view_widget in enumerate(MainAnalysisDialog.view_widgets, start=1):
-            if num_view == 2:
+            if num_view == 2 and self.layer_a is not None:
                 view_widget.QLabel_ViewName.setText("Layer A")
                 file_index = view_widget.QCBox_RenderFile.findText(self.layer_a.name(), Qt.MatchFixedString)
                 view_widget.QCBox_RenderFile.setCurrentIndex(file_index)
@@ -285,7 +285,11 @@ class MainAnalysisDialog(QDialog, FORM_CLASS):
                 level=Qgis.Warning)
             return
         # suggested filename
-        path, filename = os.path.split(get_file_path_of_layer(self.layer_a))
+        if self.layer_a is not None:
+            path, filename = os.path.split(get_file_path_of_layer(self.layer_a))
+        else:
+            from pca4cd.pca4cd import PCA4CD as pca4cd
+            path, filename = os.path.split(get_file_path_of_layer(pca4cd.dialog.QCBox_LoadStackPCA.currentLayer()))
         suggested_filename = os.path.splitext(Path(path, filename))[0] + "_pca4cd.tif"
         # merge dialog
         merge_dialog = MergeChangeLayersDialog(self.activated_ids, suggested_filename)
