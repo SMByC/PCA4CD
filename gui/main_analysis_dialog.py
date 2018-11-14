@@ -20,7 +20,6 @@
 """
 import os
 import tempfile
-import dask
 import numpy as np
 from pathlib import Path
 from osgeo import gdal
@@ -66,6 +65,9 @@ class MainAnalysisDialog(QDialog, FORM_CLASS):
         self.ReturnToMainDialog.clicked.connect(self.return_to_main_dialog)
         # save all components in a stack
         self.SavePCA.clicked.connect(self.save_pca)
+        if self.layer_a is None:
+            self.SavePCA.setDisabled(True)
+            self.SavePCA.setToolTip("Not available if the components are loaded externally")
         # merge change layer
         self.OpenMergeChangeLayers.clicked.connect(self.open_merge_change_layers)
 
