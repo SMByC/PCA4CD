@@ -185,7 +185,7 @@ class ComponentAnalysisDialog(QWidget, FORM_CLASS):
 
         # init histogram plot
         self.hist_data = None
-        self.hist_data_pc = {"auto": None, "doane": None, "scott": None, "rice": None}
+        self.hist_data_pc = {"auto": None, "doane": None, "scott": None, "rice": None}  # store histogram done for principal components
         self.hist_bins = {"pc": {"type": "auto", "bins": None}, "aoi": {"type": "auto", "bins": None}}
         self.HistogramPlot.setTitle('Histogram', size='9pt')
         self.HistogramPlot.setBackground('w')
@@ -203,6 +203,7 @@ class ComponentAnalysisDialog(QWidget, FORM_CLASS):
         self.pc_gdal_ds = gdal.Open(get_file_path_of_layer(self.pc_layer), GA_ReadOnly)
         self.pc_data = self.pc_gdal_ds.GetRasterBand(1).ReadAsArray()
         self.pc_data_flat = self.pc_data.flatten()
+        self.stats_pc = None  # store stats done for principal components
         from pca4cd.gui.main_analysis_dialog import MainAnalysisDialog
         if MainAnalysisDialog.nodata is not None:
             self.pc_data_flat = np.delete(self.pc_data_flat, np.where(self.pc_data_flat == MainAnalysisDialog.nodata))
@@ -309,6 +310,7 @@ class ComponentAnalysisDialog(QWidget, FORM_CLASS):
 
     @wait_process
     def statistics(self, data, pca_stats=None):
+        # set headers
         if pca_stats:  # for pca
             if pca_stats["eigenvals"] is not None:
                 self.stats_header.setText("Eigenvalue: {} ({}%)".format(round(pca_stats["eigenvals"][self.pc_id-1], 2),
@@ -320,13 +322,26 @@ class ComponentAnalysisDialog(QWidget, FORM_CLASS):
         else:  # for aoi
             self.stats_header.setText("Pixels in AOI: {}".format(round(data.size if data.size > 1 else 0, 2)))
             self.stats_header.setToolTip("")
-
-        self.stats_min.setText(str(round(np.min(data), 2)))
-        self.stats_max.setText(str(round(np.max(data), 2)))
-        self.stats_std.setText(str(round(np.std(data), 2)))
-        self.stats_p25.setText(str(round(np.percentile(data, 25), 2)))
-        self.stats_p50.setText(str(round(np.percentile(data, 50), 2)))
-        self.stats_p75.setText(str(round(np.percentile(data, 75), 2)))
+        # restore or compute the statistics
+        if self.QCBox_StatsLayer.currentText() == self.pc_name and self.stats_pc is not None:
+            min, max, std, p25, p50, p75 = self.stats_pc
+        else:
+            da_data = da.from_array(data, chunks=(8000000,))
+            min = da.min(da_data).compute()
+            max = da.max(da_data).compute()
+            std = da.std(da_data).compute()
+            p25 = da.percentile(da_data, 25).compute()[0]
+            p50 = da.percentile(da_data, 50).compute()[0]
+            p75 = da.percentile(da_data, 75).compute()[0]
+            if self.QCBox_StatsLayer.currentText() == self.pc_name:
+                self.stats_pc = (min, max, std, p25, p50, p75)
+        # set in dialog
+        self.stats_min.setText(str(round(min, 2)))
+        self.stats_max.setText(str(round(max, 2)))
+        self.stats_std.setText(str(round(std, 2)))
+        self.stats_p25.setText(str(round(p25, 2)))
+        self.stats_p50.setText(str(round(p50, 2)))
+        self.stats_p75.setText(str(round(p75, 2)))
 
     @pyqtSlot()
     @wait_process
