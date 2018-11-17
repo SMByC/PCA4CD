@@ -185,6 +185,7 @@ class ComponentAnalysisDialog(QWidget, FORM_CLASS):
 
         # init histogram plot
         self.hist_data = None
+        self.hist_data_pc = {"auto": None, "doane": None, "scott": None, "rice": None}
         self.hist_bins = {"pc": {"type": "auto", "bins": None}, "aoi": {"type": "auto", "bins": None}}
         self.HistogramPlot.setTitle('Histogram', size='9pt')
         self.HistogramPlot.setBackground('w')
@@ -215,7 +216,7 @@ class ComponentAnalysisDialog(QWidget, FORM_CLASS):
         self.render_widget.canvas.setLayers([])
         self.render_widget.canvas.clearCache()
         self.delete_all_aoi()
-        del self.pc_data, self.pc_data_flat, self.aoi_data, self.HistogramPlot
+        del self.pc_data, self.pc_data_flat, self.aoi_data, self.HistogramPlot, self.hist_data, self.hist_data_pc
 
     @pyqtSlot()
     def show(self):
@@ -369,7 +370,20 @@ class ComponentAnalysisDialog(QWidget, FORM_CLASS):
                 with block_signals_to(self.HistogramTypeBins):
                     self.HistogramTypeBins.setCurrentIndex(self.HistogramTypeBins.findText(hist_bins["type"]))
         # plot
-        y, x = np.histogram(self.hist_data, bins=set_bins)
+        if stats_for == self.pc_name and set_bins in ["auto", "doane", "scott", "rice"]:
+            if self.hist_data_pc[set_bins] is not None:
+                y, x = self.hist_data_pc[set_bins]  # restore histogram values
+            else:
+                bin_edges = np.histogram_bin_edges(self.hist_data, bins=set_bins)
+                da_hist_data = da.from_array(self.hist_data, chunks=(8000000,))
+                y, x = da.histogram(da_hist_data, bins=bin_edges)
+                y = y.compute(scheduler='threads', num_workers=cpu_count())
+                self.hist_data_pc[set_bins] = (y, x)
+        else:
+            bin_edges = np.histogram_bin_edges(self.hist_data, bins=set_bins)
+            da_hist_data = da.from_array(self.hist_data, chunks=(8000000,))
+            y, x = da.histogram(da_hist_data, bins=bin_edges)
+            y = y.compute(scheduler='threads', num_workers=cpu_count())
         self.HistogramPlot.clear()
         self.HistogramPlot.plot(x, y, stepMode=True, fillLevel=0, brush=(80, 80, 80))
         self.HistogramPlot.autoRange()
