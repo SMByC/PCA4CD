@@ -19,9 +19,11 @@
  ***************************************************************************/
 """
 import os
-from pathlib import Path
-
 import numpy as np
+from pathlib import Path
+from multiprocessing import cpu_count
+from dask import array as da
+
 import pyqtgraph as pg
 from PyQt5.QtCore import QTimer, Qt, pyqtSlot
 from PyQt5.QtGui import QColor
@@ -197,12 +199,12 @@ class ComponentAnalysisDialog(QWidget, FORM_CLASS):
         self.RangeChangeFrom.valueChanged.connect(self.update_region_from_values)
         self.RangeChangeTo.valueChanged.connect(self.update_region_from_values)
         # statistics for current principal component
-        dataset = gdal.Open(get_file_path_of_layer(self.pc_layer), GA_ReadOnly)
-        band = dataset.GetRasterBand(1).ReadAsArray()
-        self.pc_data = band.flatten()
+        self.pc_gdal_ds = gdal.Open(get_file_path_of_layer(self.pc_layer), GA_ReadOnly)
+        self.pc_data = self.pc_gdal_ds.GetRasterBand(1).ReadAsArray()
+        self.pc_data_flat = self.pc_data.flatten()
         from pca4cd.gui.main_analysis_dialog import MainAnalysisDialog
         if MainAnalysisDialog.nodata is not None:
-            self.pc_data = np.delete(self.pc_data, np.where(self.pc_data == MainAnalysisDialog.nodata))
+            self.pc_data_flat = np.delete(self.pc_data_flat, np.where(self.pc_data_flat == MainAnalysisDialog.nodata))
         self.set_statistics(stats_for=self.pc_name)
         # init aoi data
         self.aoi_data = np.array([np.nan])
@@ -213,7 +215,7 @@ class ComponentAnalysisDialog(QWidget, FORM_CLASS):
         self.render_widget.canvas.setLayers([])
         self.render_widget.canvas.clearCache()
         self.delete_all_aoi()
-        del self.pc_data, self.aoi_data, self.HistogramPlot
+        del self.pc_data, self.pc_data_flat, self.aoi_data, self.HistogramPlot
 
     @pyqtSlot()
     def show(self):
@@ -258,10 +260,29 @@ class ComponentAnalysisDialog(QWidget, FORM_CLASS):
         detection_to = self.RangeChangeTo.value()
         output_change_layer = Path(pca4cd.tmp_dir, self.pc_layer.name()+"_detection.tif")
 
-        gdal_calc.Calc(calc="0*logical_and(A<{range_from},A>{range_to})+1*logical_and(A>={range_from},A<={range_to})"
-                       .format(range_from=detection_from, range_to=detection_to), A=get_file_path_of_layer(self.pc_layer),
-                       outfile=str(output_change_layer), type="Byte", NoDataValue=0, quiet=True,
-                       creation_options=["NBITS=1", "COMPRESS=NONE"])
+        # compute the detection layer between range values
+        da_pc = da.from_array(self.pc_data, chunks=(2000, 2000))
+
+        def calc(block, range_from, range_to):
+            result = np.zeros_like(block)
+            result[(block >= range_from) & (block <= range_to) & (block != 0)] = 1
+            return result
+        # process
+        map_blocks = da.map_blocks(calc, da_pc, range_from=detection_from, range_to=detection_to, dtype=np.int8)
+        detection_layer_ds = map_blocks.compute(scheduler='threads', num_workers=cpu_count())
+        # save
+        driver = gdal.GetDriverByName("GTiff")
+        out_pc = driver.Create(str(output_change_layer), self.pc_gdal_ds.RasterXSize, self.pc_gdal_ds.RasterYSize, 1,
+                               gdal.GDT_Byte, ["NBITS=1", "COMPRESS=NONE"])
+        pcband = out_pc.GetRasterBand(1)
+        pcband.SetNoDataValue(0)
+        pcband.WriteArray(detection_layer_ds)
+        # set projection and geotransform
+        if self.pc_gdal_ds.GetGeoTransform() is not None:
+            out_pc.SetGeoTransform(self.pc_gdal_ds.GetGeoTransform())
+        if self.pc_gdal_ds.GetProjection() is not None:
+            out_pc.SetProjection(self.pc_gdal_ds.GetProjection())
+        out_pc.FlushCache()
 
         detection_layer = load_layer_in_qgis(output_change_layer, "raster", False)
         apply_symbology(detection_layer, [("detection", 1, (255, 255, 0, 255))])
@@ -277,8 +298,8 @@ class ComponentAnalysisDialog(QWidget, FORM_CLASS):
             from pca4cd.gui.main_analysis_dialog import MainAnalysisDialog
             with block_signals_to(self.QCBox_StatsLayer):
                 self.QCBox_StatsLayer.setCurrentIndex(0)
-            self.statistics(self.pc_data, MainAnalysisDialog.pca_stats)
-            self.histogram_plot(data=self.pc_data)
+            self.statistics(self.pc_data_flat, MainAnalysisDialog.pca_stats)
+            self.histogram_plot(data=self.pc_data_flat)
         if stats_for == "Areas Of Interest":
             with block_signals_to(self.QCBox_StatsLayer):
                 self.QCBox_StatsLayer.setCurrentIndex(1)
