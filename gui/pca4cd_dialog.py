@@ -85,7 +85,7 @@ class PCA4CDDialog(QDialog, FORM_CLASS):
             dialog_types=self.tr("Raster files (*.tif *.img);;All files (*.*)"),
             layer_type="raster"))
         self.QCBox_InputData_A.currentIndexChanged.connect(self.set_number_of_components)
-        self.QCBox_InputData_A.currentIndexChanged.connect(self.set_nodata_value)
+        self.QCBox_InputData_A.currentIndexChanged.connect(self.set_nodata_value_in_computePC)
         self.EnableInputData_A.toggled.connect(lambda: self.EnableInputData_A.setChecked(True))
         ## B
         # set properties to QgsMapLayerComboBox
@@ -108,6 +108,7 @@ class PCA4CDDialog(QDialog, FORM_CLASS):
 
         # ######### Load External Principal Components ######### #
         self.QCBox_LoadStackPCA.setCurrentIndex(-1)
+        self.QCBox_LoadStackPCA.currentIndexChanged.connect(self.set_nodata_value_in_loadPC)
         # call to browse the principal components
         self.QPBtn_browsePCA.clicked.connect(lambda: self.fileDialog_browse(
             self.QCBox_LoadStackPCA,
@@ -125,10 +126,16 @@ class PCA4CDDialog(QDialog, FORM_CLASS):
             load_and_select_filepath_in(combo_box, file_path, layer_type)
 
     @pyqtSlot()
-    def set_nodata_value(self):
+    def set_nodata_value_in_computePC(self):
         current_layer_A = self.QCBox_InputData_A.currentLayer()
         nodata_value = str(current_layer_A.dataProvider().sourceNoDataValue(1)) if current_layer_A is not None else ""
-        self.nodata_input.setText(nodata_value if nodata_value != "nan" else "None")
+        self.NoData_ComputePCA.setText(nodata_value if nodata_value != "nan" else "None")
+
+    @pyqtSlot()
+    def set_nodata_value_in_loadPC(self):
+        load_layer = self.QCBox_LoadStackPCA.currentLayer()
+        nodata_value = str(load_layer.dataProvider().sourceNoDataValue(1)) if load_layer is not None else ""
+        self.NoData_LoadPCA.setText(nodata_value if nodata_value != "nan" else "None")
 
     @pyqtSlot()
     def set_number_of_components(self):
@@ -172,7 +179,7 @@ class PCA4CDDialog(QDialog, FORM_CLASS):
         if not self.check_input_layers(self.QCBox_InputData_A.currentLayer(), self.QCBox_InputData_B.currentLayer()):
             return
         # check the nodata value
-        nodata = self.nodata_input.text() if self.nodata_input.text() not in ["", "None", "nan"] else None
+        nodata = self.NoData_ComputePCA.text() if self.NoData_ComputePCA.text() not in ["", "None", "nan"] else None
         if nodata is not None:
             try:
                 nodata = float(nodata)

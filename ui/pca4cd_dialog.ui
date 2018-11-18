@@ -299,7 +299,7 @@
               </widget>
              </item>
              <item>
-              <widget class="QLineEdit" name="nodata_input">
+              <widget class="QLineEdit" name="NoData_ComputePCA">
                <property name="toolTip">
                 <string>The nodata value set automatically from the stack A if this has the nodata value set</string>
                </property>
@@ -612,7 +612,7 @@
                  </widget>
                 </item>
                 <item>
-                 <widget class="QLineEdit" name="nodata_LoadPCA">
+                 <widget class="QLineEdit" name="NoData_LoadPCA">
                   <property name="toolTip">
                    <string>The nodata value set automatically from the stack A if this has the nodata value set</string>
                   </property>
