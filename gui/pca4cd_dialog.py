@@ -107,7 +107,6 @@ class PCA4CDDialog(QDialog, FORM_CLASS):
         self.nThreads.setValue(cpu_count())
 
         # ######### Load External Principal Components ######### #
-        self.Widget_LoadStackPC.setVisible(False)
         self.QCBox_LoadStackPCA.setCurrentIndex(-1)
         # call to browse the principal components
         self.QPBtn_browsePCA.clicked.connect(lambda: self.fileDialog_browse(
