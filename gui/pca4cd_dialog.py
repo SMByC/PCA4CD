@@ -212,6 +212,9 @@ class PCA4CDDialog(QDialog, FORM_CLASS):
     def load_external_pc_in_main_analysis_dialog(self):
         from pca4cd.pca4cd import PCA4CD as pca4cd
         stack_pc = self.QCBox_LoadStackPCA.currentLayer()
+        if stack_pc is None:
+            self.MsgBar.pushMessage("Select a valid stack for load", level=Qgis.Warning)
+            return False
 
         # extract each band as component in tmp file
         pca_layers = []
