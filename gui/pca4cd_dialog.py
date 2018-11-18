@@ -221,24 +221,28 @@ class PCA4CDDialog(QDialog, FORM_CLASS):
         if stack_pc is None:
             self.MsgBar.pushMessage("Select a valid stack for load", level=Qgis.Warning)
             return False
+        # check the nodata value
+        nodata = self.NoData_LoadPCA.text() if self.NoData_LoadPCA.text() not in ["", "None", "nan"] else None
+        if nodata is not None:
+            try:
+                nodata = float(nodata)
+            except:
+                self.MsgBar.pushMessage("The nodata value is not valid", level=Qgis.Warning)
+                return
 
         # extract each band as component in tmp file
         pca_layers = []
         for component in range(stack_pc.bandCount()):
             tmp_pca_file = Path(pca4cd.tmp_dir) / 'pc_{}.tif'.format(component + 1)
-            gdal.Translate(str(tmp_pca_file), get_file_path_of_layer(stack_pc), bandList=[component + 1])
+            gdal.Translate(str(tmp_pca_file), get_file_path_of_layer(stack_pc),
+                           bandList=[component + 1], noData=nodata)
             pca_layers.append(load_layer_in_qgis(tmp_pca_file, "raster", False))
 
         # pca statistics
         pca_stats = {}
         pca_stats["eigenvals"] = None
 
-        # get the nodata
-        nodata_value = stack_pc.dataProvider().sourceNoDataValue(1)
-        if np.isnan(nodata_value):
-            nodata_value = None
-
-        self.main_analysis_dialog = MainAnalysisDialog(None, None, pca_layers, pca_stats, nodata_value)
+        self.main_analysis_dialog = MainAnalysisDialog(None, None, pca_layers, pca_stats, nodata)
         # open dialog
         self.main_analysis_dialog.show()
         self.main_analysis_dialog.update_pc_style()
