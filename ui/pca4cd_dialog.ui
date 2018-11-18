@@ -160,15 +160,9 @@
                  </widget>
                 </item>
                 <item>
-                 <widget class="QPushButton" name="QPBtn_browseData_A">
-                  <property name="sizePolicy">
-                   <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
-                    <horstretch>0</horstretch>
-                    <verstretch>0</verstretch>
-                   </sizepolicy>
-                  </property>
+                 <widget class="QToolButton" name="QPBtn_browseData_A">
                   <property name="text">
-                   <string>Browse</string>
+                   <string>...</string>
                   </property>
                  </widget>
                 </item>
@@ -245,15 +239,9 @@
                  </widget>
                 </item>
                 <item>
-                 <widget class="QPushButton" name="QPBtn_browseData_B">
-                  <property name="sizePolicy">
-                   <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
-                    <horstretch>0</horstretch>
-                    <verstretch>0</verstretch>
-                   </sizepolicy>
-                  </property>
+                 <widget class="QToolButton" name="QPBtn_browseData_B">
                   <property name="text">
-                   <string>Browse</string>
+                   <string>...</string>
                   </property>
                  </widget>
                 </item>
@@ -561,15 +549,9 @@
                  </widget>
                 </item>
                 <item>
-                 <widget class="QPushButton" name="QPBtn_browsePCA">
-                  <property name="sizePolicy">
-                   <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
-                    <horstretch>0</horstretch>
-                    <verstretch>0</verstretch>
-                   </sizepolicy>
-                  </property>
+                 <widget class="QToolButton" name="QPBtn_browsePCA">
                   <property name="text">
-                   <string>Browse</string>
+                   <string>...</string>
                   </property>
                  </widget>
                 </item>
