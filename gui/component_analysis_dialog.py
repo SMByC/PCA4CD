@@ -212,11 +212,11 @@ class ComponentAnalysisDialog(QWidget, FORM_CLASS):
         self.aoi_data = np.array([np.nan])
 
     def clean(self):
+        self.delete_all_aoi()
         for layer in self.render_widget.canvas.layers():
             QgsProject.instance().removeMapLayer(layer.id())
         self.render_widget.canvas.setLayers([])
         self.render_widget.canvas.clearCache()
-        self.delete_all_aoi()
         del self.pc_data, self.pc_data_flat, self.aoi_data, self.HistogramPlot, self.hist_data, self.hist_data_pc
 
     @pyqtSlot()

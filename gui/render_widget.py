@@ -111,7 +111,7 @@ class RenderWidget(QWidget):
 
     def show_detection_layer(self):
         if self.layer:
-            self.canvas.setLayers([self.detection_layer, self.layer])
+            self.canvas.setLayers([self.detection_layer, self.layer] if self.detection_layer else [self.layer])
             self.canvas.refreshAllLayers()
 
     def hide_detection_layer(self):
