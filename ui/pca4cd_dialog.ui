@@ -2,6 +2,14 @@
 <ui version="4.0">
  <class>PCA4CDDialogBase</class>
  <widget class="QDialog" name="PCA4CDDialogBase">
+  <property name="geometry">
+   <rect>
+    <x>0</x>
+    <y>0</y>
+    <width>633</width>
+    <height>854</height>
+   </rect>
+  </property>
   <property name="windowTitle">
    <string>PCA4CD - Compute the Principal Components</string>
   </property>
@@ -60,8 +68,8 @@
        <rect>
         <x>0</x>
         <y>0</y>
-        <width>650</width>
-        <height>651</height>
+        <width>633</width>
+        <height>680</height>
        </rect>
       </property>
       <attribute name="label">
@@ -479,8 +487,8 @@
        <rect>
         <x>0</x>
         <y>0</y>
-        <width>650</width>
-        <height>651</height>
+        <width>633</width>
+        <height>680</height>
        </rect>
       </property>
       <attribute name="label">

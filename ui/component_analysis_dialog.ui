@@ -6,8 +6,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>1206</width>
-    <height>657</height>
+    <width>1282</width>
+    <height>801</height>
    </rect>
   </property>
   <layout class="QHBoxLayout" name="horizontalLayout">
@@ -104,7 +104,7 @@
         <widget class="QWidget" name="WidgetDetectionLayer" native="true">
          <layout class="QHBoxLayout" name="horizontalLayout_3">
           <property name="spacing">
-           <number>3</number>
+           <number>0</number>
           </property>
           <property name="leftMargin">
            <number>3</number>
@@ -200,7 +200,7 @@
              <set>Qt::AlignCenter</set>
             </property>
             <property name="decimals">
-             <number>3</number>
+             <number>9</number>
             </property>
             <property name="minimum">
              <double>-100000.000000000000000</double>
@@ -246,7 +246,7 @@
              <set>Qt::AlignCenter</set>
             </property>
             <property name="decimals">
-             <number>3</number>
+             <number>9</number>
             </property>
             <property name="minimum">
              <double>-100000.000000000000000</double>
