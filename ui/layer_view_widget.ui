@@ -142,7 +142,7 @@
        </widget>
       </item>
       <item>
-       <widget class="QPushButton" name="QCBox_browseRenderFile">
+       <widget class="QToolButton" name="QCBox_browseRenderFile">
         <property name="sizePolicy">
          <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
           <horstretch>0</horstretch>
@@ -151,7 +151,7 @@
         </property>
         <property name="maximumSize">
          <size>
-          <width>32</width>
+          <width>16777215</width>
           <height>22</height>
          </size>
         </property>
