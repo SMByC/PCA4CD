@@ -36,7 +36,6 @@ from qgis.core import QgsRaster, QgsWkbTypes, QgsFeature, QgsVectorLayer, QgsPro
 from qgis.gui import QgsMapTool, QgsRubberBand
 from qgis.core import edit
 
-from pca4cd.libs import gdal_calc
 from pca4cd.utils.others_utils import clip_raster_with_shape
 from pca4cd.utils.qgis_utils import get_file_path_of_layer, load_layer_in_qgis, apply_symbology
 from pca4cd.utils.system_utils import wait_process, block_signals_to
@@ -178,6 +177,7 @@ class ComponentAnalysisDialog(QWidget, FORM_CLASS):
         self.rubber_bands = []
         self.tmp_rubber_band = []
         self.AOI_Picker.clicked.connect(lambda: self.render_widget.canvas.setMapTool(PickerAOIPointTool(self), clean=True))
+        self.UndoAOI.clicked.connect(self.undo_aoi)
         self.DeleteAllAOI.clicked.connect(self.delete_all_aoi)
         # set statistics from combobox
         self.QCBox_StatsLayer.addItems([self.pc_name, "Areas Of Interest"])
@@ -419,13 +419,14 @@ class ComponentAnalysisDialog(QWidget, FORM_CLASS):
 
     @pyqtSlot()
     @wait_process
-    def aoi_changes(self, new_feature):
+    def aoi_changes(self, new_feature=None):
         """Actions after added each polygon in the AOI"""
         from pca4cd.pca4cd import PCA4CD as pca4cd
         from pca4cd.gui.main_analysis_dialog import MainAnalysisDialog
         # update AOI
-        with edit(self.aoi_features):
-            self.aoi_features.addFeature(new_feature)
+        if new_feature is not None:
+            with edit(self.aoi_features):
+                self.aoi_features.addFeature(new_feature)
         # clip the raster component in AOI for get only the pixel values inside it
         pc_aoi = Path(pca4cd.tmp_dir, self.pc_layer.name() + "_clip_aoi.tif")
         clip_raster_with_shape(self.pc_layer, self.aoi_features, str(pc_aoi))
@@ -444,10 +445,28 @@ class ComponentAnalysisDialog(QWidget, FORM_CLASS):
         self.RangeChangeTo.setValue(np.ceil(np.max(self.aoi_data)*1000)/1000)
         # auto generate/update the detection layer
         self.generate_detection_layer()
+        # enable undo
+        self.UndoAOI.setEnabled(True)
 
         del dataset, band
         if pc_aoi.is_file():
             os.remove(pc_aoi)
+
+    @pyqtSlot()
+    @wait_process
+    def undo_aoi(self):
+        # delete feature
+        features_ids = [f.id() for f in self.aoi_features.getFeatures()]
+        with edit(self.aoi_features):
+            self.aoi_features.deleteFeature(features_ids[-1])
+        # delete rubber bands
+        self.rubber_bands.pop().reset(QgsWkbTypes.PolygonGeometry)
+        self.tmp_rubber_band.pop().reset(QgsWkbTypes.PolygonGeometry)
+        # update
+        if len(list(self.aoi_features.getFeatures())) > 0:
+            self.aoi_changes()
+        else:  # empty
+            self.delete_all_aoi()
 
     @pyqtSlot()
     @wait_process
@@ -462,3 +481,5 @@ class ComponentAnalysisDialog(QWidget, FORM_CLASS):
         # update statistics and histogram plot
         self.aoi_data = np.array([np.nan])
         self.set_statistics(stats_for="Areas Of Interest")
+        # disable undo
+        self.UndoAOI.setEnabled(False)

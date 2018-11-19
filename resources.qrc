@@ -14,5 +14,6 @@
         <file>icons/merge_layers.svg</file>
         <file>icons/close.svg</file>
         <file>icons/save.svg</file>
+        <file>icons/undo.svg</file>
     </qresource>
 </RCC>

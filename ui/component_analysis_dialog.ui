@@ -367,6 +367,26 @@
            </widget>
           </item>
           <item>
+           <widget class="QToolButton" name="UndoAOI">
+            <property name="enabled">
+             <bool>false</bool>
+            </property>
+            <property name="toolTip">
+             <string>Undo the last AOI created</string>
+            </property>
+            <property name="icon">
+             <iconset>
+              <normaloff>:/plugins/pca4cd/icons/undo.svg</normaloff>:/plugins/pca4cd/icons/undo.svg</iconset>
+            </property>
+            <property name="toolButtonStyle">
+             <enum>Qt::ToolButtonIconOnly</enum>
+            </property>
+            <property name="autoRaise">
+             <bool>true</bool>
+            </property>
+           </widget>
+          </item>
+          <item>
            <widget class="QToolButton" name="DeleteAllAOI">
             <property name="toolTip">
              <string>Delete all AOI</string>
