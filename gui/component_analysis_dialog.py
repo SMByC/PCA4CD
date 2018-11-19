@@ -445,8 +445,9 @@ class ComponentAnalysisDialog(QWidget, FORM_CLASS):
         self.RangeChangeTo.setValue(np.ceil(np.max(self.aoi_data)*1000)/1000)
         # auto generate/update the detection layer
         self.generate_detection_layer()
-        # enable undo
+        # enable undo and delete buttons
         self.UndoAOI.setEnabled(True)
+        self.DeleteAllAOI.setEnabled(True)
 
         del dataset, band
         if pc_aoi.is_file():
@@ -481,8 +482,9 @@ class ComponentAnalysisDialog(QWidget, FORM_CLASS):
         # update statistics and histogram plot
         self.aoi_data = np.array([np.nan])
         self.set_statistics(stats_for="Areas Of Interest")
-        # disable undo
+        # disable undo delete buttons
         self.UndoAOI.setEnabled(False)
+        self.DeleteAllAOI.setEnabled(False)
         # clear the detection layer
         self.render_widget.set_detection_layer(None)
         self.parent_view_widget.render_widget.set_detection_layer(None)

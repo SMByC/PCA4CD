@@ -388,6 +388,9 @@
           </item>
           <item>
            <widget class="QToolButton" name="DeleteAllAOI">
+            <property name="enabled">
+             <bool>false</bool>
+            </property>
             <property name="toolTip">
              <string>Delete all AOI</string>
             </property>
