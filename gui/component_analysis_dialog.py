@@ -483,3 +483,7 @@ class ComponentAnalysisDialog(QWidget, FORM_CLASS):
         self.set_statistics(stats_for="Areas Of Interest")
         # disable undo
         self.UndoAOI.setEnabled(False)
+        # clear the detection layer
+        self.render_widget.set_detection_layer(None)
+        self.parent_view_widget.render_widget.set_detection_layer(None)
+

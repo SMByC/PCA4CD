@@ -110,7 +110,7 @@ class RenderWidget(QWidget):
                 view_widget.QCBox_RenderFile.setExceptedLayerList(MainAnalysisDialog.pca_layers + detection_layers)
 
     def show_detection_layer(self):
-        if self.detection_layer and self.layer:
+        if self.layer:
             self.canvas.setLayers([self.detection_layer, self.layer])
             self.canvas.refreshAllLayers()
 
