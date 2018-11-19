@@ -64,8 +64,6 @@ class LayerViewWidget(QWidget, FORM_CLASS):
         self.layerStyleEditor.clicked.connect(self.render_widget.layer_style_editor)
         # active/deactive
         self.EnableChangeDetection.toggled.connect(self.detection_layer_toggled)
-        # disable enter action
-        self.QCBox_browseRenderFile.setAutoDefault(False)
 
         # component analysis layer
         self.QPBtn_ComponentAnalysisDialog.clicked.connect(self.open_component_analysis_dialog)
