@@ -441,8 +441,13 @@ class ComponentAnalysisDialog(QWidget, FORM_CLASS):
         # update statistics and histogram plot
         self.set_statistics(stats_for="Areas Of Interest")
         # update range values using min/max of AOI with decimal adjusted for include in change layer
-        self.RangeChangeFrom.setValue(np.floor(np.min(self.aoi_data)*1000)/1000)
-        self.RangeChangeTo.setValue(np.ceil(np.max(self.aoi_data)*1000)/1000)
+        range_from = np.floor(np.min(self.aoi_data)*1000)/1000
+        range_to = np.ceil(np.max(self.aoi_data)*1000)/1000
+        # double set due the synchronization values from plot min/max adjust
+        self.RangeChangeFrom.setValue(range_from)
+        self.RangeChangeTo.setValue(range_to)
+        self.RangeChangeFrom.setValue(range_from)
+        self.RangeChangeTo.setValue(range_to)
         # auto generate/update the detection layer
         self.generate_detection_layer()
         # enable undo and delete buttons
