@@ -15,5 +15,6 @@
         <file>icons/close.svg</file>
         <file>icons/save.svg</file>
         <file>icons/undo.svg</file>
+        <file>icons/zoom_to_layer.svg</file>
     </qresource>
 </RCC>

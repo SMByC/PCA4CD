@@ -87,6 +87,26 @@
             </property>
            </widget>
           </item>
+          <item>
+           <widget class="QToolButton" name="ZoomToLayer">
+            <property name="toolTip">
+             <string>Zoom to layer</string>
+            </property>
+            <property name="text">
+             <string/>
+            </property>
+            <property name="icon">
+             <iconset>
+              <normaloff>:/plugins/pca4cd/icons/zoom_to_layer.svg</normaloff>:/plugins/pca4cd/icons/zoom_to_layer.svg</iconset>
+            </property>
+            <property name="toolButtonStyle">
+             <enum>Qt::ToolButtonIconOnly</enum>
+            </property>
+            <property name="autoRaise">
+             <bool>true</bool>
+            </property>
+           </widget>
+          </item>
          </layout>
         </widget>
        </item>

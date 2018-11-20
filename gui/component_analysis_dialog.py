@@ -158,6 +158,8 @@ class ComponentAnalysisDialog(QWidget, FORM_CLASS):
         self.pc_id = parent_view_widget.pc_id
         # edit layer properties
         self.layerStyleEditor.clicked.connect(self.render_widget.layer_style_editor)
+        # zoom to layer
+        self.ZoomToLayer.clicked.connect(self.zoom_to_layer)
         # set layer
         self.render_widget.render_layer(parent_view_widget.render_widget.layer)
         self.pc_layer = self.render_widget.layer
@@ -248,6 +250,12 @@ class ComponentAnalysisDialog(QWidget, FORM_CLASS):
                 # for components analysis opened
                 if view_widget.component_analysis_dialog and view_widget.component_analysis_dialog.is_opened:
                     view_widget.component_analysis_dialog.render_widget.update_canvas_to(new_extent)
+
+    @pyqtSlot()
+    def zoom_to_layer(self):
+        self.render_widget.canvas.setExtent(self.render_widget.layer.extent())
+        self.canvas_changed()
+        self.render_widget.canvas.refresh()
 
     @pyqtSlot()
     def detection_layer_toggled(self):
