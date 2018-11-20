@@ -104,7 +104,8 @@ class RenderWidget(QWidget):
         from pca4cd.gui.main_analysis_dialog import MainAnalysisDialog
         detection_layers = [view_widget.render_widget.detection_layer for view_widget in MainAnalysisDialog.view_widgets
                             if view_widget.pc_id is not None and view_widget.render_widget.detection_layer is not None
-                            and view_widget.id != self.parent_view.id] + [self.detection_layer]
+                            and view_widget.id != self.parent_view.id] + ([self.detection_layer] if self.detection_layer
+                            else [])
         for view_widget in MainAnalysisDialog.view_widgets:
             if view_widget.pc_id is None:
                 view_widget.QCBox_RenderFile.setExceptedLayerList(MainAnalysisDialog.pca_layers + detection_layers)
