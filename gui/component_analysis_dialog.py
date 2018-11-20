@@ -403,16 +403,22 @@ class ComponentAnalysisDialog(QWidget, FORM_CLASS):
             if self.hist_data_pc[set_bins] is not None:
                 y, x = self.hist_data_pc[set_bins]  # restore histogram values
             else:
+                try:
+                    bin_edges = np.histogram_bin_edges(self.hist_data, bins=set_bins)
+                    da_hist_data = da.from_array(self.hist_data, chunks=(8000000,))
+                    y, x = da.histogram(da_hist_data, bins=bin_edges)
+                    y = y.compute(scheduler='threads', num_workers=cpu_count())
+                except:  # TODO: after some time delete, compatibility to old numpy version Qgis < 3.4
+                    y, x = np.histogram(self.hist_data, bins=set_bins)
+                self.hist_data_pc[set_bins] = (y, x)
+        else:
+            try:
                 bin_edges = np.histogram_bin_edges(self.hist_data, bins=set_bins)
                 da_hist_data = da.from_array(self.hist_data, chunks=(8000000,))
                 y, x = da.histogram(da_hist_data, bins=bin_edges)
                 y = y.compute(scheduler='threads', num_workers=cpu_count())
-                self.hist_data_pc[set_bins] = (y, x)
-        else:
-            bin_edges = np.histogram_bin_edges(self.hist_data, bins=set_bins)
-            da_hist_data = da.from_array(self.hist_data, chunks=(8000000,))
-            y, x = da.histogram(da_hist_data, bins=bin_edges)
-            y = y.compute(scheduler='threads', num_workers=cpu_count())
+            except:  # TODO: after some time delete, compatibility to old numpy version Qgis < 3.4
+                y, x = np.histogram(self.hist_data, bins=set_bins)
         self.HistogramPlot.clear()
         self.HistogramPlot.plot(x, y, stepMode=True, fillLevel=0, brush=(80, 80, 80))
         self.HistogramPlot.autoRange()
