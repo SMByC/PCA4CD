@@ -299,6 +299,7 @@ class ComponentAnalysisDialog(QWidget, FORM_CLASS):
         if self.pc_gdal_ds.GetProjection() is not None:
             out_pc.SetProjection(self.pc_gdal_ds.GetProjection())
         out_pc.FlushCache()
+        del out_pc, driver
 
         detection_layer = load_layer_in_qgis(output_change_layer, "raster", False)
         apply_symbology(detection_layer, [("detection", 1, (255, 255, 0, 255))])
