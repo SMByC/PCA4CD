@@ -38,7 +38,7 @@ SOURCES = \
     __init__.py \
     pca4cd.py
 
-PLUGINNAME = PCA4CD - PCA for change detection
+PLUGINNAME = pca4cd
 
 PY_FILES = \
     __init__.py \
@@ -108,7 +108,7 @@ deploy: compile doc transcompile
 	#cp -vf $(UI_FILES) $(HOME)/$(QGISDIR)/python/plugins/$(PLUGINNAME)
 	cp -vf $(COMPILED_RESOURCE_FILES) $(HOME)/$(QGISDIR)/python/plugins/$(PLUGINNAME)
 	cp -vf $(EXTRAS) $(HOME)/$(QGISDIR)/python/plugins/$(PLUGINNAME)
-	cp -vfr i18n $(HOME)/$(QGISDIR)/python/plugins/$(PLUGINNAME)
+	#cp -vfr i18n $(HOME)/$(QGISDIR)/python/plugins/$(PLUGINNAME)
 	cp -vfr $(HELP) $(HOME)/$(QGISDIR)/python/plugins/$(PLUGINNAME)/help
 	# Copy extra directories if any
 	cp -vfr $(EXTRA_DIRS) $(HOME)/$(QGISDIR)/python/plugins/$(PLUGINNAME)
@@ -176,8 +176,8 @@ transcompile:
 	@echo "----------------------------------------"
 	@echo "Compiled translation files to .qm files."
 	@echo "----------------------------------------"
-	@chmod +x scripts/compile-strings.sh
-	@scripts/compile-strings.sh $(LRELEASE) $(LOCALES)
+	#@chmod +x scripts/compile-strings.sh
+	#@scripts/compile-strings.sh $(LRELEASE) $(LOCALES)
 
 transclean:
 	@echo
