@@ -3,7 +3,7 @@
 #
 # Principal components analysis for change detection
 #                             -------------------
-#        copyright            : (C) 2018 by Xavier Corredor Llano, SMByC
+#        copyright            : (C) 2018-2019 by Xavier Corredor Llano, SMByC
 #        email                : xcorredorl@ideam.gov.co
 # ***************************************************************************/
 #
