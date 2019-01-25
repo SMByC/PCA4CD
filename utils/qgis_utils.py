@@ -126,7 +126,7 @@ class StyleEditorDialog(QDialog, FORM_CLASS):
         self.setupUi(self)
         self.layer = layer
 
-        self.setWindowTitle("{} - style editor".format(self.layer.name()))
+        self.setWindowTitle("{} - Style Editor".format(self.layer.name()))
 
         if self.layer.type() == QgsMapLayer.VectorLayer:
             self.StyleEditorWidget = QgsRendererPropertiesDialog(self.layer, QgsStyle(), True, parent)

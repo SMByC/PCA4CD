@@ -10,6 +10,9 @@
     <height>801</height>
    </rect>
   </property>
+  <property name="windowTitle">
+   <string>Component Analysis</string>
+  </property>
   <layout class="QHBoxLayout" name="horizontalLayout">
    <item>
     <widget class="QSplitter" name="splitter">

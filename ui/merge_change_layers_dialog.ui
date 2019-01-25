@@ -11,7 +11,7 @@
    </rect>
   </property>
   <property name="windowTitle">
-   <string>Merge change layers</string>
+   <string>Merge Change Detection Layers</string>
   </property>
   <layout class="QVBoxLayout" name="verticalLayout">
    <item>
