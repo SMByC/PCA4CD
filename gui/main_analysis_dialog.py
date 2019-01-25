@@ -240,8 +240,11 @@ class MainAnalysisDialog(QDialog, FORM_CLASS):
                 src_ds = gdal.Open(get_file_path_of_layer(view_widget.render_widget.layer), gdal.GA_ReadOnly)
                 ds = src_ds.GetRasterBand(1).ReadAsArray().flatten().astype(np.float32)
                 ds = ds[ds != 0]
-                mean = np.mean(ds)
-                std = np.std(ds)
+                try:
+                    mean = np.mean(ds)
+                    std = np.std(ds)
+                except:
+                    continue
                 renderer = QgsSingleBandGrayRenderer(view_widget.render_widget.layer.dataProvider(), 1)
                 ce = QgsContrastEnhancement(view_widget.render_widget.layer.dataProvider().dataType(0))
                 ce.setContrastEnhancementAlgorithm(QgsContrastEnhancement.StretchToMinimumMaximum)
