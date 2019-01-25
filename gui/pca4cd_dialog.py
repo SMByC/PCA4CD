@@ -107,14 +107,7 @@ class PCA4CDDialog(QDialog, FORM_CLASS):
         self.nThreads.setValue(cpu_count())
 
         # ######### Load External Principal Components ######### #
-        self.QCBox_LoadStackPCA.setCurrentIndex(-1)
-        self.QCBox_LoadStackPCA.currentIndexChanged.connect(self.set_nodata_value_in_loadPC)
-        # call to browse the principal components
-        self.QPBtn_browsePCA.clicked.connect(lambda: self.fileDialog_browse(
-            self.QCBox_LoadStackPCA,
-            dialog_title=self.tr("Select the stack file of the principal components"),
-            dialog_types=self.tr("Raster files (*.tif *.img);;All files (*.*)"),
-            layer_type="raster"))
+        self.QgsFile_LoadStackPCA.fileChanged.connect(self.set_nodata_value_in_loadPC)
         # load
         self.QPBtn_LoadStackPCA.clicked.connect(self.load_external_pc_in_main_analysis_dialog)
 
@@ -127,15 +120,21 @@ class PCA4CDDialog(QDialog, FORM_CLASS):
 
     @pyqtSlot()
     def set_nodata_value_in_computePC(self):
-        current_layer_A = self.QCBox_InputData_A.currentLayer()
-        nodata_value = str(current_layer_A.dataProvider().sourceNoDataValue(1)) if current_layer_A is not None else ""
-        self.NoData_ComputePCA.setText(nodata_value if nodata_value != "nan" else "None")
+        nodata_value = self.QCBox_InputData_A.currentLayer().dataProvider().sourceNoDataValue(1)
+        nodata_value = str(nodata_value) if not np.isnan(nodata_value) else ""
+        self.NoData_ComputePCA.setText(nodata_value)
 
     @pyqtSlot()
     def set_nodata_value_in_loadPC(self):
-        load_layer = self.QCBox_LoadStackPCA.currentLayer()
-        nodata_value = str(load_layer.dataProvider().sourceNoDataValue(1)) if load_layer is not None else ""
-        self.NoData_LoadPCA.setText(nodata_value if nodata_value != "nan" else "None")
+        stack_path = self.QgsFile_LoadStackPCA.filePath()
+        src_ds = gdal.Open(stack_path, gdal.GA_ReadOnly)
+        if src_ds is None:
+            self.NoData_LoadPCA.setText("")
+            return
+        nodata_value = src_ds.GetRasterBand(1).GetNoDataValue()
+        nodata_value = str(nodata_value) if nodata_value not in [None, "nan"] else ""
+        self.NoData_LoadPCA.setText(nodata_value)
+        del src_ds
 
     @pyqtSlot()
     def set_number_of_components(self):
@@ -217,8 +216,8 @@ class PCA4CDDialog(QDialog, FORM_CLASS):
     @wait_process
     def load_external_pc_in_main_analysis_dialog(self):
         from pca4cd.pca4cd import PCA4CD as pca4cd
-        stack_pc = self.QCBox_LoadStackPCA.currentLayer()
-        if stack_pc is None:
+        stack_path = self.QgsFile_LoadStackPCA.filePath()
+        if not os.path.isfile(stack_path):
             self.MsgBar.pushMessage("Select a valid stack for load", level=Qgis.Warning)
             return False
         # check the nodata value
@@ -231,11 +230,13 @@ class PCA4CDDialog(QDialog, FORM_CLASS):
                 return
 
         # extract each band as component in tmp file
+        src_ds = gdal.Open(stack_path, gdal.GA_ReadOnly)
+        num_bands = src_ds.RasterCount
+        del src_ds
         pca_layers = []
-        for component in range(stack_pc.bandCount()):
+        for component in range(num_bands):
             tmp_pca_file = Path(pca4cd.tmp_dir) / 'pc_{}.tif'.format(component + 1)
-            gdal.Translate(str(tmp_pca_file), get_file_path_of_layer(stack_pc),
-                           bandList=[component + 1], noData=nodata)
+            gdal.Translate(str(tmp_pca_file), stack_path, bandList=[component + 1], noData=nodata)
             pca_layers.append(load_layer_in_qgis(tmp_pca_file, "raster", False))
 
         # pca statistics
