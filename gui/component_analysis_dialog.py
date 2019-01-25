@@ -170,7 +170,6 @@ class ComponentAnalysisDialog(QWidget, FORM_CLASS):
         self.PickerRangeFrom.clicked.connect(lambda: self.picker_mouse_value(self.RangeChangeFrom))
         self.PickerRangeTo.clicked.connect(lambda: self.picker_mouse_value(self.RangeChangeTo))
         # detection layer
-        self.driver_detection_layer = None
         self.GenerateDetectionLayer.clicked.connect(self.generate_detection_layer)
         # active/deactive
         self.ShowHideChangeDetection.toggled.connect(self.detection_layer_toggled)
@@ -226,8 +225,7 @@ class ComponentAnalysisDialog(QWidget, FORM_CLASS):
         self.tmp_rubber_band = []
         # remove all features in aoi
         self.aoi_features.dataProvider().truncate()
-        del self.pc_data, self.pc_data_flat, self.aoi_data, self.HistogramPlot, self.hist_data, \
-            self.hist_data_pc, self.driver_detection_layer
+        del self.pc_data, self.pc_data_flat, self.aoi_data, self.HistogramPlot, self.hist_data, self.hist_data_pc
 
     @pyqtSlot()
     def show(self):
@@ -289,20 +287,22 @@ class ComponentAnalysisDialog(QWidget, FORM_CLASS):
         map_blocks = da.map_blocks(calc, da_pc, range_from=detection_from, range_to=detection_to, dtype=np.int8)
         detection_layer_ds = map_blocks.compute(scheduler='threads', num_workers=cpu_count())
         # save
-        if self.driver_detection_layer is None:
-            driver = gdal.GetDriverByName("GTiff")
-            self.driver_detection_layer = driver.Create(str(output_change_layer), self.pc_gdal_ds.RasterXSize,
-                                                        self.pc_gdal_ds.RasterYSize, 1, gdal.GDT_Byte,
-                                                        ["NBITS=1", "COMPRESS=NONE"])
-        pcband = self.driver_detection_layer.GetRasterBand(1)
-        pcband.SetNoDataValue(0)
-        pcband.WriteArray(detection_layer_ds)
+        driver_detection_layer = \
+            gdal.GetDriverByName("GTiff").Create(str(output_change_layer), self.pc_gdal_ds.RasterXSize,
+                                                 self.pc_gdal_ds.RasterYSize, 1, gdal.GDT_Byte,
+                                                 ["NBITS=1", "COMPRESS=NONE"])
+        dl_band = driver_detection_layer.GetRasterBand(1)
+        dl_band.SetNoDataValue(0)
+        dl_band.WriteArray(detection_layer_ds)
         # set projection and geotransform
         if self.pc_gdal_ds.GetGeoTransform() is not None:
-            self.driver_detection_layer.SetGeoTransform(self.pc_gdal_ds.GetGeoTransform())
+            driver_detection_layer.SetGeoTransform(self.pc_gdal_ds.GetGeoTransform())
         if self.pc_gdal_ds.GetProjection() is not None:
-            self.driver_detection_layer.SetProjection(self.pc_gdal_ds.GetProjection())
-        self.driver_detection_layer.FlushCache()
+            driver_detection_layer.SetProjection(self.pc_gdal_ds.GetProjection())
+        dl_band.FlushCache()
+        dl_band = None
+        driver_detection_layer.FlushCache()
+        driver_detection_layer = None
 
         detection_layer = load_layer_in_qgis(output_change_layer, "raster", False)
         apply_symbology(detection_layer, [("detection", 1, (255, 255, 0, 255))])
