@@ -123,7 +123,7 @@ def external_deps(deps):
             if dependency == "dask":
                 status = subprocess.call(['python3', '-m', 'pip', 'install', 'dask[array]', '--user'], shell=True)
             else:
-                status = subprocess.call(['python3', '-m', 'pip', 'install', dependency, '--user', '--no-deps'], shell=True)
+                status = subprocess.call(['python3', '-m', 'pip', 'install', dependency, '--user'], shell=True)
 
             if status != 0:
                 msg_info.close()
