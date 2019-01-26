@@ -112,23 +112,30 @@ def external_deps(deps):
         msg_info = QMessageBox()
         msg_info.setIcon(QMessageBox.Information)
         msg_info.setStandardButtons(QMessageBox.Close)
-        msg_info.setWindowTitle("PCA4CD plugin dependencies")
-        msg_info.setText("installing python dependencies:\nPlease wait...")
-        msg_info.open()
+        msg_info.setWindowTitle("PCA4CD installing dependencies")
+        msg_info.setText("Installing python dependencies:\nPlease wait...")
+        msg_info.show()
 
         for dependency in deps_not_installed:
-            msg_info.setText("installing python dependencies: {}\nPlease wait...".format(dependency))
+            msg_info.setText("installing dependency: {}\nPlease wait...".format(dependency))
             QApplication.processEvents()
 
             if dependency == "dask":
-                status = subprocess.call(['python3', '-m', 'pip', 'install', 'dask[array]', '--user'], shell=True)
+                status = subprocess.call(['python3', '-m', 'pip', 'install', 'dask[array]', '--user'], shell=False)
             else:
-                status = subprocess.call(['python3', '-m', 'pip', 'install', dependency, '--user'], shell=True)
+                status = subprocess.call(['python3', '-m', 'pip', 'install', dependency, '--user'], shell=False)
 
             if status != 0:
                 msg_info.close()
-                QMessageBox.warning(None, "PCA4CD plugin", "Error installing python dependencies for PCA4CD plugin: {}"
-                                    .format(dependency))
+                msg_info = QMessageBox()
+                msg_info.setIcon(QMessageBox.Information)
+                msg_info.setStandardButtons(QMessageBox.Ok)
+                msg_info.setTextFormat(Qt.RichText)
+                msg_info.setWindowTitle("PCA4CD plugin dependencies")
+                msg_info.setText("Error installing dependencies for PCA4CD: <b>{}</b><br/><br/>"
+                                 "Read more: <a href='https://smbyc.bitbucket.io/qgisplugins/pca4cd'>installation</a>"
+                                 .format(dependency))
+                msg_info.exec_()
                 return False
 
         msg_info.close()
