@@ -21,10 +21,9 @@
 import functools
 import traceback
 import os, sys, subprocess
-from importlib import reload
 
 from qgis.PyQt.QtCore import Qt
-from qgis.PyQt.QtWidgets import QApplication, QMessageBox
+from qgis.PyQt.QtWidgets import QApplication
 from qgis.PyQt.QtGui import QCursor
 from qgis.core import QgsMessageLog, Qgis
 from qgis.utils import iface
@@ -97,51 +96,3 @@ class block_signals_to(object):
         # unblock
         self.object_to_block.blockSignals(False)
 
-
-def external_deps(deps):
-    # https://gis.stackexchange.com/questions/196002/development-of-a-plugin-which-depends-on-an-external-python-library
-
-    deps_not_installed = []
-    for dependency in deps:
-        try:
-            __import__(dependency)
-        except:
-            deps_not_installed.append(dependency)
-
-    if deps_not_installed:
-        msg_info = QMessageBox()
-        msg_info.setIcon(QMessageBox.Information)
-        msg_info.setStandardButtons(QMessageBox.Close)
-        msg_info.setWindowTitle("PCA4CD installing dependencies")
-        msg_info.setText("Installing python dependencies:\nPlease wait...")
-        msg_info.show()
-
-        for dependency in deps_not_installed:
-            msg_info.setText("installing dependency: {}\nPlease wait...".format(dependency))
-            QApplication.processEvents()
-
-            if dependency == "dask":
-                status = subprocess.call(['python3', '-m', 'pip', 'install', 'dask[array]', '--user'], shell=False)
-            else:
-                status = subprocess.call(['python3', '-m', 'pip', 'install', dependency, '--user'], shell=False)
-
-            if status != 0:
-                msg_info.close()
-                msg_info = QMessageBox()
-                msg_info.setIcon(QMessageBox.Information)
-                msg_info.setStandardButtons(QMessageBox.Ok)
-                msg_info.setTextFormat(Qt.RichText)
-                msg_info.setWindowTitle("PCA4CD plugin dependencies")
-                msg_info.setText("Error installing dependencies for PCA4CD: <b>{}</b><br/><br/>"
-                                 "Read more: <a href='https://smbyc.bitbucket.io/qgisplugins/pca4cd'>installation</a>"
-                                 .format(dependency))
-                msg_info.exec_()
-                return False
-
-        msg_info.close()
-
-        # reload libs
-        import site
-        reload(site)
-
-    return True
