@@ -48,7 +48,8 @@ Dependency = namedtuple('Dep', ['name', 'min', 'install'])
 
 # list of Python packages and versions necessary for this plugin
 DEPS = [
-    Dependency('dask2', install=None, min='1.1.0'),
+    Dependency('dask', install=None, min='1.1.0'),
+    Dependency('toolz', install=None, min=None),
     Dependency('pyqtgraph', install=None, min='0.10.0'),
 ]
 
