@@ -3,7 +3,7 @@
  <class>PCA4CDDialogBase</class>
  <widget class="QDialog" name="PCA4CDDialogBase">
   <property name="windowTitle">
-   <string>PCA4CD - Compute the Principal Components</string>
+   <string>PCA4CD - Compute or Load the PCA</string>
   </property>
   <layout class="QVBoxLayout" name="verticalLayout">
    <property name="spacing">
