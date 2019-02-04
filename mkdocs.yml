@@ -16,8 +16,5 @@ markdown_extensions:
   - sane_lists
 pages:
   - Home: index.md
-  - About: about.md
-  - Installation: installation.md
   - How to use: how_to_use.md
-  - Use cases: use_cases.md
 
