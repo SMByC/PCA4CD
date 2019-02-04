@@ -175,7 +175,11 @@ class PCA4CDDialog(QDialog, FORM_CLASS):
     @error_handler
     def generate_principal_components(self):
         from pca4cd.pca4cd import PCA4CD as pca4cd
-        # check if exists the input stack
+        # check if is valid the input raster layer
+        if self.QCBox_InputData_A.currentLayer() is None:
+            self.MsgBar.pushMessage("Select a valid input raster layer", level=Qgis.Warning)
+            return
+        # check both layers
         if not self.check_input_layers(self.QCBox_InputData_A.currentLayer(), self.QCBox_InputData_B.currentLayer()):
             return
         # check the nodata value
