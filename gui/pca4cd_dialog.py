@@ -120,9 +120,10 @@ class PCA4CDDialog(QDialog, FORM_CLASS):
 
     @pyqtSlot()
     def set_nodata_value_in_computePC(self):
-        nodata_value = self.QCBox_InputData_A.currentLayer().dataProvider().sourceNoDataValue(1)
-        nodata_value = str(nodata_value) if not np.isnan(nodata_value) else ""
-        self.NoData_ComputePCA.setText(nodata_value)
+        if hasattr(self.QCBox_InputData_A.currentLayer(), "dataProvider"):
+            nodata_value = self.QCBox_InputData_A.currentLayer().dataProvider().sourceNoDataValue(1)
+            nodata_value = str(nodata_value) if not np.isnan(nodata_value) else ""
+            self.NoData_ComputePCA.setText(nodata_value)
 
     @pyqtSlot()
     def set_nodata_value_in_loadPC(self):
