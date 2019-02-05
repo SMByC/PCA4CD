@@ -1,9 +1,11 @@
 [general]
 name=PCA4CD - PCA for change detection
-description=Principal components analysis for change detection
-about=Principal components analysis for change detection
+description=The PCA4CD is a Qgis plugin to build the change detection layer using the principal components method.
+about=The PCA4CD is a Qgis plugin to build the change detection layer using the principal components method.
+    Designed mainly with the goal of generating or load the principal components (PCA) and build the change
+    detection layer based on the dimensionality reduction properties.
 
-version=18.11.1
+version=19.2.4
 qgisMinimumVersion=3.0
 qgisMaximumVersion=3.99
 
@@ -15,15 +17,16 @@ tracker=https://bitbucket.org/smbyc/qgisplugin-pca4cd/issues
 repository=https://bitbucket.org/smbyc/qgisplugin-pca4cd
 
 changelog=
-    18.11.1:
-    - First public and stable version
+    19.2.4:
+    - First public, tested and stable version. All comments, suggestions and issues to:
+      https://bitbucket.org/smbyc/qgisplugin-pca4cd/issues or to email.
 
     Previous versions:
     - All commits in: https://bitbucket.org/smbyc/qgisplugin-pca4cd/commits/all
 
 tags=pca,principal components analysis,analysis,change detection,raster,remote sensing
 
-external_deps=dask,pyqtgraph
+external_deps=dask,pyqtgraph,toolz
 
 category=Plugins
 icon=icons/pca4cd.svg
