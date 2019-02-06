@@ -59,4 +59,6 @@ Acknowledge to all SMByC team.
 Xavier Corredor Ll.: *xcorredorl (a) ideam.gov.co*  
 SMByC: *smbyc (a) ideam.gov.co*
 
-General Public License - GPLv3
+## License
+
+PCA4CD is a free/libre software and is licensed under the GNU General Public License.
