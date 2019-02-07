@@ -20,8 +20,8 @@
  This script initializes the plugin, making it known to QGIS.
 """
 
-from PyQt5.QtCore import QCoreApplication
-from PyQt5.QtWidgets import QMessageBox
+from qgis.PyQt.QtCore import QCoreApplication
+from qgis.PyQt.QtWidgets import QMessageBox
 from qgis.utils import iface
 
 from pca4cd.utils.extra_deps import load_install_extra_deps, WaitDialog

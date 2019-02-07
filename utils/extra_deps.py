@@ -27,8 +27,8 @@ import pkg_resources
 from pathlib import Path
 from collections import namedtuple
 
-from PyQt5.QtCore import Qt
-from PyQt5.QtWidgets import QVBoxLayout, QProgressBar, QDialog
+from qgis.PyQt.QtCore import Qt
+from qgis.PyQt.QtWidgets import QVBoxLayout, QProgressBar, QDialog
 
 """Install extra plugin dependencies needed for run
 

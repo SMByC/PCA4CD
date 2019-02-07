@@ -27,9 +27,9 @@ from multiprocessing import cpu_count
 from dask import array as da
 
 import pyqtgraph as pg
-from PyQt5.QtCore import QTimer, Qt, pyqtSlot
-from PyQt5.QtGui import QColor
-from PyQt5.QtWidgets import QWidget
+from qgis.PyQt.QtCore import QTimer, Qt, pyqtSlot
+from qgis.PyQt.QtGui import QColor
+from qgis.PyQt.QtWidgets import QWidget
 from osgeo import gdal
 from osgeo.gdalconst import GA_ReadOnly
 

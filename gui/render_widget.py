@@ -18,9 +18,9 @@
  *                                                                         *
  ***************************************************************************/
 """
-from PyQt5.QtCore import Qt, QTimer, QSettings, pyqtSlot
-from PyQt5.QtGui import QColor
-from PyQt5.QtWidgets import QWidget, QGridLayout
+from qgis.PyQt.QtCore import Qt, QTimer, QSettings, pyqtSlot
+from qgis.PyQt.QtGui import QColor
+from qgis.PyQt.QtWidgets import QWidget, QGridLayout
 from qgis.gui import QgsMapToolPan, QgsMapCanvas
 
 from pca4cd.utils.qgis_utils import StyleEditorDialog
