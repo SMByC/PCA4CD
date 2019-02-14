@@ -28,7 +28,7 @@ from pathlib import Path
 from osgeo import gdal
 
 from qgis.PyQt import uic
-from qgis.PyQt.QtCore import pyqtSignal, pyqtSlot
+from qgis.PyQt.QtCore import pyqtSignal, pyqtSlot, Qt
 from qgis.PyQt.QtWidgets import QFileDialog, QDialog
 from qgis.core import QgsMapLayerProxyModel, Qgis
 
@@ -65,6 +65,11 @@ class PCA4CDDialog(QDialog, FORM_CLASS):
     def closeEvent(self, event):
         self.closingPlugin.emit()
         event.accept()
+
+    def keyPressEvent(self, event):
+        # ignore esc key for close the main dialog
+        if not event.key() == Qt.Key_Escape:
+            super(PCA4CDDialog, self).keyPressEvent(event)
 
     def setup_gui(self):
         # ######### plugin info ######### #
