@@ -73,7 +73,6 @@ class PCA4CD:
 
         self.about_dialog = AboutDialog()
 
-
     # noinspection PyMethodMayBeStatic
     def tr(self, message):
         """Get the translation for a string using Qt translation API.

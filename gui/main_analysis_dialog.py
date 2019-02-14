@@ -273,7 +273,6 @@ class MainAnalysisDialog(QDialog, FORM_CLASS):
         if file_out != '':
             save()
 
-
     @pyqtSlot()
     def open_merge_change_layers(self):
         # select all activated change layers
