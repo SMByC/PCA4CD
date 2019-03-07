@@ -12,9 +12,9 @@ qgisMaximumVersion=3.99
 author=Xavier Corredor Llano, SMByC
 email=xcorredorl@ideam.gov.co
 
-homepage=https://smbyc.bitbucket.io/qgisplugins/pca4cd
+homepage=https://bitbucket.org/smbyc/qgisplugin-pca4cd/src
 tracker=https://bitbucket.org/smbyc/qgisplugin-pca4cd/issues
-repository=https://bitbucket.org/smbyc/qgisplugin-pca4cd
+repository=https://bitbucket.org/smbyc/qgisplugin-pca4cd/src
 
 changelog=
     19.2.4:
