@@ -129,8 +129,6 @@ class PCA4CD:
             PCA4CD.tmp_dir = tempfile.mkdtemp()
             # connect to provide cleanup on closing of dialog
             PCA4CD.dialog.closingPlugin.connect(self.onClosePlugin)
-            # reload
-            PCA4CD.dialog.QPBtn_PluginClearReload.clicked.connect(self.clear_reload_plugin)
 
             # show the dialog
             PCA4CD.dialog.show()
@@ -174,18 +172,6 @@ class PCA4CD:
 
         if PCA4CD.dialog:
             PCA4CD.dialog.close()
-
-    def clear_reload_plugin(self):
-        # first prompt
-        quit_msg = "Are you sure you want to: clean tmp files, delete all unsaved files, and reload plugin?"
-        reply = QMessageBox.question(None, 'Clear all and reload the PCA4CD plugin.',
-                                     quit_msg, QMessageBox.Yes, QMessageBox.No)
-        if reply == QMessageBox.No:
-            return
-
-        self.onClosePlugin()
-        from qgis.utils import plugins
-        plugins["pca4cd"].run()
 
     @staticmethod
     def removes_temporary_files():

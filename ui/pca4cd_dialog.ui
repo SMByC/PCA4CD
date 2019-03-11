@@ -672,6 +672,31 @@
           <number>0</number>
          </property>
          <item>
+          <widget class="QPushButton" name="QPBtn_PluginInfo">
+           <property name="font">
+            <font>
+             <pointsize>9</pointsize>
+            </font>
+           </property>
+           <property name="cursor">
+            <cursorShape>WhatsThisCursor</cursorShape>
+           </property>
+           <property name="toolTip">
+            <string>About</string>
+           </property>
+           <property name="text">
+            <string>version</string>
+           </property>
+           <property name="icon">
+            <iconset>
+             <normaloff>:/plugins/pca4cd/icons/pca4cd.svg</normaloff>:/plugins/pca4cd/icons/pca4cd.svg</iconset>
+           </property>
+           <property name="flat">
+            <bool>true</bool>
+           </property>
+          </widget>
+         </item>
+         <item>
           <widget class="QPushButton" name="QPBtn_PluginDocs">
            <property name="font">
             <font>
@@ -697,31 +722,6 @@
           </widget>
          </item>
          <item>
-          <widget class="QPushButton" name="QPBtn_PluginClearReload">
-           <property name="font">
-            <font>
-             <pointsize>9</pointsize>
-            </font>
-           </property>
-           <property name="cursor">
-            <cursorShape>PointingHandCursor</cursorShape>
-           </property>
-           <property name="toolTip">
-            <string>Clear all and reload the PCA4CD plugin.</string>
-           </property>
-           <property name="text">
-            <string>Clear/Reload</string>
-           </property>
-           <property name="icon">
-            <iconset>
-             <normaloff>:/plugins/pca4cd/icons/reload.svg</normaloff>:/plugins/pca4cd/icons/reload.svg</iconset>
-           </property>
-           <property name="flat">
-            <bool>true</bool>
-           </property>
-          </widget>
-         </item>
-         <item>
           <spacer name="horizontalSpacer_10">
            <property name="orientation">
             <enum>Qt::Horizontal</enum>
@@ -735,24 +735,18 @@
           </spacer>
          </item>
          <item>
-          <widget class="QPushButton" name="QPBtn_PluginInfo">
+          <widget class="QPushButton" name="QPBtn_Close">
            <property name="font">
             <font>
              <pointsize>9</pointsize>
             </font>
            </property>
-           <property name="cursor">
-            <cursorShape>WhatsThisCursor</cursorShape>
-           </property>
-           <property name="toolTip">
-            <string>About</string>
-           </property>
            <property name="text">
-            <string>version</string>
+            <string>Close</string>
            </property>
            <property name="icon">
             <iconset>
-             <normaloff>:/plugins/pca4cd/icons/pca4cd.svg</normaloff>:/plugins/pca4cd/icons/pca4cd.svg</iconset>
+             <normaloff>:/plugins/pca4cd/icons/close.svg</normaloff>:/plugins/pca4cd/icons/close.svg</iconset>
            </property>
            <property name="flat">
             <bool>true</bool>
@@ -794,8 +788,8 @@
    <slot>setEnabled(bool)</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>26</x>
-     <y>320</y>
+     <x>79</x>
+     <y>379</y>
     </hint>
     <hint type="destinationlabel">
      <x>114</x>
@@ -816,6 +810,22 @@
     <hint type="destinationlabel">
      <x>191</x>
      <y>709</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>QPBtn_Close</sender>
+   <signal>clicked()</signal>
+   <receiver>PCA4CDDialogBase</receiver>
+   <slot>close()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>565</x>
+     <y>887</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>505</x>
+     <y>-5</y>
     </hint>
    </hints>
   </connection>
