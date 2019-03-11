@@ -2,14 +2,6 @@
 <ui version="4.0">
  <class>ViewWidget</class>
  <widget class="QWidget" name="ViewWidget">
-  <property name="geometry">
-   <rect>
-    <x>0</x>
-    <y>0</y>
-    <width>538</width>
-    <height>554</height>
-   </rect>
-  </property>
   <layout class="QVBoxLayout" name="verticalLayout">
    <property name="spacing">
     <number>3</number>
@@ -175,6 +167,12 @@
        <horstretch>0</horstretch>
        <verstretch>0</verstretch>
       </sizepolicy>
+     </property>
+     <property name="minimumSize">
+      <size>
+       <width>100</width>
+       <height>100</height>
+      </size>
      </property>
     </widget>
    </item>

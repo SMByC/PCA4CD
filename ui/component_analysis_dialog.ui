@@ -2,14 +2,6 @@
 <ui version="4.0">
  <class>ViewWidget</class>
  <widget class="QWidget" name="ViewWidget">
-  <property name="geometry">
-   <rect>
-    <x>0</x>
-    <y>0</y>
-    <width>1282</width>
-    <height>801</height>
-   </rect>
-  </property>
   <property name="windowTitle">
    <string>Component Analysis</string>
   </property>
@@ -710,7 +702,14 @@
            </widget>
           </item>
           <item>
-           <widget class="PlotWidget" name="HistogramPlot"/>
+           <widget class="PlotWidget" name="HistogramPlot">
+            <property name="minimumSize">
+             <size>
+              <width>0</width>
+              <height>100</height>
+             </size>
+            </property>
+           </widget>
           </item>
           <item>
            <widget class="QWidget" name="widget_4" native="true">
