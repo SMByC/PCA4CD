@@ -42,7 +42,7 @@ Use _Correlation_ or _Covariance_ depend of the data and of type of data (by def
 
 ### Process settings
 
-To compute the principal components for a image, like a Landsat scene or more bigger, required relatively a heavy computation, the PCA4CD compute the PCA in a parallel process for reducing the time and the memory usage. However, good free RAM memory is required for not crash in the process, if this happens, try to use lower values in these parameters.
+To compute the principal components for a image, like a Landsat scene or more bigger, required relatively a heavy computation, **the PCA4CD compute the PCA in parallel process** for reducing the time and the memory usage. However, good free RAM memory is required for not crash in the process, if this happens, try to use lower values in these parameters.
 
 ## 1b. Load the principal components
 
