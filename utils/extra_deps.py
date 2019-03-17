@@ -41,23 +41,25 @@ Some code was based on:
     https://github.com/GIS4WRF/gis4wrf/blob/master/gis4wrf/plugin/ui/helpers.py
 """
 
-# Python x.y version tuple, e.g. ('3', '6').
+# Python x.y version tuple, e.g. ('3', '7').
 PY_MAJORMINOR = platform.python_version_tuple()[:2]
 
 Dependency = namedtuple('Dep', ['name', 'min', 'install'])
 
 # list of Python packages and versions necessary for this plugin
+#   install: fix/exact version number or None
+#   min: minimum version number or None
 DEPS = [
-    Dependency('dask', install=None, min='1.1.0'),
+    Dependency('dask', install=None, min='1.1.4'),
     Dependency('toolz', install=None, min=None),
     Dependency('pyqtgraph', install=None, min='0.10.0'),
 ]
 
 # Use a custom folder for the packages to avoid polluting the per-user site-packages.
 # This also avoids any permission issues.
-# Windows: ~\AppData\Local\gis4wrf\python<xy>
-# macOS: ~/Library/Application Support/gis4wrf/python<xy>
-# Linux: ~/.local/share/gis4wrf/python<xy>
+# Windows: ~\AppData\Local\pca4cd\python<xy>
+# macOS: ~/Library/Application Support/pca4cd/python<xy>
+# Linux: ~/.local/share/pca4cd/python<xy>
 if platform.system() == 'Windows':
     DATA_HOME = os.getenv('LOCALAPPDATA')
     assert DATA_HOME, '%LOCALAPPDATA% not found'
