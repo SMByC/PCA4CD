@@ -5,7 +5,7 @@ about=The PCA4CD is a Qgis plugin to build the change detection layer using the 
     Designed mainly with the goal of generating or load the principal components (PCA) and build the change
     detection layer based on the dimensionality reduction properties.
 
-version=19.3.10
+version=19.3.18
 qgisMinimumVersion=3.0
 qgisMaximumVersion=3.99
 
@@ -17,11 +17,9 @@ tracker=https://bitbucket.org/smbyc/qgisplugin-pca4cd/issues
 repository=https://bitbucket.org/smbyc/qgisplugin-pca4cd/src
 
 changelog=
-    19.3.10:
-    - Update plugin icon
-    - Use internal gdal script in Qgis for merge and calc process to replace and delete the cloned script in libs dir
-    - UI sizes adjusted
-    - Icons adjusted in the main dialog
+    19.3.18:
+    - Fix deps install on Windows using the latest Qgis 3.4 ltr
+    - Docs updated
     - Other minor improvements and fixes
 
     Previous versions:
