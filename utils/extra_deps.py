@@ -165,6 +165,8 @@ def load_install_extra_deps():
             else:
                 python_qgis_dir = exe_dir
             python = os.path.abspath(os.path.join(python_qgis_dir, 'python-qgis.bat'))
+            if not os.path.isfile(python):
+                python = os.path.abspath(os.path.join(python_qgis_dir, 'python-qgis-ltr.bat'))  # for qgis-ltr
 
         # Must use a single pip install invocation, otherwise dependencies of newly
         # installed packages get re-installed and we couldn't pin versions.
