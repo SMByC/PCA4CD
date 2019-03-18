@@ -22,12 +22,11 @@
 
 from qgis.PyQt.QtCore import QCoreApplication
 from qgis.PyQt.QtWidgets import QMessageBox
-from qgis.utils import iface
 
 from pca4cd.utils.extra_deps import load_install_extra_deps, WaitDialog
 
 
-def pre_init_plugin():
+def pre_init_plugin(iface):
     app = QCoreApplication.instance()
     parent = iface.mainWindow()
     dialog = None
@@ -59,7 +58,7 @@ def classFactory(iface):  # pylint: disable=invalid-name
     :type iface: QgsInterface
     """
     # load/install extra python dependencies
-    pre_init_plugin()
+    pre_init_plugin(iface)
 
     # start
     from .pca4cd import PCA4CD
