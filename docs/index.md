@@ -25,7 +25,15 @@ PCA4CD requires additional Python packages to function, that are generally not p
 * Python-Dask
 * PyQtGraph
 
-The way for have that: First way (recommended and automatic) is that the plugin (when is installing or updating) will be installed into a separate folder specific to PCA4CD and will not influence any existing Python installation. Second, install it in your system python installation first before install the plugin, but depends of the operating system to work.
+The way for have that:
+
+1. First way (recommended) the plugin install automatically it when is installing or updating, it will be installed into a separate folder specific to PCA4CD and will not influence any existing Python installation or Qgis environment:
+
+    >Windows: ~\AppData\Local\pca4cd\  
+    >macOS: ~/Library/Application Support/pca4cd/  
+    >Linux: ~/.local/share/pca4cd/
+
+2. Second, install it in your system python installation first before install the plugin, but depends of the operating system to work.
 
 ## Source code
 
