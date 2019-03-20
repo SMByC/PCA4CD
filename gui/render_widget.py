@@ -48,6 +48,10 @@ class PanAndZoomPointTool(QgsMapToolPan):
         if event.button() != Qt.RightButton:
             QgsMapToolPan.canvasPressEvent(self, event)
 
+    def keyReleaseEvent(self, event):
+        if event.key() in [Qt.Key_Up, Qt.Key_Down, Qt.Key_Right, Qt.Key_Left, Qt.Key_PageUp, Qt.Key_PageDown]:
+            QTimer.singleShot(10, self.render_widget.parent_view.canvas_changed)
+
 
 class RenderWidget(QWidget):
     def __init__(self, parent=None):

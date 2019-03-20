@@ -68,6 +68,10 @@ class PickerPixelPointTool(QgsMapTool):
         # delay some ms before restore maptool
         QTimer.singleShot(180, lambda: self.render_widget.canvas.setMapTool(self.render_widget.pan_zoom_tool))
 
+    def keyReleaseEvent(self, event):
+        if event.key() in [Qt.Key_Up, Qt.Key_Down, Qt.Key_Right, Qt.Key_Left, Qt.Key_PageUp, Qt.Key_PageDown]:
+            QTimer.singleShot(10, self.render_widget.parent_view.canvas_changed)
+
 
 class PickerAOIPointTool(QgsMapTool):
     def __init__(self, cad):
@@ -139,6 +143,11 @@ class PickerAOIPointTool(QgsMapTool):
                 self.finish_drawing()
                 # add the new feature and update the statistics
                 self.cad.aoi_changes(new_feature)
+
+    def keyReleaseEvent(self, event):
+        if event.key() in [Qt.Key_Up, Qt.Key_Down, Qt.Key_Right, Qt.Key_Left, Qt.Key_PageUp, Qt.Key_PageDown]:
+            QTimer.singleShot(10, self.cad.render_widget.parent_view.canvas_changed)
+
 
 
 # plugin path
