@@ -345,8 +345,14 @@ class MainAnalysisDialog(QDialog, FORM_CLASS):
                 self.MsgBar.pushMessage("Error during merging the change layers, check the Qgis log", level=Qgis.Critical)
                 return
 
+        # unset nodata
+        cmd = ['gdal_edit' if platform.system() == 'Windows' else 'gdal_edit.py', merged_change_layer, "-unsetnodata"]
+        call(" ".join(cmd), shell=True)
+        # apply style
         merged_layer = load_layer_in_qgis(merged_change_layer, "raster", True if merge_dialog.LoadInQgis.isChecked() else False)
-        apply_symbology(merged_layer, [("detection", 1, (255, 255, 0, 255))])
+        apply_symbology(merged_layer, [("0", 0, (255, 255, 255, 0)), ("1", 1, (255, 255, 0, 255))])
+        # save named style in QML aux file
+        merged_layer.saveNamedStyle(merged_change_layer[0:-4] + ".qml")
 
         # add the merged layer to input and auxiliary view
         for view_widget in MainAnalysisDialog.view_widgets:

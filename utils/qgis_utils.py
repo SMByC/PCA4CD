@@ -145,7 +145,7 @@ class StyleEditorDialog(QDialog, FORM_CLASS):
         self.layer.triggerRepaint()
 
 
-def apply_symbology(rlayer, symbology, transparent=0):
+def apply_symbology(rlayer, symbology, transparent=None):
     """ Apply classification symbology to raster layer """
     # See: QgsRasterRenderer* QgsSingleBandPseudoColorRendererWidget::renderer()
     # https://github.com/qgis/QGIS/blob/master/src/gui/raster/qgssinglebandpseudocolorrendererwidget.cpp
@@ -172,11 +172,12 @@ def apply_symbology(rlayer, symbology, transparent=0):
     rlayer.setRenderer(renderer)
 
     # Set NoData transparency to layer qgis (temporal)
-    if not isinstance(transparent, list):
-        transparent = [transparent]
-    nodata = [QgsRasterRange(t, t) for t in transparent]
-    if nodata:
-        rlayer.dataProvider().setUserNoDataValue(1, nodata)
+    if transparent is not None:
+        if not isinstance(transparent, list):
+            transparent = [transparent]
+        nodata = [QgsRasterRange(t, t) for t in transparent]
+        if nodata:
+            rlayer.dataProvider().setUserNoDataValue(1, nodata)
 
     # Repaint
     if hasattr(rlayer, 'setCacheImage'):

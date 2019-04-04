@@ -322,7 +322,7 @@ class ComponentAnalysisDialog(QWidget, FORM_CLASS):
             self.driver_detection_layer = None
 
         detection_layer = load_layer_in_qgis(output_change_layer, "raster", False)
-        apply_symbology(detection_layer, [("detection", 1, (255, 255, 0, 255))])
+        apply_symbology(detection_layer, [("0", 0, (255, 255, 255, 0)), ("1", 1, (255, 255, 0, 255))])
 
         self.render_widget.set_detection_layer(detection_layer)
         self.parent_view_widget.render_widget.set_detection_layer(detection_layer)
