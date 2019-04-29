@@ -24,8 +24,8 @@ import shutil
 import tempfile
 from pathlib import Path
 
-from qgis.PyQt.QtCore import QSettings, QTranslator, qVersion, QCoreApplication
-from qgis.PyQt.QtWidgets import QAction, QMessageBox
+from qgis.PyQt.QtCore import QSettings, QTranslator, qVersion, QCoreApplication, Qt
+from qgis.PyQt.QtWidgets import QAction
 from qgis.PyQt.QtGui import QIcon
 from qgis.utils import iface
 
@@ -139,6 +139,17 @@ class PCA4CD:
                 # Do something useful here - delete the line containing pass and
                 # substitute with your code.
                 pass
+        else:
+            # an instance of PCA4CD is already created
+            # brings that instance to front even if it is minimized
+            if hasattr(PCA4CD.dialog, "main_analysis_dialog") and PCA4CD.dialog.main_analysis_dialog:  # main dialog
+                PCA4CD.dialog.main_analysis_dialog.setWindowState(PCA4CD.dialog.main_analysis_dialog.windowState() & ~Qt.WindowMinimized | Qt.WindowActive)
+                PCA4CD.dialog.main_analysis_dialog.raise_()
+                PCA4CD.dialog.main_analysis_dialog.activateWindow()
+            else:  # the init dialog
+                PCA4CD.dialog.setWindowState(PCA4CD.dialog.windowState() & ~Qt.WindowMinimized | Qt.WindowActive)
+                PCA4CD.dialog.raise_()
+                PCA4CD.dialog.activateWindow()
 
     #--------------------------------------------------------------------------
 
