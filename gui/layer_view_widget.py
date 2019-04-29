@@ -24,7 +24,7 @@ from pathlib import Path
 from qgis.PyQt import uic
 from qgis.PyQt.QtGui import QColor
 from qgis.PyQt.QtWidgets import QWidget, QFileDialog
-from qgis.PyQt.QtCore import pyqtSlot
+from qgis.PyQt.QtCore import pyqtSlot, Qt
 from qgis.core import QgsProject
 
 from pca4cd.gui.component_analysis_dialog import ComponentAnalysisDialog
@@ -146,6 +146,9 @@ class LayerViewWidget(QWidget, FORM_CLASS):
         if not self.component_analysis_dialog:
             self.component_analysis_dialog = ComponentAnalysisDialog(parent_view_widget=self)
         if self.component_analysis_dialog.is_opened:
+            self.component_analysis_dialog.setWindowState(self.component_analysis_dialog.windowState()
+                                                          & ~Qt.WindowMinimized | Qt.WindowActive)
+            self.component_analysis_dialog.raise_()
             self.component_analysis_dialog.activateWindow()
             return
         self.component_analysis_dialog.show()

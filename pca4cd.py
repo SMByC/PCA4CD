@@ -143,7 +143,8 @@ class PCA4CD:
             # an instance of PCA4CD is already created
             # brings that instance to front even if it is minimized
             if hasattr(PCA4CD.dialog, "main_analysis_dialog") and PCA4CD.dialog.main_analysis_dialog:  # main dialog
-                PCA4CD.dialog.main_analysis_dialog.setWindowState(PCA4CD.dialog.main_analysis_dialog.windowState() & ~Qt.WindowMinimized | Qt.WindowActive)
+                PCA4CD.dialog.main_analysis_dialog.setWindowState(PCA4CD.dialog.main_analysis_dialog.windowState()
+                                                                  & ~Qt.WindowMinimized | Qt.WindowActive)
                 PCA4CD.dialog.main_analysis_dialog.raise_()
                 PCA4CD.dialog.main_analysis_dialog.activateWindow()
             else:  # the init dialog
