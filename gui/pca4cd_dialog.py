@@ -84,7 +84,7 @@ class PCA4CDDialog(QDialog, FORM_CLASS):
         self.QCBox_InputData_A.setCurrentIndex(-1)
         self.QCBox_InputData_A.setFilters(QgsMapLayerProxyModel.RasterLayer)
         # call to browse the thematic raster file
-        self.QPBtn_browseData_A.clicked.connect(lambda: self.fileDialog_browse(
+        self.QPBtn_browseData_A.clicked.connect(lambda: self.browser_dialog_to_load_file(
             self.QCBox_InputData_A,
             dialog_title=self.tr("Select the first period of the raster image to analyze"),
             file_filters=self.tr("Raster files (*.tif *.img);;All files (*.*)")))
@@ -96,7 +96,7 @@ class PCA4CDDialog(QDialog, FORM_CLASS):
         self.QCBox_InputData_B.setCurrentIndex(-1)
         self.QCBox_InputData_B.setFilters(QgsMapLayerProxyModel.RasterLayer)
         # call to browse the thematic raster file
-        self.QPBtn_browseData_B.clicked.connect(lambda: self.fileDialog_browse(
+        self.QPBtn_browseData_B.clicked.connect(lambda: self.browser_dialog_to_load_file(
             self.QCBox_InputData_B,
             dialog_title=self.tr("Select the second period of the raster image to analyze"),
             file_filters=self.tr("Raster files (*.tif *.img);;All files (*.*)")))
@@ -115,7 +115,7 @@ class PCA4CDDialog(QDialog, FORM_CLASS):
         self.QPBtn_LoadStackPCA.clicked.connect(self.load_external_pc_in_main_analysis_dialog)
 
     @pyqtSlot()
-    def fileDialog_browse(self, combo_box, dialog_title, file_filters):
+    def browser_dialog_to_load_file(self, combo_box, dialog_title, file_filters):
         file_path, _ = QFileDialog.getOpenFileName(self, dialog_title, "", file_filters)
         if file_path != '' and os.path.isfile(file_path):
             # load to qgis and update combobox list
