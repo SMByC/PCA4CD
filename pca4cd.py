@@ -34,7 +34,7 @@ from .resources import *
 
 from pca4cd.gui.pca4cd_dialog import PCA4CDDialog
 from pca4cd.gui.about_dialog import AboutDialog
-from pca4cd.utils.qgis_utils import unload_layer_in_qgis
+from pca4cd.utils.qgis_utils import unload_layer
 
 
 class PCA4CD:
@@ -197,7 +197,7 @@ class PCA4CD:
         except: files_in_tmp_dir = []
 
         for file_tmp in files_in_tmp_dir:
-            unload_layer_in_qgis(str(file_tmp))
+            unload_layer(str(file_tmp))
 
         # clear PCA4CD.tmp_dir
         if PCA4CD.tmp_dir and os.path.isdir(PCA4CD.tmp_dir):

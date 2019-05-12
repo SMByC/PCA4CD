@@ -35,7 +35,7 @@ from qgis.core import QgsMapLayerProxyModel, Qgis
 from pca4cd.core.pca_dask_gdal import pca
 from pca4cd.gui.about_dialog import AboutDialog
 from pca4cd.gui.main_analysis_dialog import MainAnalysisDialog
-from pca4cd.utils.qgis_utils import load_and_select_filepath_in, load_layer_in_qgis, get_file_path_of_layer
+from pca4cd.utils.qgis_utils import load_and_select_filepath_in, load_layer, get_file_path_of_layer
 from pca4cd.utils.system_utils import error_handler, wait_process
 
 # plugin path
@@ -87,8 +87,7 @@ class PCA4CDDialog(QDialog, FORM_CLASS):
         self.QPBtn_browseData_A.clicked.connect(lambda: self.fileDialog_browse(
             self.QCBox_InputData_A,
             dialog_title=self.tr("Select the first period of the raster image to analyze"),
-            dialog_types=self.tr("Raster files (*.tif *.img);;All files (*.*)"),
-            layer_type="raster"))
+            file_filters=self.tr("Raster files (*.tif *.img);;All files (*.*)")))
         self.QCBox_InputData_A.currentIndexChanged.connect(self.set_number_of_components)
         self.QCBox_InputData_A.currentIndexChanged.connect(self.set_nodata_value_in_computePC)
         self.EnableInputData_A.toggled.connect(lambda: self.EnableInputData_A.setChecked(True))
@@ -100,8 +99,7 @@ class PCA4CDDialog(QDialog, FORM_CLASS):
         self.QPBtn_browseData_B.clicked.connect(lambda: self.fileDialog_browse(
             self.QCBox_InputData_B,
             dialog_title=self.tr("Select the second period of the raster image to analyze"),
-            dialog_types=self.tr("Raster files (*.tif *.img);;All files (*.*)"),
-            layer_type="raster"))
+            file_filters=self.tr("Raster files (*.tif *.img);;All files (*.*)")))
         self.QCBox_InputData_B.currentIndexChanged.connect(self.set_number_of_components)
         self.EnableInputData_B.toggled.connect(lambda: self.QCBox_InputData_B.setCurrentIndex(-1))
 
@@ -117,11 +115,11 @@ class PCA4CDDialog(QDialog, FORM_CLASS):
         self.QPBtn_LoadStackPCA.clicked.connect(self.load_external_pc_in_main_analysis_dialog)
 
     @pyqtSlot()
-    def fileDialog_browse(self, combo_box, dialog_title, dialog_types, layer_type):
-        file_path, _ = QFileDialog.getOpenFileName(self, dialog_title, "", dialog_types)
+    def fileDialog_browse(self, combo_box, dialog_title, file_filters):
+        file_path, _ = QFileDialog.getOpenFileName(self, dialog_title, "", file_filters)
         if file_path != '' and os.path.isfile(file_path):
             # load to qgis and update combobox list
-            load_and_select_filepath_in(combo_box, file_path, layer_type)
+            load_and_select_filepath_in(combo_box, file_path)
 
     @pyqtSlot()
     def set_nodata_value_in_computePC(self):
@@ -207,7 +205,7 @@ class PCA4CDDialog(QDialog, FORM_CLASS):
         pca_layers = []
         if pca_files:
             for pca_file in pca_files:
-                pca_layers.append(load_layer_in_qgis(pca_file, "raster", False))
+                pca_layers.append(load_layer(pca_file, add_to_legend=False))
             # then, open main analysis dialog
             self.open_main_analysis_dialog(pca_layers, pca_stats, nodata)
         else:
@@ -247,7 +245,7 @@ class PCA4CDDialog(QDialog, FORM_CLASS):
         for component in range(num_bands):
             tmp_pca_file = Path(pca4cd.tmp_dir) / 'pc_{}.tif'.format(component + 1)
             gdal.Translate(str(tmp_pca_file), stack_path, bandList=[component + 1], noData=nodata)
-            pca_layers.append(load_layer_in_qgis(tmp_pca_file, "raster", False))
+            pca_layers.append(load_layer(tmp_pca_file, add_to_legend=False))
 
         # pca statistics
         pca_stats = {}

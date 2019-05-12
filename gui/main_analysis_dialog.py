@@ -35,7 +35,7 @@ from qgis.utils import iface
 
 from pca4cd.gui.layer_view_widget import LayerViewWidget
 from pca4cd.gui.merge_change_layers_dialog import MergeChangeLayersDialog
-from pca4cd.utils.qgis_utils import load_layer_in_qgis, apply_symbology, get_file_path_of_layer
+from pca4cd.utils.qgis_utils import load_layer, apply_symbology, get_file_path_of_layer
 from pca4cd.utils.system_utils import wait_process
 
 # plugin path
@@ -349,7 +349,7 @@ class MainAnalysisDialog(QDialog, FORM_CLASS):
         cmd = ['gdal_edit' if platform.system() == 'Windows' else 'gdal_edit.py', merged_change_layer, "-unsetnodata"]
         call(" ".join(cmd), shell=True)
         # apply style
-        merged_layer = load_layer_in_qgis(merged_change_layer, "raster", True if merge_dialog.LoadInQgis.isChecked() else False)
+        merged_layer = load_layer(merged_change_layer, add_to_legend=True if merge_dialog.LoadInQgis.isChecked() else False)
         apply_symbology(merged_layer, [("0", 0, (255, 255, 255, 0)), ("1", 1, (255, 255, 0, 255))])
         # save named style in QML aux file
         merged_layer.saveNamedStyle(merged_change_layer[0:-4] + ".qml")

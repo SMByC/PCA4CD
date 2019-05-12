@@ -39,7 +39,7 @@ from qgis.gui import QgsMapTool, QgsRubberBand
 from qgis.core import edit
 
 from pca4cd.utils.others_utils import clip_raster_with_shape
-from pca4cd.utils.qgis_utils import get_file_path_of_layer, load_layer_in_qgis, apply_symbology
+from pca4cd.utils.qgis_utils import get_file_path_of_layer, load_layer, apply_symbology
 from pca4cd.utils.system_utils import wait_process, block_signals_to
 
 
@@ -321,7 +321,7 @@ class ComponentAnalysisDialog(QWidget, FORM_CLASS):
         if platform.system() != 'Windows':
             self.driver_detection_layer = None
 
-        detection_layer = load_layer_in_qgis(output_change_layer, "raster", False)
+        detection_layer = load_layer(output_change_layer, add_to_legend=False)
         apply_symbology(detection_layer, [("0", 0, (255, 255, 255, 0)), ("1", 1, (255, 255, 0, 255))])
 
         self.render_widget.set_detection_layer(detection_layer)
