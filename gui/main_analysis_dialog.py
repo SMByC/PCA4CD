@@ -58,6 +58,8 @@ class MainAnalysisDialog(QDialog, FORM_CLASS):
         MainAnalysisDialog.pca_layers = pca_layers
         MainAnalysisDialog.pca_stats = pca_stats
         MainAnalysisDialog.nodata = nodata
+        # flags
+        self.setWindowFlags(self.windowFlags() | Qt.WindowMinimizeButtonHint | Qt.WindowMaximizeButtonHint)
 
         self.setupUi(self)
 
