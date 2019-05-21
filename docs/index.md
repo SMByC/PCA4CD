@@ -33,7 +33,9 @@ The way for have that:
     >macOS: ~/Library/Application Support/pca4cd/  
     >Linux: ~/.local/share/pca4cd/
 
-2. Second, install it in your system python installation first before install the plugin, but depends of the operating system to work.
+2. Second, install it in your system python installation first before install the plugin, but depends of the operating system to work. For Ubuntu and derivatives distributions:
+
+    >sudo apt install python3-pyqtgraph python3-dask
 
 ## Source code
 
