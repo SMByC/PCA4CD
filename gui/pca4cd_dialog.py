@@ -243,7 +243,7 @@ class PCA4CDDialog(QDialog, FORM_CLASS):
         del src_ds
         pca_layers = []
         for component in range(num_bands):
-            tmp_pca_file = Path(pca4cd.tmp_dir) / 'pc_{}.tif'.format(component + 1)
+            tmp_pca_file = pca4cd.tmp_dir / 'pc_{}.tif'.format(component + 1)
             gdal.Translate(str(tmp_pca_file), stack_path, bandList=[component + 1], noData=nodata)
             pca_layers.append(load_layer(tmp_pca_file, add_to_legend=False))
 

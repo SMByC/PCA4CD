@@ -51,7 +51,7 @@ def pca(A, B, n_pc, estimator_matrix, out_dir, n_threads, block_size):
         with rasterio.open(path) as src:
             return src.profile.copy()
 
-    if B is not None:
+    if B:
         raw_image_a = read_raster(A, block_size=block_size)
         raw_image_b = read_raster(B, block_size=block_size)
         raw_image = da.vstack((raw_image_a, raw_image_b))

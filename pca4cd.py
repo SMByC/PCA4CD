@@ -126,7 +126,7 @@ class PCA4CD:
                 PCA4CD.dialog = PCA4CDDialog()
 
             # init tmp dir for all process and intermediate files
-            PCA4CD.tmp_dir = tempfile.mkdtemp()
+            PCA4CD.tmp_dir = Path(tempfile.mkdtemp())
             # connect to provide cleanup on closing of dialog
             PCA4CD.dialog.closingPlugin.connect(self.onClosePlugin)
 
@@ -190,14 +190,9 @@ class PCA4CD:
         if not PCA4CD.dialog:
             return
         # unload all layers instances from Qgis saved in tmp dir
-        try:
-            d = PCA4CD.tmp_dir
-            files_in_tmp_dir = [Path(d, f) for f in os.listdir(d)
-                                if Path(d, f).is_file()]
-        except: files_in_tmp_dir = []
-
-        for file_tmp in files_in_tmp_dir:
-            unload_layer(str(file_tmp))
+        if PCA4CD.tmp_dir and PCA4CD.tmp_dir.is_dir():
+            for file_tmp in PCA4CD.tmp_dir.glob("*"):
+                unload_layer(file_tmp)
 
         # clear PCA4CD.tmp_dir
         if PCA4CD.tmp_dir and os.path.isdir(PCA4CD.tmp_dir):

@@ -47,15 +47,15 @@ def pca(A, B, n_pc, estimator_matrix, out_dir, n_threads, block_size, nodata=Non
 
     raw_image = []
     nodata_mask = None
-    src_ds_A = gdal.Open(A, gdal.GA_ReadOnly)
+    src_ds_A = gdal.Open(str(A), gdal.GA_ReadOnly)
     src_ds_B = None
     for band in range(src_ds_A.RasterCount):
         ds = src_ds_A.GetRasterBand(band + 1).ReadAsArray().flatten().astype(np.float32)
         if nodata is not None:
             nodata_mask = ds==nodata if nodata_mask is None else np.logical_or(nodata_mask, ds==nodata)
         raw_image.append(ds)
-    if B is not None:
-        src_ds_B = gdal.Open(B, gdal.GA_ReadOnly)
+    if B:
+        src_ds_B = gdal.Open(str(B), gdal.GA_ReadOnly)
         for band in range(src_ds_B.RasterCount):
             ds = src_ds_B.GetRasterBand(band + 1).ReadAsArray().flatten().astype(np.float32)
             if nodata is not None:
@@ -116,11 +116,11 @@ def pca(A, B, n_pc, estimator_matrix, out_dir, n_threads, block_size, nodata=Non
     # save the principal components separated in tif images
 
     def get_raw_band_from_stack(band):
-        src_ds_A = gdal.Open(A, gdal.GA_ReadOnly)
+        src_ds_A = gdal.Open(str(A), gdal.GA_ReadOnly)
         if band < src_ds_A.RasterCount:
             return src_ds_A.GetRasterBand(band + 1).ReadAsArray().flatten().astype(np.float32)
         if band >= src_ds_A.RasterCount:
-            src_ds_B = gdal.Open(B, gdal.GA_ReadOnly)
+            src_ds_B = gdal.Open(str(B), gdal.GA_ReadOnly)
             return src_ds_B.GetRasterBand(band - src_ds_A.RasterCount + 1).ReadAsArray().flatten().astype(np.float32)
 
     pca_files = []

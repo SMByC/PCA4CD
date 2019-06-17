@@ -202,7 +202,7 @@ class MainAnalysisDialog(QDialog, FORM_CLASS):
         self.reject(is_ok_to_close=True)
         self.deleteLater()
         pca4cd.removes_temporary_files()
-        pca4cd.tmp_dir = tempfile.mkdtemp()
+        pca4cd.tmp_dir = Path(tempfile.mkdtemp())
         iface.mapCanvas().clearCache()
         # recover the main dialog
         pca4cd.dialog.show()
@@ -241,7 +241,7 @@ class MainAnalysisDialog(QDialog, FORM_CLASS):
         """
         for view_widget in MainAnalysisDialog.view_widgets:
             if view_widget.pc_id is not None:
-                src_ds = gdal.Open(get_file_path_of_layer(view_widget.render_widget.layer), gdal.GA_ReadOnly)
+                src_ds = gdal.Open(str(get_file_path_of_layer(view_widget.render_widget.layer)), gdal.GA_ReadOnly)
                 ds = src_ds.GetRasterBand(1).ReadAsArray().flatten().astype(np.float32)
                 ds = ds[ds != 0]
                 try:
@@ -272,7 +272,7 @@ class MainAnalysisDialog(QDialog, FORM_CLASS):
             nodata = ["-a_nodata", "0"] if MainAnalysisDialog.nodata is not None else []
             cmd = ['gdal_merge' if platform.system() == 'Windows' else 'gdal_merge.py', '-q'] + \
                   ["", "-separate", "-of", "GTiff", "-o", file_out] + nodata + \
-                  [get_file_path_of_layer(layer) for layer in self.pca_layers]
+                  [str(get_file_path_of_layer(layer)) for layer in self.pca_layers]
             return_code = call(" ".join(cmd), shell=True)
 
             if return_code != 0:
@@ -301,10 +301,10 @@ class MainAnalysisDialog(QDialog, FORM_CLASS):
             return
         # suggested filename
         if self.layer_a is not None:
-            path, filename = os.path.split(get_file_path_of_layer(self.layer_a))
+            path, filename = os.path.split(str(get_file_path_of_layer(self.layer_a)))
         else:
             from pca4cd.pca4cd import PCA4CD as pca4cd
-            path, filename = os.path.split(get_file_path_of_layer(pca4cd.dialog.QCBox_LoadStackPCA.currentLayer()))
+            path, filename = os.path.split(str(get_file_path_of_layer(pca4cd.dialog.QCBox_LoadStackPCA.currentLayer())))
         suggested_filename = os.path.splitext(Path(path, filename))[0] + "_pca4cd.tif"
         # merge dialog
         merge_dialog = MergeChangeLayersDialog(self.activated_ids, suggested_filename)
@@ -314,15 +314,15 @@ class MainAnalysisDialog(QDialog, FORM_CLASS):
     @pyqtSlot()
     @wait_process
     def do_merge_change_layers(self, merge_dialog):
-        merged_change_layer = merge_dialog.MergeFileWidget.filePath()
+        merged_change_layer = Path(merge_dialog.MergeFileWidget.filePath())
         MergeChangeLayersDialog.merged_file_path = merged_change_layer
 
         merge_method = merge_dialog.MergeMethod.currentText()
 
         if merge_method == "Union":
             cmd = ['gdal_merge' if platform.system() == 'Windows' else 'gdal_merge.py', '-q',
-                   "-of", "GTiff", "-o", merged_change_layer, "-n", "0", "-a_nodata", "0", "-ot", "Byte"] + \
-                  [get_file_path_of_layer(layer) for layer in self.activated_change_layers]
+                   "-of", "GTiff", "-o", str(merged_change_layer), "-n", "0", "-a_nodata", "0", "-ot", "Byte"] + \
+                  [str(get_file_path_of_layer(layer)) for layer in self.activated_change_layers]
             return_code = call(" ".join(cmd), shell=True)
 
             if return_code != 0:
@@ -332,7 +332,7 @@ class MainAnalysisDialog(QDialog, FORM_CLASS):
         if merge_method == "Intersection":
             alpha_list = ["A", "B", "C", "D", "E", "F", "G", "H", "I", "J", "K", "L", "M", "N", "O", "P", "Q", "R", "S",
                           "T", "U", "V", "W", "X", "Y", "Z"]
-            input_files = {alpha_list[x]: get_file_path_of_layer(f) for x, f in enumerate(self.activated_change_layers)}
+            input_files = {alpha_list[x]: str(get_file_path_of_layer(f)) for x, f in enumerate(self.activated_change_layers)}
             filter_ones = ",".join([alpha_list[x] + "==1" for x in range(len(self.activated_change_layers))])
             filter_zeros = ",".join([alpha_list[x] + "==0" for x in range(len(self.activated_change_layers))])
 
@@ -348,13 +348,13 @@ class MainAnalysisDialog(QDialog, FORM_CLASS):
                 return
 
         # unset nodata
-        cmd = ['gdal_edit' if platform.system() == 'Windows' else 'gdal_edit.py', merged_change_layer, "-unsetnodata"]
+        cmd = ['gdal_edit' if platform.system() == 'Windows' else 'gdal_edit.py', str(merged_change_layer), "-unsetnodata"]
         call(" ".join(cmd), shell=True)
         # apply style
         merged_layer = load_layer(merged_change_layer, add_to_legend=True if merge_dialog.LoadInQgis.isChecked() else False)
         apply_symbology(merged_layer, [("0", 0, (255, 255, 255, 0)), ("1", 1, (255, 255, 0, 255))])
         # save named style in QML aux file
-        merged_layer.saveNamedStyle(merged_change_layer[0:-4] + ".qml")
+        merged_layer.saveNamedStyle(str(merged_change_layer.with_suffix(".qml")))
 
         # add the merged layer to input and auxiliary view
         for view_widget in MainAnalysisDialog.view_widgets:

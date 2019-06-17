@@ -214,7 +214,7 @@ class ComponentAnalysisDialog(QWidget, FORM_CLASS):
         self.RangeChangeFrom.valueChanged.connect(self.update_region_from_values)
         self.RangeChangeTo.valueChanged.connect(self.update_region_from_values)
         # statistics for current principal component
-        self.pc_gdal_ds = gdal.Open(get_file_path_of_layer(self.pc_layer), GA_ReadOnly)
+        self.pc_gdal_ds = gdal.Open(str(get_file_path_of_layer(self.pc_layer)), GA_ReadOnly)
         self.pc_data = self.pc_gdal_ds.GetRasterBand(1).ReadAsArray()
         self.pc_data_flat = self.pc_data.flatten()
         self.stats_pc = None  # store stats done for principal components

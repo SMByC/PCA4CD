@@ -33,7 +33,7 @@ from qgis.utils import iface
 
 def get_file_path_of_layer(layer):
     if layer and layer.isValid():
-        return os.path.realpath(layer.source())
+        return Path(layer.source())
     return ""
 
 
@@ -56,7 +56,7 @@ def get_layer_by_name(layer_name):
 
 def get_current_file_path_in(combo_box, show_message=True):
     file_path = get_file_path_of_layer(combo_box.currentLayer())
-    if os.path.isfile(file_path):
+    if file_path.is_file():
         return file_path
     elif show_message:
         iface.messageBar().pushMessage("PCA4CD", "Error, please select a valid file", level=Qgis.Warning)
@@ -84,12 +84,12 @@ def load_layer(file_path, name=None, add_to_legend=True):
     # first unload layer from qgis if exists
     unload_layer(file_path)
 
-    name = name or os.path.splitext(os.path.basename(file_path))[0]
+    name = name or file_path.stem
     # vector
-    qgslayer = QgsVectorLayer(file_path, name, "ogr")
+    qgslayer = QgsVectorLayer(str(file_path), name, "ogr")
     if not qgslayer.isValid():
         # raster
-        qgslayer = QgsRasterLayer(file_path, name, "gdal")
+        qgslayer = QgsRasterLayer(str(file_path), name, "gdal")
 
     # load
     if qgslayer.isValid():
@@ -103,7 +103,7 @@ def load_layer(file_path, name=None, add_to_legend=True):
 def unload_layer(layer_path):
     layers_loaded = QgsProject.instance().mapLayers().values()
     for layer_loaded in layers_loaded:
-        if layer_path == get_file_path_of_layer(layer_loaded):
+        if layer_loaded.isValid() and layer_path.resolve() == get_file_path_of_layer(layer_loaded).resolve():
             QgsProject.instance().removeMapLayer(layer_loaded.id())
 
 
