@@ -40,13 +40,13 @@ The way for have that:
 ## Source code
 
 The official version control system repository of the plugin:
-[https://bitbucket.org/smbyc/qgisplugin-pca4cd](https://bitbucket.org/smbyc/qgisplugin-pca4cd)
+[https://github.com/SMByC/PCA4CD](https://github.com/SMByC/PCA4CD)
 
 The home plugin in plugins.qgis.org: [http://plugins.qgis.org/plugins/PCA4CD/](http://plugins.qgis.org/plugins/PCA4CD/)
 
 ## Issue Tracker
 
-Issues, ideas and enhancements: [https://bitbucket.org/smbyc/qgisplugin-pca4cd/issues](https://bitbucket.org/smbyc/qgisplugin-pca4cd/issues)
+Issues, ideas and enhancements: [https://github.com/SMByC/PCA4CD/issues](https://github.com/SMByC/PCA4CD/issues)
 
 ## Get involved
 
