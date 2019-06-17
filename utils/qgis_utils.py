@@ -81,6 +81,7 @@ def add_layer(layer, add_to_legend=True):
 
 
 def load_layer(file_path, name=None, add_to_legend=True):
+    file_path = Path(file_path)
     # first unload layer from qgis if exists
     unload_layer(file_path)
 
