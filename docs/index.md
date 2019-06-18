@@ -42,7 +42,7 @@ The way for have that:
 The official version control system repository of the plugin:
 [https://github.com/SMByC/PCA4CD](https://github.com/SMByC/PCA4CD)
 
-The home plugin in plugins.qgis.org: [http://plugins.qgis.org/plugins/PCA4CD/](http://plugins.qgis.org/plugins/PCA4CD/)
+The home plugin in plugins.qgis.org: [https://plugins.qgis.org/plugins/pca4cd/](https://plugins.qgis.org/plugins/pca4cd/)
 
 ## Issue Tracker
 
