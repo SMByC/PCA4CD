@@ -269,10 +269,10 @@ class MainAnalysisDialog(QDialog, FORM_CLASS):
 
         @wait_process
         def save():
-            nodata = ["-a_nodata", "0"] if MainAnalysisDialog.nodata is not None else []
+            nodata = ['-a_nodata', '0'] if MainAnalysisDialog.nodata is not None else []
             cmd = ['gdal_merge' if platform.system() == 'Windows' else 'gdal_merge.py', '-q'] + \
-                  ["", "-separate", "-of", "GTiff", "-o", file_out] + nodata + \
-                  [str(get_file_path_of_layer(layer)) for layer in self.pca_layers]
+                  ['', '-separate', '-of', 'GTiff', '-o', '"{}"'.format(file_out)] + nodata + \
+                  ['"{}"'.format(get_file_path_of_layer(layer)) for layer in self.pca_layers]
             return_code = call(" ".join(cmd), shell=True)
 
             if return_code != 0:
@@ -321,8 +321,8 @@ class MainAnalysisDialog(QDialog, FORM_CLASS):
 
         if merge_method == "Union":
             cmd = ['gdal_merge' if platform.system() == 'Windows' else 'gdal_merge.py', '-q',
-                   "-of", "GTiff", "-o", str(merged_change_layer), "-n", "0", "-a_nodata", "0", "-ot", "Byte"] + \
-                  [str(get_file_path_of_layer(layer)) for layer in self.activated_change_layers]
+                   '-of', 'GTiff', '-o', '"{}"'.format(merged_change_layer), '-n', '0', '-a_nodata', '0', '-ot', 'Byte'] + \
+                  ['"{}"'.format(get_file_path_of_layer(layer)) for layer in self.activated_change_layers]
             return_code = call(" ".join(cmd), shell=True)
 
             if return_code != 0:
@@ -348,7 +348,8 @@ class MainAnalysisDialog(QDialog, FORM_CLASS):
                 return
 
         # unset nodata
-        cmd = ['gdal_edit' if platform.system() == 'Windows' else 'gdal_edit.py', str(merged_change_layer), "-unsetnodata"]
+        cmd = ['gdal_edit' if platform.system() == 'Windows' else 'gdal_edit.py',
+               '"{}"'.format(merged_change_layer), '-unsetnodata']
         call(" ".join(cmd), shell=True)
         # apply style
         merged_layer = load_layer(merged_change_layer, add_to_legend=True if merge_dialog.LoadInQgis.isChecked() else False)

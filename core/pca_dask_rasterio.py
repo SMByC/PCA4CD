@@ -122,7 +122,7 @@ def pca(A, B, n_pc, estimator_matrix, out_dir, n_threads, block_size):
     # compute the pyramids for each pc image
     @dask.delayed
     def pyramids(pca_file):
-        call("gdaladdo --config BIGTIFF_OVERVIEW YES {}".format(pca_file), shell=True)
+        call('gdaladdo --config BIGTIFF_OVERVIEW YES "{}"'.format(pca_file), shell=True)
 
     dask.compute(*[pyramids(pca_file) for pca_file in pca_files], num_workers=2)
 

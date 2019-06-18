@@ -155,7 +155,7 @@ def pca(A, B, n_pc, estimator_matrix, out_dir, n_threads, block_size, nodata=Non
 
     # compute the pyramids for each pc image
     for pca_file in pca_files:
-        call("gdaladdo -q --config BIGTIFF_OVERVIEW YES {}".format(pca_file), shell=True)
+        call('gdaladdo -q --config BIGTIFF_OVERVIEW YES "{}"'.format(pca_file), shell=True)
 
     ########
     # pca statistics
