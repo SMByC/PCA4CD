@@ -35,7 +35,7 @@ from qgis.utils import iface
 
 from pca4cd.gui.layer_view_widget import LayerViewWidget
 from pca4cd.gui.merge_change_layers_dialog import MergeChangeLayersDialog
-from pca4cd.utils.qgis_utils import load_layer, apply_symbology, get_file_path_of_layer
+from pca4cd.utils.qgis_utils import load_layer, apply_symbology, get_file_path_of_layer, unload_layer
 from pca4cd.utils.system_utils import wait_process
 
 # plugin path
@@ -316,6 +316,8 @@ class MainAnalysisDialog(QDialog, FORM_CLASS):
     def do_merge_change_layers(self, merge_dialog):
         merged_change_layer = Path(merge_dialog.MergeFileWidget.filePath())
         MergeChangeLayersDialog.merged_file_path = merged_change_layer
+        # first unload layer from qgis if exists
+        unload_layer(merged_change_layer)
 
         merge_method = merge_dialog.MergeMethod.currentText()
 
