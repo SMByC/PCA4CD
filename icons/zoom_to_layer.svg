@@ -1,62 +1,13 @@
-<?xml version="1.0" encoding="UTF-8" standalone="no"?>
-<svg
-   xmlns:dc="http://purl.org/dc/elements/1.1/"
-   xmlns:cc="http://creativecommons.org/ns#"
-   xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#"
-   xmlns:svg="http://www.w3.org/2000/svg"
-   xmlns="http://www.w3.org/2000/svg"
-   xmlns:sodipodi="http://sodipodi.sourceforge.net/DTD/sodipodi-0.dtd"
-   xmlns:inkscape="http://www.inkscape.org/namespaces/inkscape"
-   viewBox="0 0 16 16"
-   version="1.1"
-   id="svg6"
-   sodipodi:docname="zoom_fit.svg"
-   inkscape:version="0.92.2 2405546, 2018-03-11">
-  <metadata
-     id="metadata10">
-    <rdf:RDF>
-      <cc:Work
-         rdf:about="">
-        <dc:format>image/svg+xml</dc:format>
-        <dc:type
-           rdf:resource="http://purl.org/dc/dcmitype/StillImage" />
-      </cc:Work>
-    </rdf:RDF>
-  </metadata>
-  <sodipodi:namedview
-     pagecolor="#ffffff"
-     bordercolor="#666666"
-     borderopacity="1"
-     objecttolerance="10"
-     gridtolerance="10"
-     guidetolerance="10"
-     inkscape:pageopacity="0"
-     inkscape:pageshadow="2"
-     inkscape:window-width="2560"
-     inkscape:window-height="1404"
-     id="namedview8"
-     showgrid="false"
-     inkscape:zoom="32"
-     inkscape:cx="11.802454"
-     inkscape:cy="8.6095187"
-     inkscape:window-x="0"
-     inkscape:window-y="36"
-     inkscape:window-maximized="1"
-     inkscape:current-layer="svg6" />
-  <defs
-     id="defs3051">
-    <style
-       type="text/css"
-       id="current-color-scheme">
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 16 16">
+  <defs id="defs3051">
+    <style type="text/css" id="current-color-scheme">
       .ColorScheme-Text {
-        color:#4d4d4d;
+        color:#232629;
       }
       </style>
   </defs>
-  <path
-     style="color:#4d4d4d;fill:currentColor;fill-opacity:1;stroke:none;stroke-width:1"
-     d="M 0,0 V 3.9999999 H 1.3333333 V 1.3333333 H 3.9999998 V 0 H 1.3333333 Z M 7.9999996,0 5.3333331,2.6666666 H 10.666666 Z M 12,0 v 1.3333333 h 2.666666 V 3.9999999 H 16 V 0 H 14.666666 Z M 3.9999998,3.9999999 V 12 H 12 V 3.9999999 Z M 2.6666665,5.3333332 0,7.9999997 2.6666665,10.666666 Z m 2.6666666,0 H 10.666666 V 10.666666 H 5.3333331 Z m 7.9999999,0 V 10.666666 L 16,7.9999997 Z M 0,12 v 4 H 1.3333333 3.9999998 V 14.666666 H 1.3333333 V 12 Z m 14.666666,0 v 2.666666 H 12 V 16 h 4 V 14.666666 12 Z M 5.3333331,13.333333 7.9999996,16 10.666666,13.333333 Z"
+ <path style="fill:currentColor;fill-opacity:1;stroke:none" 
+       d="M 2 2 L 2 5 L 3 5 L 3 3 L 5 3 L 5 2 L 3 2 L 2 2 z M 11 2 L 11 3 L 13 3 L 13 5 L 14 5 L 14 2 L 13 2 L 11 2 z M 4 4 L 4 12 L 12 12 L 12 4 L 4 4 z M 5 5 L 11 5 L 11 11 L 5 11 L 5 5 z M 2 11 L 2 14 L 3 14 L 5 14 L 5 13 L 3 13 L 3 11 L 2 11 z M 13 11 L 13 13 L 11 13 L 11 14 L 14 14 L 14 13 L 14 11 L 13 11 z "
      class="ColorScheme-Text"
-     id="path4"
-     inkscape:connector-curvature="0" />
+     />
 </svg>

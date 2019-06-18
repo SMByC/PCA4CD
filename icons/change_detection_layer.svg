@@ -11,7 +11,7 @@
    version="1.1"
    id="svg6"
    sodipodi:docname="change_detection_layer.svg"
-   inkscape:version="0.92.2 2405546, 2018-03-11">
+   inkscape:version="0.92.4 5da689c313, 2019-01-14">
   <metadata
      id="metadata10">
     <rdf:RDF>
@@ -32,16 +32,16 @@
      guidetolerance="10"
      inkscape:pageopacity="0"
      inkscape:pageshadow="2"
-     inkscape:window-width="2230"
-     inkscape:window-height="1307"
+     inkscape:window-width="1600"
+     inkscape:window-height="1176"
      id="namedview8"
      showgrid="false"
-     inkscape:zoom="45.254834"
-     inkscape:cx="6.0441803"
-     inkscape:cy="7.8274684"
-     inkscape:window-x="0"
-     inkscape:window-y="36"
-     inkscape:window-maximized="0"
+     inkscape:zoom="14.75"
+     inkscape:cx="8.6779661"
+     inkscape:cy="7.3220339"
+     inkscape:window-x="1600"
+     inkscape:window-y="0"
+     inkscape:window-maximized="1"
      inkscape:current-layer="svg6" />
   <defs
      id="defs3051">
@@ -49,14 +49,23 @@
        type="text/css"
        id="current-color-scheme">
       .ColorScheme-Text {
-        color:#4d4d4d;
+        color:#232629;
+      }
+      .ColorScheme-Highlight {
+        color:#3daee9;
       }
       </style>
   </defs>
   <path
-     style="color:#4d4d4d;fill:currentColor;fill-opacity:1;stroke:none;stroke-width:1.00000012"
-     d="M -0.00332823,-0.00332823 V 3.9983363 H 1.33056 V 1.33056 H 3.9983363 V -0.00332823 H 1.33056 Z m 12.00499423,0 V 1.33056 h 2.667776 V 2.6644481 3.9983363 H 16.00333 V 1.33056 -0.00332823 Z M 6.6661126,3.9983363 2.6644481,8.0000008 H 9.3338889 L 13.335553,3.9983363 Z m 0,5.3355526 -4.0016645,4.0016641 H 9.3338889 L 13.335553,9.3338889 Z m -6.66944083,2.6677771 v 1.333887 1.333889 1.333888 H 3.9983363 V 14.669442 H 1.33056 v -1.333889 -1.333887 z m 14.67277023,0 v 1.333887 1.333889 h -1.333889 -1.333887 v 1.333888 h 1.333887 1.333889 1.333888 v -2.667777 -1.333887 z"
-     class="ColorScheme-Text"
-     id="path4"
-     inkscape:connector-curvature="0" />
+     style="fill:#232629;fill-opacity:1;stroke:none"
+     d="M 5 5 L 2 8 L 11 8 L 14 5 L 5 5 z M 5 9 L 2 12 L 11 12 L 14 9 L 5 9 z "
+     class="ColorScheme-Highlight"
+     id="path4" />
+  <style
+     id="current-color-scheme-3"
+     type="text/css">
+        .ColorScheme-Text {
+            color:#232629;
+        }
+    </style>
 </svg>
