@@ -5,18 +5,20 @@ about=The PCA4CD is a Qgis plugin to build the change detection layer using the 
     Designed mainly with the goal of generating or load the principal components (PCA) and build the change
     detection layer based on the dimensionality reduction properties.
 
-version=19.6.18
+version=19.6.23
 qgisMinimumVersion=3.0
 qgisMaximumVersion=3.99
 
 author=Xavier Corredor Llano, SMByC
 email=xcorredorl@ideam.gov.co
 
-homepage=https://github.com/SMByC/PCA4CD/src
+homepage=https://github.com/SMByC/PCA4CD
 tracker=https://github.com/SMByC/PCA4CD/issues
-repository=https://github.com/SMByC/PCA4CD/src
+repository=https://github.com/SMByC/PCA4CD
 
 changelog=
+    19.6.23:
+    - Fix links
     19.6.18:
     - Fix functions to get the file path of layer or file selected in combobox
     - Fix getting the files path using Pathlib library
@@ -26,7 +28,7 @@ changelog=
     - Others minor improvements and fixes
 
     Previous versions:
-    - All commits in: https://github.com/SMByC/PCA4CD/commits/all
+    - All commits in: https://github.com/SMByC/PCA4CD/commits
 
 tags=pca,principal components analysis,analysis,change detection,raster,remote sensing
 
