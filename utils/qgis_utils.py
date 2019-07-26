@@ -33,7 +33,7 @@ from qgis.utils import iface
 
 def get_file_path_of_layer(layer):
     if layer and layer.isValid():
-        return Path(layer.source())
+        return Path(os.path.realpath(layer.source().split("|layername")[0]))
     return ""
 
 
