@@ -1,19 +1,24 @@
-# PCA4CD - PCA for change detection #
+# PCA4CD - PCA for change detection
+
+![](icons/pca4cd.svg)
 
 The PCA4CD is a Qgis plugin to build the change detection layer using the principal components method. Designed mainly with the goal of:
 
 1. generate or load the principal components (PCA)
 2. and build the change detection layer based on the dimensionality reduction properties.
 
-## Documentation
+![](docs/img/overview.png)
 
-Home page documentation: [https://smbyc.bitbucket.io/qgisplugins/pca4cd](https://smbyc.bitbucket.io/qgisplugins/pca4cd)
+Read more in: [https://smbyc.github.io/PCA4CD](https://smbyc.github.io/PCA4CD)
 
 ## Installation
 
 The plugin can be installed using the QGIS Plugin Manager, go into Qgis to `Plugins` menu and `Manage and install plugins`, in `All` section search for `PCA4CD`.
 
 The plugin will be available in the `Plugins` menu and `Plugins toolbar`.
+
+> *Warning:* 
+    This plugin only works in Qgis version >= 3.4, is very recommended use the latest available version of Qgis 3 with Python environment 3.7 due to the dependencies and some problems with Dask library.
 
 ### Additional Python packages
 
@@ -22,7 +27,17 @@ PCA4CD requires additional Python packages to function, that are generally not p
 * Python-Dask
 * PyQtGraph
 
-The way for have that: First way (recommended and automatic) is that the plugin (when is installing or updating) will be installed into a separate folder specific to PCA4CD and will not influence any existing Python installation. Second, install it in your system python installation first before install the plugin, but depends of the operating system to work.
+The way for have that:
+
+1. First way (recommended) the plugin install automatically it when is installing or updating, it will be installed into a separate folder specific to PCA4CD and will not influence any existing Python installation or Qgis environment:
+
+    >Windows: ~\AppData\Local\pca4cd\  
+    >macOS: ~/Library/Application Support/pca4cd/  
+    >Linux: ~/.local/share/pca4cd/
+
+2. Second, install it in your system python installation first before install the plugin, but depends of the operating system to work. E.g. for Ubuntu and derivatives distributions:
+
+    >sudo apt install python3-pyqtgraph python3-dask
 
 ## Source code
 

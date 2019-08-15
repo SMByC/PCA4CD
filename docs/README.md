@@ -1,4 +1,11 @@
-# How to use
+# PCA4CD
+
+![](../icons/pca4cd.svg)
+
+The PCA4CD is a Qgis plugin to build the change detection layer using the principal components method. Designed mainly with the goal of:
+
+1. generate or load the principal components (PCA)
+2. and build the change detection layer based on the dimensionality reduction properties.
 
 First, the main window is divided by two sections:
 
@@ -19,8 +26,8 @@ The following steps are:
 
 Select one or two input layer with or without multi-bands. If you use one layer (A) you must have all bands to process in it, instead if you want, for example, analysis two different periods for the same region is better use two layers, you can put the reference layer in (A) and the target layer in (B).
 
-!!! warning "If use A and B layers:"
-    The plugin required that both layers have the same extent, the same pixel size and same projection.
+> *Warning:* 
+    If use A and B layers,the plugin required that both layers have the same extent, the same pixel size and same projection.
 
 Is important to know that each band in A (and B if enabled) is a variable for PCA, then the maximum number of components for compute is the total of bands in A (plus bands in B).
 
@@ -113,3 +120,19 @@ Choose the method for merge, select the file for store the final merge layer and
 The merged change layer is saved and loaded for all view in the first row, is loaded (if was activated) in Qgis too. You can adjusted/regenerated it changing the detection layer by components and merge again.
 
 Finally you can close the plugin and continue the analysis and adjustments of the final layer in Qgis.
+
+## About us
+
+PCA4CD was developing, designed and implemented by the Group of Forest and Carbon Monitoring System (SMByC), operated by the Institute of Hydrology, Meteorology and Environmental Studies (IDEAM) - Colombia.
+
+Author and developer: *Xavier Corredor Ll.*  
+Theoretical support, tester and product verification: SMByC-PDI group
+
+### Contact
+
+Xavier Corredor Ll.: *xcorredorl (a) ideam.gov.co*  
+SMByC: *smbyc (a) ideam.gov.co*
+
+## License
+
+PCA4CD is a free/libre software and is licensed under the GNU General Public License.
