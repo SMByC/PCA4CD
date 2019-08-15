@@ -1,6 +1,6 @@
 # PCA4CD
 
-![](../icons/pca4cd.svg)
+![](img/favicon.png)
 
 The PCA4CD is a Qgis plugin to build the change detection layer using the principal components method. Designed mainly with the goal of:
 
@@ -20,7 +20,7 @@ The following steps are:
 
 ## 1a. Compute the principal components
 
-<img src="../img/1a.png" width="38%">
+<img src="img/1a.png" width="38%">
 
 ### Input layers
 
@@ -53,7 +53,7 @@ To compute the principal components for a image, like a Landsat scene or more bi
 
 ## 1b. Load the principal components
 
-<img src="../img/1b.png" width="38%">
+<img src="img/1b.png" width="38%">
 
 This is for analysis and creates the change layer of the principal components already generated, then you must load the principal components externally, this could have been generated with this plugin or not, but is important that bands are in order respect to the components of PCA.
 
@@ -63,7 +63,7 @@ The no data value is very important to set if the image have no valid value. The
 
 After compute or load the principal components, the plugin open the following change detection analysis dialog:
 
-<img src="../img/2a.png" width="90%">
+<img src="img/2a.png" width="90%">
 
 **A. Principal row:** In the center in the first row, the original input layer A (and B) is shown, these could be used as a reference of analysis, however you can change it if you want.
 
@@ -77,7 +77,7 @@ After compute or load the principal components, the plugin open the following ch
 
 Use the principal row (input and auxiliary layers) in the "change detection analysis" dialog to find and choose the better components (one or more) that capture the changes you want.
 
-<img src="../img/2b.png" width="30%">
+<img src="img/2b.png" width="30%">
 
 In this example, I picked the component 3 and 8
 
@@ -85,37 +85,37 @@ In this example, I picked the component 3 and 8
 
 **F. Change detection layer:** This open the "Component Analysis" dialog for this principal component.
 
-<img src="../img/2c.png" width="70%">
+<img src="img/2c.png" width="70%">
 
 With this dialog, you can generate the change detection layer using a range of values (lower and upper). The plugin provides three ways for choosing the correct range of values depends on you looking for.
 
 1. **Using the mouse picker:** Pick the value using the mouse over the image using the _from value_ picker and _to value_ picker mouse tool. The value is fixed using the left mouse button. When the two values are set, click in _Generate_ for compute the change detection layer.
 
-    <img src="../img/2d.png" width="60%">
+    <img src="img/2d.png" width="60%">
 
 2. **Using AOI picker:** You can use several areas of interest using the AOI picker to capturing the values in the image that represent the change you want of this component. The plugin updates the statistics automatically for the pixels inside the AOIs and computes the minimum and maximum as the range of the change detection layer.
 
     Tips for the AOI picker: _left mouse button_ for create new point of the AOI, _esc_ or _backspace_ keyboard key for delete the last point, _right mouse button_ for finish the current AOI. The change detection layer is automatically created/updated every new AOI.
 
-    <img src="../img/2e.png" width="75%">
+    <img src="img/2e.png" width="75%">
 
 3. **Using the histogram:** The histogram is interactive, you can zoom in/out and stretch. The range values is the yellow area, you can change it manually with the mouse, when the yellow area is changed the range values change automatically (and vice versa), then do click in _Generate_ for compute the change detection layer.
 
-    <img src="../img/2f.png" width="75%">
+    <img src="img/2f.png" width="75%">
 
 ### 2b. Generate the merge change layer
 
 When you have generated all change layers by components, you must active/enable the change detection layers (E button) for all layer that you want inside the final change layer.
 
-<img src="../img/2g.png" width="70%">
+<img src="img/2g.png" width="70%">
 
 then do click on "Generate/Save the Merged Change Layer" button, this open the merge dialog:
 
-<img src="../img/2h.png" width="45%">
+<img src="img/2h.png" width="45%">
 
 Choose the method for merge, select the file for store the final merge layer and do click in Ok button.
 
-<img src="../img/2i.png" width="70%">
+<img src="img/2i.png" width="70%">
 
 The merged change layer is saved and loaded for all view in the first row, is loaded (if was activated) in Qgis too. You can adjusted/regenerated it changing the detection layer by components and merge again.
 
