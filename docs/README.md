@@ -1,6 +1,6 @@
 # PCA4CD
 
-<img src="img/favicon.png" width="50%">
+<img src="img/favicon.png" width="30%">
 
 The PCA4CD is a Qgis plugin to build the change detection layer using the principal components method. Designed mainly with the goal of:
 
