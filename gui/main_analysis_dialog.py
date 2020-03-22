@@ -20,8 +20,9 @@
 """
 import os
 import platform
+import shutil
 import tempfile
-from subprocess import call
+import subprocess
 
 import numpy as np
 from pathlib import Path
@@ -273,13 +274,9 @@ class MainAnalysisDialog(QDialog, FORM_CLASS):
             cmd = ['gdal_merge' if platform.system() == 'Windows' else 'gdal_merge.py', '-q'] + \
                   ['', '-separate', '-of', 'GTiff', '-o', '"{}"'.format(file_out)] + nodata + \
                   ['"{}"'.format(get_file_path_of_layer(layer)) for layer in self.pca_layers]
-            return_code = call(" ".join(cmd), shell=True)
+            subprocess.run(cmd)
 
-            if return_code != 0:
-                self.MsgBar.pushMessage("Error during saving the PCA stack, check the Qgis log", level=Qgis.Critical)
-                return
-            else:
-                self.MsgBar.pushMessage("PCA stack saved successfully: \"{}\"".format(os.path.basename(file_out)), level=Qgis.Success)
+            self.MsgBar.pushMessage("PCA stack saved successfully: \"{}\"".format(os.path.basename(file_out)), level=Qgis.Success)
 
         if file_out != '':
             save()
@@ -312,7 +309,6 @@ class MainAnalysisDialog(QDialog, FORM_CLASS):
             self.do_merge_change_layers(merge_dialog)
 
     @pyqtSlot()
-    @wait_process
     def do_merge_change_layers(self, merge_dialog):
         merged_change_layer = Path(merge_dialog.MergeFileWidget.filePath())
         MergeChangeLayersDialog.merged_file_path = merged_change_layer
@@ -321,38 +317,33 @@ class MainAnalysisDialog(QDialog, FORM_CLASS):
 
         merge_method = merge_dialog.MergeMethod.currentText()
 
-        if merge_method == "Union":
-            cmd = ['gdal_merge' if platform.system() == 'Windows' else 'gdal_merge.py', '-q',
-                   '-of', 'GTiff', '-o', '"{}"'.format(merged_change_layer), '-n', '0', '-a_nodata', '0', '-ot', 'Byte'] + \
-                  ['"{}"'.format(get_file_path_of_layer(layer)) for layer in self.activated_change_layers]
-            return_code = call(" ".join(cmd), shell=True)
+        if len(self.activated_change_layers) == 1:
+            shutil.copy(get_file_path_of_layer(self.activated_change_layers[0]), merged_change_layer)
 
-            if return_code != 0:
-                self.MsgBar.pushMessage("Error during merging the change layers, check the Qgis log", level=Qgis.Critical)
-                return
+        if len(self.activated_change_layers) > 1 and merge_method == "Union":
+            cmd = ['gdal_merge' if platform.system() == 'Windows' else 'gdal_merge.py',
+                   '-of', 'GTiff', '-o', str(merged_change_layer), '-n', '0', '-a_nodata', '0', '-ot',
+                   'Byte'] + [str(get_file_path_of_layer(layer)) for layer in self.activated_change_layers]
+            subprocess.run(cmd)
 
-        if merge_method == "Intersection":
+        if len(self.activated_change_layers) > 1 and merge_method == "Intersection":
             alpha_list = ["A", "B", "C", "D", "E", "F", "G", "H", "I", "J", "K", "L", "M", "N", "O", "P", "Q", "R", "S",
                           "T", "U", "V", "W", "X", "Y", "Z"]
             input_files = {alpha_list[x]: str(get_file_path_of_layer(f)) for x, f in enumerate(self.activated_change_layers)}
             filter_ones = ",".join([alpha_list[x] + "==1" for x in range(len(self.activated_change_layers))])
             filter_zeros = ",".join([alpha_list[x] + "==0" for x in range(len(self.activated_change_layers))])
 
-            cmd = ['gdal_calc' if platform.system() == 'Windows' else 'gdal_calc.py', '--quiet', '--overwrite',
-                   '--calc "0*(numpy.any([{filter_zeros}], axis=0)) + 1*(numpy.all([{filter_ones}], axis=0))"'
-                   .format(filter_zeros=filter_zeros, filter_ones=filter_ones),
-                   '--outfile "{}"'.format(merged_change_layer), '--NoDataValue=0', '--type="Byte"'] + \
-                  ['-{} "{}"'.format(letter, filepath) for letter, filepath in input_files.items()]
-            return_code = call(" ".join(cmd), shell=True)
-
-            if return_code != 0:
-                self.MsgBar.pushMessage("Error during merging the change layers, check the Qgis log", level=Qgis.Critical)
-                return
+            cmd = ['gdal_calc' if platform.system() == 'Windows' else 'gdal_calc.py', '--overwrite',
+                   '--calc', '0*(numpy.any([{filter_zeros}], axis=0)) + 1*(numpy.all([{filter_ones}], axis=0))'
+                       .format(filter_zeros=filter_zeros, filter_ones=filter_ones),
+                   '--outfile', str(merged_change_layer), '--NoDataValue=0', '--type=Byte'] + \
+                  [i for sl in [["-{}".format(letter), filepath] for letter, filepath in input_files.items()] for i in sl]
+            subprocess.run(cmd)
 
         # unset nodata
         cmd = ['gdal_edit' if platform.system() == 'Windows' else 'gdal_edit.py',
                '"{}"'.format(merged_change_layer), '-unsetnodata']
-        call(" ".join(cmd), shell=True)
+        subprocess.run(cmd)
         # apply style
         merged_layer = load_layer(merged_change_layer, add_to_legend=True if merge_dialog.LoadInQgis.isChecked() else False)
         apply_symbology(merged_layer, [("0", 0, (255, 255, 255, 0)), ("1", 1, (255, 255, 0, 255))])
