@@ -47,7 +47,9 @@ class MergeChangeLayersDialog(QDialog, FORM_CLASS):
             self.MergeFileWidget.setFilePath(suggested_filename)
 
         if len(activated_ids) == 1:
+            self.setWindowTitle("Save and load the change layer selected")
             self.LabelMergeMethod.setEnabled(False)
+            self.LabelMergeMethod.setText("To use combination method, you must create and activate more than one detection layer")
             self.MergeMethod.setEnabled(False)
             self.LabelMergeFileWidget.setText("Save the change layer")
             self.MergeFileWidget.setDialogTitle("Save the change layer")

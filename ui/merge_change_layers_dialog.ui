@@ -74,6 +74,9 @@
      <property name="text">
       <string>Choose the method for merge the change layers:</string>
      </property>
+     <property name="wordWrap">
+      <bool>true</bool>
+     </property>
     </widget>
    </item>
    <item>
