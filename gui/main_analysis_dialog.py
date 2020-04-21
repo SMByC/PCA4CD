@@ -274,7 +274,7 @@ class MainAnalysisDialog(QDialog, FORM_CLASS):
             cmd = ['gdal_merge' if platform.system() == 'Windows' else 'gdal_merge.py', '-q'] + \
                   ['', '-separate', '-of', 'GTiff', '-o', '"{}"'.format(file_out)] + nodata + \
                   ['"{}"'.format(get_file_path_of_layer(layer)) for layer in self.pca_layers]
-            subprocess.run(cmd)
+            subprocess.run(" ".join(cmd), shell=True)
 
             self.MsgBar.pushMessage("PCA stack saved successfully: \"{}\"".format(os.path.basename(file_out)), level=Qgis.Success)
 
@@ -324,7 +324,7 @@ class MainAnalysisDialog(QDialog, FORM_CLASS):
             cmd = ['gdal_merge' if platform.system() == 'Windows' else 'gdal_merge.py',
                    '-of', 'GTiff', '-o', str(merged_change_layer), '-n', '0', '-a_nodata', '0', '-ot',
                    'Byte'] + [str(get_file_path_of_layer(layer)) for layer in self.activated_change_layers]
-            subprocess.run(cmd)
+            subprocess.run(" ".join(cmd), shell=True)
 
         if len(self.activated_change_layers) > 1 and merge_method == "Intersection":
             alpha_list = ["A", "B", "C", "D", "E", "F", "G", "H", "I", "J", "K", "L", "M", "N", "O", "P", "Q", "R", "S",
@@ -338,12 +338,12 @@ class MainAnalysisDialog(QDialog, FORM_CLASS):
                        .format(filter_zeros=filter_zeros, filter_ones=filter_ones),
                    '--outfile', str(merged_change_layer), '--NoDataValue=0', '--type=Byte'] + \
                   [i for sl in [["-{}".format(letter), filepath] for letter, filepath in input_files.items()] for i in sl]
-            subprocess.run(cmd)
+            subprocess.run(" ".join(cmd), shell=True)
 
         # unset nodata
         cmd = ['gdal_edit' if platform.system() == 'Windows' else 'gdal_edit.py',
                '"{}"'.format(merged_change_layer), '-unsetnodata']
-        subprocess.run(cmd)
+        subprocess.run(" ".join(cmd), shell=True)
         # apply style
         merged_layer = load_layer(merged_change_layer, add_to_legend=True if merge_dialog.LoadInQgis.isChecked() else False)
         apply_symbology(merged_layer, [("0", 0, (255, 255, 255, 0)), ("1", 1, (255, 255, 0, 255))])
