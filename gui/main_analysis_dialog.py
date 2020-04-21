@@ -334,7 +334,7 @@ class MainAnalysisDialog(QDialog, FORM_CLASS):
             filter_zeros = ",".join([alpha_list[x] + "==0" for x in range(len(self.activated_change_layers))])
 
             cmd = ['gdal_calc' if platform.system() == 'Windows' else 'gdal_calc.py', '--overwrite',
-                   '--calc', '0*(numpy.any([{filter_zeros}], axis=0)) + 1*(numpy.all([{filter_ones}], axis=0))'
+                   '--calc', '"0*(numpy.any([{filter_zeros}], axis=0)) + 1*(numpy.all([{filter_ones}], axis=0))"'
                        .format(filter_zeros=filter_zeros, filter_ones=filter_ones),
                    '--outfile', str(merged_change_layer), '--NoDataValue=0', '--type=Byte'] + \
                   [i for sl in [["-{}".format(letter), filepath] for letter, filepath in input_files.items()] for i in sl]
