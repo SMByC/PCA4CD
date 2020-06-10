@@ -322,7 +322,7 @@ class MainAnalysisDialog(QDialog, FORM_CLASS):
 
         if len(self.activated_change_layers) > 1 and merge_method == "Union":
             cmd = ['gdal_merge' if platform.system() == 'Windows' else 'gdal_merge.py',
-                   '-of', 'GTiff', '-o', str(merged_change_layer), '-n', '0', '-a_nodata', '0', '-ot',
+                   '-of', 'GTiff', '-o', '"{}"'.format(merged_change_layer), '-n', '0', '-a_nodata', '0', '-ot',
                    'Byte'] + [str(get_file_path_of_layer(layer)) for layer in self.activated_change_layers]
             subprocess.run(" ".join(cmd), shell=True)
 
@@ -336,7 +336,7 @@ class MainAnalysisDialog(QDialog, FORM_CLASS):
             cmd = ['gdal_calc' if platform.system() == 'Windows' else 'gdal_calc.py', '--overwrite',
                    '--calc', '"0*(numpy.any([{filter_zeros}], axis=0)) + 1*(numpy.all([{filter_ones}], axis=0))"'
                        .format(filter_zeros=filter_zeros, filter_ones=filter_ones),
-                   '--outfile', str(merged_change_layer), '--NoDataValue=0', '--type=Byte'] + \
+                   '--outfile', '"{}"'.format(merged_change_layer), '--NoDataValue=0', '--type=Byte'] + \
                   [i for sl in [["-{}".format(letter), filepath] for letter, filepath in input_files.items()] for i in sl]
             subprocess.run(" ".join(cmd), shell=True)
 
