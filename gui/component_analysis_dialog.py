@@ -186,7 +186,7 @@ class ComponentAnalysisDialog(QWidget, FORM_CLASS):
         # active/deactive
         self.ShowHideChangeDetection.toggled.connect(self.detection_layer_toggled)
         # init temporal AOI layer
-        self.aoi_features = QgsVectorLayer("Polygon?crs=" + self.pc_layer.crs().toWkt(), "aoi", "memory")
+        self.aoi_features = QgsVectorLayer("MultiPolygon?crs=" + self.pc_layer.crs().toWkt(), "aoi", "memory")
         # aoi
         self.rubber_bands = []
         self.tmp_rubber_band = []
