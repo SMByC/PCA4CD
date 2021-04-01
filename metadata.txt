@@ -5,7 +5,7 @@ about=The PCA4CD is a Qgis plugin to build the change detection layer using the 
     Designed mainly with the goal of generating or load the principal components (PCA) and build the change
     detection layer based on the dimensionality reduction properties.
 
-version=21.2.27
+version=21.4.1
 qgisMinimumVersion=3.0
 qgisMaximumVersion=3.99
 
@@ -17,8 +17,8 @@ tracker=https://github.com/SMByC/PCA4CD/issues
 repository=https://github.com/SMByC/PCA4CD
 
 changelog=
-    21.2.27:
-    - Fix bug while the plugin is storing the AOIs from rubber bands to a QgsVectorLayer instance, issue #8
+    21.4.1:
+    - Force to use pyqtgraph 0.11.1 due to problems with the latest version of pyqtgraph >= 0.12
     - All commits in: https://github.com/SMByC/PCA4CD/commits
 
 tags=pca,principal components analysis,analysis,change detection,raster,remote sensing
