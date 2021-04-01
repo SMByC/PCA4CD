@@ -52,7 +52,7 @@ Dependency = namedtuple('Dep', ['name', 'min', 'install'])
 DEPS = [
     Dependency('dask', install=None, min='1.1.4'),
     Dependency('toolz', install=None, min=None),
-    Dependency('pyqtgraph', install=None, min='0.10.0'),
+    Dependency('pyqtgraph', install='0.11.1', min='0.11.1'),
 ]
 
 # Use a custom folder for the packages to avoid polluting the per-user site-packages.
@@ -74,6 +74,10 @@ LOG_PATH = os.path.join(INSTALL_PREFIX, 'pip.log')
 
 
 def load_install_extra_deps():
+    # clean libs installed due to problems with pyqtgraph > 0.11.1  TODO delete after some time
+    if os.path.isdir(os.path.join(INSTALL_PREFIX, 'Lib', 'site-packages', 'pyqtgraph-0.12.0.dist-info')):
+        shutil.rmtree(os.path.join(DATA_HOME, 'pca4cd'), ignore_errors=True)
+
     # Add custom folder to search path.
     for path in site.getsitepackages(prefixes=[INSTALL_PREFIX]):
         if not path.startswith(INSTALL_PREFIX):
