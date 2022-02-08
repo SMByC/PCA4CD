@@ -22,7 +22,7 @@ The plugin will be available in the `Plugins` menu and `Plugins toolbar`.
 
 ### Additional Python packages
 
-PCA4CD requires additional Python packages to function, that are generally not part of QGIS's Python. These are:
+PCA4CD requires additional Python packages, that are generally not part of QGIS's Python. These are:
 
 * Python-Dask
 * PyQtGraph
