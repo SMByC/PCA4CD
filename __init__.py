@@ -19,11 +19,31 @@
  ***************************************************************************/
  This script initializes the plugin, making it known to QGIS.
 """
+import os
+import platform
+import site
+import pkg_resources
 
 from qgis.PyQt.QtCore import QCoreApplication
 from qgis.PyQt.QtWidgets import QMessageBox
 
 from pca4cd.utils.extra_deps import load_install_extra_deps, WaitDialog
+
+
+def pre_init_plugin_libs_inside():
+    if platform.system() == "Windows":
+        extlib_path = 'extlibs_windows'
+    # if platform.system() == "Darwin":
+    #     extlib_path = 'extlibs_darwin'
+    # if platform.system() == "Linux":
+    #     extlib_path = 'extlibs_linux'
+    extra_libs_path = os.path.abspath(os.path.join(os.path.dirname(__file__), extlib_path))
+
+    if os.path.isdir(extra_libs_path):
+        # add to python path
+        site.addsitedir(extra_libs_path)
+        # pkg_resources doesn't listen to changes on sys.path.
+        pkg_resources.working_set.add_entry(extra_libs_path)
 
 
 def pre_init_plugin(iface):
@@ -58,7 +78,10 @@ def classFactory(iface):  # pylint: disable=invalid-name
     :type iface: QgsInterface
     """
     # load/install extra python dependencies
-    pre_init_plugin(iface)
+    if platform.system() == "Windows":
+        pre_init_plugin_libs_inside()
+    else:
+        pre_init_plugin(iface)
 
     # start
     from .pca4cd import PCA4CD
