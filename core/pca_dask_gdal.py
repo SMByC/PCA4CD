@@ -51,14 +51,18 @@ def pca(A, B, n_pc, estimator_matrix, out_dir, n_threads, block_size, nodata=Non
     src_ds_B = None
     for band in range(src_ds_A.RasterCount):
         ds = src_ds_A.GetRasterBand(band + 1).ReadAsArray().flatten().astype(np.float32)
-        if nodata is not None:
+        if np.isnan(nodata):
+            nodata_mask = np.isnan(ds) if nodata_mask is None else np.logical_or(nodata_mask, np.isnan(ds))
+        elif nodata is not None:
             nodata_mask = ds==nodata if nodata_mask is None else np.logical_or(nodata_mask, ds==nodata)
         raw_image.append(ds)
     if B:
         src_ds_B = gdal.Open(str(B), gdal.GA_ReadOnly)
         for band in range(src_ds_B.RasterCount):
             ds = src_ds_B.GetRasterBand(band + 1).ReadAsArray().flatten().astype(np.float32)
-            if nodata is not None:
+            if np.isnan(nodata):
+                nodata_mask = np.logical_or(nodata_mask, np.isnan(ds))
+            elif nodata is not None:
                 nodata_mask = np.logical_or(nodata_mask, ds==nodata)
             raw_image.append(ds)
 
@@ -95,7 +99,7 @@ def pca(A, B, n_pc, estimator_matrix, out_dir, n_threads, block_size, nodata=Non
                 estimation_matrix[j][i] = estimation_matrix[i][j] = \
                     da.cov(deviation_scores_band_i, deviation_scores_band_j)[0][1]
     # free mem
-    del raw_image, flat_dims, src_ds_B, ds
+    del raw_image, flat_dims, ds
 
     ########
     # calculate eigenvectors & eigenvalues of the matrix
@@ -130,7 +134,7 @@ def pca(A, B, n_pc, estimator_matrix, out_dir, n_threads, block_size, nodata=Non
             pc = pc + eigenvectors[j, i] * (get_raw_band_from_stack(j) - band_mean[j])
 
         if nodata is not None:
-            pc[nodata_mask] = 0
+            pc[nodata_mask] = nodata
         pc = pc.reshape((src_ds_A.RasterYSize, src_ds_A.RasterXSize))
         # save component as file
         tmp_pca_file = Path(out_dir) / 'pc_{}.tif'.format(i+1)
@@ -138,7 +142,7 @@ def pca(A, B, n_pc, estimator_matrix, out_dir, n_threads, block_size, nodata=Non
         out_pc = driver.Create(str(tmp_pca_file), src_ds_A.RasterXSize, src_ds_A.RasterYSize, 1, gdal.GDT_Float32)
         pcband = out_pc.GetRasterBand(1)
         if nodata is not None:
-            pcband.SetNoDataValue(0)
+            pcband.SetNoDataValue(nodata)
         pcband.WriteArray(pc)
         # set projection and geotransform
         if src_ds_A.GetGeoTransform() is not None:

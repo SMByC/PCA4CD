@@ -125,7 +125,7 @@ class PCA4CDDialog(QDialog, FORM_CLASS):
     def set_nodata_value_in_computePC(self):
         if hasattr(self.QCBox_InputData_A.currentLayer(), "dataProvider"):
             nodata_value = self.QCBox_InputData_A.currentLayer().dataProvider().sourceNoDataValue(1)
-            nodata_value = str(nodata_value) if not np.isnan(nodata_value) else ""
+            nodata_value = str(nodata_value)
             self.NoData_ComputePCA.setText(nodata_value)
 
     @pyqtSlot()
@@ -186,10 +186,12 @@ class PCA4CDDialog(QDialog, FORM_CLASS):
         if not self.check_input_layers(self.QCBox_InputData_A.currentLayer(), self.QCBox_InputData_B.currentLayer()):
             return
         # check the nodata value
-        nodata = self.NoData_ComputePCA.text() if self.NoData_ComputePCA.text() not in ["", "None", "nan"] else None
+        nodata = self.NoData_ComputePCA.text() if self.NoData_ComputePCA.text() not in ["", "None"] else None
         if nodata is not None:
             try:
                 nodata = float(nodata)
+                if np.isnan(nodata):
+                    nodata = np.nan
             except:
                 self.MsgBar.pushMessage("The nodata value is not valid", level=Qgis.Warning)
                 return
@@ -218,7 +220,7 @@ class PCA4CDDialog(QDialog, FORM_CLASS):
         self.main_analysis_dialog = MainAnalysisDialog(current_layer_A, current_layer_B, pca_layers, pca_stats, nodata)
         # open dialog
         self.main_analysis_dialog.show()
-        self.main_analysis_dialog.update_pc_style()
+        self.main_analysis_dialog.update_pc_style(nodata)
 
     @pyqtSlot()
     @wait_process
@@ -254,4 +256,4 @@ class PCA4CDDialog(QDialog, FORM_CLASS):
         self.main_analysis_dialog = MainAnalysisDialog(None, None, pca_layers, pca_stats, nodata)
         # open dialog
         self.main_analysis_dialog.show()
-        self.main_analysis_dialog.update_pc_style()
+        self.main_analysis_dialog.update_pc_style(nodata)

@@ -237,14 +237,17 @@ class MainAnalysisDialog(QDialog, FORM_CLASS):
             super(MainAnalysisDialog, self).reject()
 
     @wait_process
-    def update_pc_style(self):
+    def update_pc_style(self, nodata):
         """Update the grey style using mean+-5*std for all principal components
         """
         for view_widget in MainAnalysisDialog.view_widgets:
             if view_widget.pc_id is not None:
                 src_ds = gdal.Open(str(get_file_path_of_layer(view_widget.render_widget.layer)), gdal.GA_ReadOnly)
                 ds = src_ds.GetRasterBand(1).ReadAsArray().flatten().astype(np.float32)
-                ds = ds[ds != 0]
+                if np.isnan(nodata):
+                    ds = ds[~np.isnan(ds)]
+                else:
+                    ds = ds[ds != nodata]
                 try:
                     mean = np.mean(ds)
                     std = np.std(ds)
