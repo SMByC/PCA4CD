@@ -120,11 +120,9 @@ def pca(A, B, n_pc, estimator_matrix, out_dir, n_threads, block_size, nodata=Non
     # save the principal components separated in tif images
 
     def get_raw_band_from_stack(band):
-        src_ds_A = gdal.Open(str(A), gdal.GA_ReadOnly)
         if band < src_ds_A.RasterCount:
             return src_ds_A.GetRasterBand(band + 1).ReadAsArray().flatten().astype(np.float32)
         if band >= src_ds_A.RasterCount:
-            src_ds_B = gdal.Open(str(B), gdal.GA_ReadOnly)
             return src_ds_B.GetRasterBand(band - src_ds_A.RasterCount + 1).ReadAsArray().flatten().astype(np.float32)
 
     pca_files = []
