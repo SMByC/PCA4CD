@@ -31,7 +31,6 @@ from qgis.PyQt.QtCore import QTimer, Qt, pyqtSlot
 from qgis.PyQt.QtGui import QColor
 from qgis.PyQt.QtWidgets import QWidget
 from osgeo import gdal
-from osgeo.gdalconst import GA_ReadOnly
 
 from qgis.PyQt import uic
 from qgis.core import QgsRaster, QgsWkbTypes, QgsFeature, QgsVectorLayer, QgsProject
@@ -214,9 +213,10 @@ class ComponentAnalysisDialog(QWidget, FORM_CLASS):
         self.RangeChangeFrom.valueChanged.connect(self.update_region_from_values)
         self.RangeChangeTo.valueChanged.connect(self.update_region_from_values)
         # statistics for current principal component
-        self.pc_gdal_ds = gdal.Open(str(get_file_path_of_layer(self.pc_layer)), GA_ReadOnly)
+        self.pc_gdal_ds = gdal.Open(str(get_file_path_of_layer(self.pc_layer)), gdal.GA_ReadOnly)
         self.pc_data = self.pc_gdal_ds.GetRasterBand(1).ReadAsArray()
         self.pc_data_flat = self.pc_data.flatten()
+        self.pc_data_flat = self.pc_data_flat[~np.isnan(self.pc_data_flat)]
         self.stats_pc = None  # store stats done for principal components
         from pca4cd.gui.main_analysis_dialog import MainAnalysisDialog
         if MainAnalysisDialog.nodata is not None:
@@ -470,13 +470,12 @@ class ComponentAnalysisDialog(QWidget, FORM_CLASS):
                 self.aoi_features.addFeature(new_feature)
         # clip the raster component in AOI for get only the pixel values inside it
         pc_aoi = Path(pca4cd.tmp_dir, self.pc_layer.name() + "_clip_aoi.tif")
-        clip_raster_with_shape(self.pc_layer, self.aoi_features, str(pc_aoi))
-        dataset = gdal.Open(str(pc_aoi), GA_ReadOnly)
-        band = dataset.GetRasterBand(1).ReadAsArray()
-        self.aoi_data = band.flatten()
-        self.aoi_data = np.delete(self.aoi_data, np.where(self.aoi_data == 0))
-        if MainAnalysisDialog.nodata is not None:
+        clip_raster_with_shape(self.pc_layer, self.aoi_features, str(pc_aoi), MainAnalysisDialog.nodata)
+        dataset = gdal.Open(str(pc_aoi), gdal.GA_ReadOnly)
+        self.aoi_data = dataset.GetRasterBand(1).ReadAsArray().flatten()
+        if MainAnalysisDialog.nodata is not None and not np.isnan(MainAnalysisDialog.nodata):
             self.aoi_data = np.delete(self.aoi_data, np.where(self.aoi_data == MainAnalysisDialog.nodata))
+        self.aoi_data = np.delete(self.aoi_data, np.where(np.isnan(self.aoi_data)))
         if self.aoi_data.size == 0:
             self.aoi_data = np.array([np.nan])
         # update statistics and histogram plot
@@ -495,7 +494,7 @@ class ComponentAnalysisDialog(QWidget, FORM_CLASS):
         self.UndoAOI.setEnabled(True)
         self.DeleteAllAOI.setEnabled(True)
 
-        del dataset, band
+        del dataset
         if pc_aoi.is_file():
             os.remove(pc_aoi)
 
