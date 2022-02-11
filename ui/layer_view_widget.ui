@@ -2,6 +2,14 @@
 <ui version="4.0">
  <class>ViewWidget</class>
  <widget class="QWidget" name="ViewWidget">
+  <property name="geometry">
+   <rect>
+    <x>0</x>
+    <y>0</y>
+    <width>337</width>
+    <height>189</height>
+   </rect>
+  </property>
   <layout class="QVBoxLayout" name="verticalLayout">
    <property name="spacing">
     <number>3</number>
@@ -179,7 +187,7 @@
    <item>
     <widget class="QWidget" name="WidgetDetectionLayer" native="true">
      <property name="enabled">
-      <bool>false</bool>
+      <bool>true</bool>
      </property>
      <layout class="QHBoxLayout" name="horizontalLayout_3">
       <property name="leftMargin">
@@ -209,6 +217,9 @@
       </item>
       <item>
        <widget class="QRadioButton" name="EnableChangeDetection">
+        <property name="enabled">
+         <bool>true</bool>
+        </property>
         <property name="maximumSize">
          <size>
           <width>16777215</width>
@@ -226,12 +237,15 @@
         <property name="text">
          <string/>
         </property>
+        <property name="checked">
+         <bool>true</bool>
+        </property>
        </widget>
       </item>
       <item>
        <widget class="QToolButton" name="QPBtn_ComponentAnalysisDialog">
         <property name="enabled">
-         <bool>false</bool>
+         <bool>true</bool>
         </property>
         <property name="maximumSize">
          <size>
@@ -302,12 +316,12 @@
    <slot>setEnabled(bool)</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>158</x>
-     <y>484</y>
+     <x>76</x>
+     <y>176</y>
     </hint>
     <hint type="destinationlabel">
-     <x>200</x>
-     <y>487</y>
+     <x>283</x>
+     <y>176</y>
     </hint>
    </hints>
   </connection>
