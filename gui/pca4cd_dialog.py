@@ -29,7 +29,7 @@ from osgeo import gdal
 
 from qgis.PyQt import uic
 from qgis.PyQt.QtCore import pyqtSignal, pyqtSlot, Qt
-from qgis.PyQt.QtWidgets import QFileDialog, QDialog
+from qgis.PyQt.QtWidgets import QFileDialog, QDialog, QMessageBox
 from qgis.core import QgsMapLayerProxyModel, Qgis
 
 from pca4cd.core.pca_dask_gdal import pca
@@ -203,6 +203,13 @@ class PCA4CDDialog(QDialog, FORM_CLASS):
 
         pca_files, pca_stats = pca(path_layer_A, path_layer_B, n_pc, estimator_matrix, pca4cd.tmp_dir,
                                    self.nThreads.value(), self.BlockSize.value(), nodata)
+
+        if pca_files is False and pca_stats is False:
+            self.MsgBar.pushMessage("Error calculating PCA", level=Qgis.Critical, duration=10)
+            quit_msg = "The estimation matrix is empty, that usually happens due to nodata values. " \
+                       "Check the nodata value set in the plugin correspond to the nodata of the layer selected."
+            QMessageBox.critical(self, 'Error calculating PCA', quit_msg, QMessageBox.Ok)
+            return
 
         pca_layers = []
         if pca_files:

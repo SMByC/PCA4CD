@@ -19,7 +19,6 @@
  ***************************************************************************/
 """
 from pathlib import Path
-
 import numpy as np
 import dask
 from osgeo import gdal
@@ -100,6 +99,9 @@ def pca(A, B, n_pc, estimator_matrix, out_dir, n_threads, block_size, nodata=Non
                     da.cov(deviation_scores_band_i, deviation_scores_band_j)[0][1]
     # free mem
     del raw_image, flat_dims, ds
+
+    if estimation_matrix[~np.isnan(estimation_matrix)].size == 0:
+        return False, False
 
     ########
     # calculate eigenvectors & eigenvalues of the matrix
