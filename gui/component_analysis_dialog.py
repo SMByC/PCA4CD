@@ -331,7 +331,7 @@ class ComponentAnalysisDialog(QWidget, FORM_CLASS):
         self.ShowHideChangeDetection.setChecked(True)
 
     def set_statistics(self, stats_for=None):
-        if stats_for == self.pc_name:
+        if stats_for is None or stats_for == self.pc_name:
             from pca4cd.gui.main_analysis_dialog import MainAnalysisDialog
             with block_signals_to(self.QCBox_StatsLayer):
                 self.QCBox_StatsLayer.setCurrentIndex(0)
@@ -479,7 +479,7 @@ class ComponentAnalysisDialog(QWidget, FORM_CLASS):
         if self.aoi_data.size == 0:
             self.aoi_data = np.array([np.nan])
         # update statistics and histogram plot
-        self.set_statistics(stats_for="Areas Of Interest")
+        self.set_statistics()
         # update range values using min/max of AOI with decimal adjusted for include in change layer
         range_from = np.floor(np.min(self.aoi_data)*1000000000)/1000000000
         range_to = np.ceil(np.max(self.aoi_data)*1000000000)/1000000000
@@ -526,7 +526,7 @@ class ComponentAnalysisDialog(QWidget, FORM_CLASS):
         self.aoi_features.dataProvider().truncate()
         # update statistics and histogram plot
         self.aoi_data = np.array([np.nan])
-        self.set_statistics(stats_for="Areas Of Interest")
+        self.set_statistics()
         # disable undo delete buttons
         self.UndoAOI.setEnabled(False)
         self.DeleteAllAOI.setEnabled(False)
