@@ -24,9 +24,7 @@ import platform
 import numpy as np
 from pathlib import Path
 from multiprocessing import cpu_count
-from dask import array as da
 
-import pyqtgraph as pg
 from qgis.PyQt.QtCore import QTimer, Qt, pyqtSlot
 from qgis.PyQt.QtGui import QColor
 from qgis.PyQt.QtWidgets import QWidget
@@ -157,6 +155,7 @@ FORM_CLASS, _ = uic.loadUiType(Path(plugin_folder, 'ui', 'component_analysis_dia
 class ComponentAnalysisDialog(QWidget, FORM_CLASS):
     @wait_process
     def __init__(self, parent_view_widget, parent=None):
+        import pyqtgraph as pg
         QWidget.__init__(self, parent)
         self.setupUi(self)
         self.is_opened = False
@@ -284,6 +283,7 @@ class ComponentAnalysisDialog(QWidget, FORM_CLASS):
     @pyqtSlot()
     @wait_process
     def generate_detection_layer(self):
+        from dask import array as da
         from pca4cd.pca4cd import PCA4CD as pca4cd
         detection_from = self.RangeChangeFrom.value()
         detection_to = self.RangeChangeTo.value()
@@ -345,6 +345,7 @@ class ComponentAnalysisDialog(QWidget, FORM_CLASS):
 
     @wait_process
     def statistics(self, data, pca_stats=None):
+        from dask import array as da
         # set headers
         if pca_stats:  # for pca
             if pca_stats["eigenvals"] is not None:
@@ -381,6 +382,7 @@ class ComponentAnalysisDialog(QWidget, FORM_CLASS):
     @pyqtSlot()
     @wait_process
     def histogram_plot(self, data=None, bins=None):
+        from dask import array as da
         # which plot
         stats_for = self.QCBox_StatsLayer.currentText()
         if stats_for == self.pc_name:

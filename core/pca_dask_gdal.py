@@ -20,9 +20,7 @@
 """
 from pathlib import Path
 import numpy as np
-import dask
 from osgeo import gdal
-from dask import array as da
 from multiprocessing.pool import ThreadPool
 from subprocess import call
 
@@ -41,6 +39,8 @@ def pca(A, B, n_pc, estimator_matrix, out_dir, n_threads, block_size, nodata=Non
     :param out_dir: directory to save the outputs
     :return: pca files list and statistics
     """
+    import dask
+    from dask import array as da
     # init dask as threads (shared memory is required)
     dask.config.set(pool=ThreadPool(n_threads))
 
