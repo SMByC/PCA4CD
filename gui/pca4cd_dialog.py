@@ -77,11 +77,11 @@ class PCA4CDDialog(QDialog, FORM_CLASS):
             import pyqtgraph as pg
             import dask
         except:
-            self.MsgBar.pushMessage("Loading PCA4CD: missing dependencies.", level=Qgis.Critical)
+            self.MsgBar.pushMessage("Error: missing dependencies.", level=Qgis.Critical)
             msg = "\nError loading PCA4CD, this plugin requires additional Python packages to work. " \
                   "There are some alternatives to supply these dependencies. Read the install instructions here:\n\n" \
                   "https://github.com/SMByC/PCA4CD#installation\n\n"
-            QMessageBox.critical(self, 'Error loading PCA4CD', msg, QMessageBox.Ok)
+            QMessageBox.critical(None, 'Error loading PCA4CD', msg, QMessageBox.Ok)
 
     def setup_gui(self):
         # ######### plugin info ######### #
