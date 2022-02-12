@@ -29,15 +29,35 @@ PCA4CD requires additional Python packages, that are generally not part of QGIS'
 
 The way for have that:
 
-1. First way (recommended) the plugin install automatically it when is installing or updating, it will be installed into a separate folder specific to PCA4CD and will not influence any existing Python installation or Qgis environment:
+#### Auto install the dependencies
+
+The plugin install automatically it when is installing or updating, it will be installed into a separate folder specific to PCA4CD and will not influence any existing Python installation or Qgis environment:
 
     >Windows: ~\AppData\Local\pca4cd\  
     >macOS: ~/Library/Application Support/pca4cd/  
     >Linux: ~/.local/share/pca4cd/
 
-2. Second, install it in your system python installation first before install the plugin, but depends of the operating system to work. E.g. for Ubuntu and derivatives distributions:
+#### Install the dependencies before - Linux (and Mac)
+
+Before install the plugin, install the dependencies in your system python, but it depends on the operating system, E.g. for Ubuntu and derivatives distributions:
 
     >sudo apt install python3-pyqtgraph python3-dask
+
+#### Package all-in-one - Windows 64bits
+
+For Windows users download and reinstall the plugin with [this zip all-in-one](https://drive.google.com/uc?export=download&confirm=gzst&id=1YU65HYQUKQX5GpVsSH8GkCfGiqnV8Wez) with all the libs and dependencies inside. This should work directly without any additional steps with a Qgis version >= 3.18 on a 64bit Windows system, if you have issues with this try with the alternative installation below.
+
+> *Note:* For uninstall/reinstall/update this plugin using this all-in-one in Windows, you must first deactivate, restart Qgis, uninstall/reinstall/update it and finally activate it again.
+
+#### Using Conda
+
+If you have problems with the dependencies, the best options to solve it is use [conda](https://docs.conda.io/en/latest/miniconda.html) and install Arosics and Qgis (from the conda shell):
+
+```bash
+conda install -c conda-forge dask pyqtgraph qgis
+```
+
+After that open Qgis from the shell with `qgis` command. Then install the plugin.
 
 ## Source code
 
