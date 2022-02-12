@@ -5,7 +5,7 @@ about=The PCA4CD is a Qgis plugin to build the change detection layer using the 
     Designed mainly with the goal of generating or load the principal components (PCA) and build the change
     detection layer based on the dimensionality reduction properties.
 
-version=21.4.1
+version=22.2.11
 qgisMinimumVersion=3.0
 qgisMaximumVersion=3.99
 
@@ -17,8 +17,15 @@ tracker=https://github.com/SMByC/PCA4CD/issues
 repository=https://github.com/SMByC/PCA4CD
 
 changelog=
-    21.4.1:
-    - Force to use pyqtgraph 0.11.1 due to problems with the latest version of pyqtgraph >= 0.12
+    22.2.11:
+    - Added the possibility to process images with NaN as a nodata, fixed several problems with the nodata
+    - Prepared a package all-in-one with the dependencies inside, for Windows users
+    - Improving the access to the images and time computing the PCA
+    - Check and show an error message when the estimator matrix is empty usually happens when the user
+      not set correctly the nodata value
+    - Fix an error getting the path of a memory layer
+    - Change detection layer always on by default
+    - Let the histogram stats and plot always on for the PCA component
     - All commits in: https://github.com/SMByC/PCA4CD/commits
 
 tags=pca,principal components analysis,analysis,change detection,raster,remote sensing
