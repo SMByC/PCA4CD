@@ -1,0 +1,3 @@
+dask
+toolz
+pyqtgraph
