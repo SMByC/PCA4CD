@@ -6,7 +6,7 @@ plugins:
   - jekyll-remote-theme
 
 title: PCA4CD
-description: The PCA4CD is a Qgis plugin to calculate Principal Component Analysis (PCA) and (optional) build the change detection layer based on the dimensionality reduction properties of PCA.
+description: PCA4CD is a QGIS plugin that computes Principal Component Analysis (PCA) and can create a change detection layer using PCA's dimensionality reduction properties.
 logo: ./img/pca4cd.svg
 email:
 favicon: true

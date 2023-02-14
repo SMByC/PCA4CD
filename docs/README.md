@@ -2,7 +2,7 @@
 
 ![](img/overview.png)
 
-The PCA4CD is a Qgis plugin to calculate Principal Component Analysis (PCA) and (optional) build the change detection layer based on the dimensionality reduction properties of PCA. Designed mainly with the goal of:
+PCA4CD is a QGIS plugin that computes Principal Component Analysis (PCA) and can create a change detection layer using PCA's dimensionality reduction properties. Designed mainly with the goal of:
 
 1. Generate (or load) the principal components (PCA) of the input layers
 2. (optional) Build the change detection layer based on the dimensionality reduction properties of PCA.
@@ -27,7 +27,7 @@ The following steps are:
 Select one or two input layer with or without multi-bands. If you use one layer (A) you must have all bands to process in it, instead if you want, for example, analysis two different periods for the same region is better use two layers, you can put the reference layer in (A) and the target layer in (B).
 
 > *Warning:* 
-    If use A and B layers,the plugin required that both layers have the same extent, the same pixel size and same projection.
+    If you use A and B layers,the plugin required that both layers have the same extent, the same pixel size and same projection.
 
 Is important to know that each band in A (and B if enabled) is a variable for PCA, then the maximum number of components for compute is the total of bands in A (plus bands in B).
 
