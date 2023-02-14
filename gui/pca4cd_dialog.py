@@ -88,7 +88,7 @@ class PCA4CDDialog(QDialog, FORM_CLASS):
         self.about_dialog = AboutDialog()
         self.QPBtn_PluginInfo.setText("v{}".format(VERSION))
         self.QPBtn_PluginInfo.clicked.connect(self.about_dialog.show)
-        self.QPBtn_PluginDocs.clicked.connect(lambda: webbrowser.open("https://smbyc.bitbucket.io/qgisplugins/pca4cd"))
+        self.QPBtn_PluginDocs.clicked.connect(lambda: webbrowser.open("https://smbyc.github.io/PCA4CD/"))
 
         # ######### Input Raster Data ######### #
         ## A
