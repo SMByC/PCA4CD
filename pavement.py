@@ -108,6 +108,6 @@ def make_zip(zipFile, options):
 
     for root, dirs, files in os.walk(src_dir):
         for f in filter_excludes(files):
-            relpath = os.path.relpath(root, '..')
+            relpath = os.path.relpath(root, '..').replace('PCA4CD', 'pca4cd')
             zipFile.write(path(root) / f, path(relpath) / f)
         filter_excludes(dirs)
