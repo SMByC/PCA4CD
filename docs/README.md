@@ -1,11 +1,11 @@
 # PCA4CD
 
-<img src="img/favicon.png" width="30%">
+![](img/overview.png)
 
-The PCA4CD is a Qgis plugin to build the change detection layer using the principal components method. Designed mainly with the goal of:
+The PCA4CD is a Qgis plugin to calculate Principal Component Analysis (PCA) and (optional) build the change detection layer based on the dimensionality reduction properties of PCA. Designed mainly with the goal of:
 
-1. generate or load the principal components (PCA)
-2. and build the change detection layer based on the dimensionality reduction properties.
+1. Generate (or load) the principal components (PCA) of the input layers
+2. (optional) Build the change detection layer based on the dimensionality reduction properties of PCA.
 
 First, the main window is divided by two sections:
 
@@ -37,7 +37,7 @@ The no data value is very important to set if the image have no valid value, els
 
 ### The estimator matrix
 
-Use _Correlation_ or _Covariance_ depend of the data and of type of data (by default and recommended is the correlation). Some points about the use of these two specific estimators in the dimensionality reduction process:
+Use _Correlation_ or _Covariance_ depend on the data and of type of data (by default and recommended is the correlation). Some points about the use of these two specific estimators in the dimensionality reduction process:
 
 * The covariance is dependent on the scale of the variables
 
@@ -49,7 +49,7 @@ Use _Correlation_ or _Covariance_ depend of the data and of type of data (by def
 
 ### Process settings
 
-To compute the principal components for a image, like a Landsat scene or more bigger, required relatively a heavy computation, **the PCA4CD compute the PCA in parallel process** for reducing the time and the memory usage. However, good free RAM memory is required for not crash in the process, if this happens, try to use lower values in these parameters.
+To compute the principal components for a image, like a Landsat scene or bigger, required relatively a heavy computation, **the PCA4CD compute the PCA in parallel process** for reducing the time and the memory usage. However, good free RAM memory is required for not crash in the process, if this happens, try to use lower values in these parameters.
 
 ## 1b. Load the principal components
 
@@ -81,7 +81,7 @@ Use the principal row (input and auxiliary layers) in the "change detection anal
 
 In this example, I picked the component 3 and 8
 
-**E. Enable/disable the change layer:** When the change layer is created this is useful for show/hide the change layer. You must active this for enable the "change detection layer" (F) button.
+**E. Enable/disable the change layer:** When the change layer is created this is useful for show/hide the change layer. You must activate this for enable the "change detection layer" (F) button.
 
 **F. Change detection layer:** This open the "Component Analysis" dialog for this principal component.
 
@@ -117,21 +117,16 @@ Choose the method for merge, select the file for store the final merge layer and
 
 <img src="img/2i.png" width="90%">
 
-The merged change layer is saved and loaded for all view in the first row, is loaded (if was activated) in Qgis too. You can adjusted/regenerated it changing the detection layer by components and merge again.
+The merged change layer is saved and loaded for all view in the first row, is loaded (if was activated) in Qgis too. You can adjust/regenerate it changing the detection layer by components and merge again.
 
-Finally you can close the plugin and continue the analysis and adjustments of the final layer in Qgis.
+Finally, you can close the plugin and continue the analysis and adjustments of the final layer in Qgis.
 
 ## About us
 
 PCA4CD was developing, designed and implemented by the Group of Forest and Carbon Monitoring System (SMByC), operated by the Institute of Hydrology, Meteorology and Environmental Studies (IDEAM) - Colombia.
 
-Author and developer: *Xavier Corredor Ll.*  
+Author and developer: *Xavier C. Llano* *<xavier.corredor.llano@gmail.com>*  
 Theoretical support, tester and product verification: SMByC-PDI group
-
-### Contact
-
-Xavier Corredor Ll.: *xcorredorl (a) ideam.gov.co*  
-SMByC: *smbyc (a) ideam.gov.co*
 
 ## License
 
