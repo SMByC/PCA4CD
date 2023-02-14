@@ -5,8 +5,8 @@
                                  A QGIS plugin
  Principal components analysis for change detection
                               -------------------
-        copyright            : (C) 2018-2019 by Xavier Corredor Llano, SMByC
-        email                : xcorredorl@ideam.gov.co
+        copyright            : (C) 2018-2023 by Xavier Corredor Llano, SMByC
+        email                : xavier.corredor.llano@gmail.com
  ***************************************************************************/
 
 /***************************************************************************
