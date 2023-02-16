@@ -26,13 +26,7 @@ import pkg_resources
 
 
 def pre_init_plugin_libs_inside():
-    if platform.system() == "Windows":
-        extlib_path = 'extlibs_windows'
-    if platform.system() == "Darwin":
-        extlib_path = 'extlibs_darwin'
-    if platform.system() == "Linux":
-        extlib_path = 'extlibs_linux'
-    extra_libs_path = os.path.abspath(os.path.join(os.path.dirname(__file__), extlib_path))
+    extra_libs_path = os.path.abspath(os.path.join(os.path.dirname(__file__), "extlibs"))
 
     if os.path.isdir(extra_libs_path):
         # add to python path

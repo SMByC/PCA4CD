@@ -3,7 +3,7 @@ name=PCA4CD - PCA for change detection
 description=PCA4CD is a QGIS plugin that computes Principal Component Analysis (PCA) and can create a change detection layer using PCA's dimensionality reduction properties.
 about=PCA4CD is a QGIS plugin that computes Principal Component Analysis (PCA) and can create a change detection layer using PCA's dimensionality reduction properties.
 
-version=23.2
+version=23.2a
 qgisMinimumVersion=3.0
 qgisMaximumVersion=3.99
 
