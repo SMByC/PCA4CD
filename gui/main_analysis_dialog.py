@@ -52,7 +52,7 @@ class MainAnalysisDialog(QDialog, FORM_CLASS):
 
     def __init__(self, layer_a, layer_b, pca_layers, pca_stats, nodata=None):
         QDialog.__init__(self)
-        self.setAttribute(Qt.WA_DeleteOnClose, True)
+        self.setAttribute(Qt.WidgetAttribute.WA_DeleteOnClose, True)
         self.layer_a = layer_a
         self.layer_b = layer_b
         self.pca_layers = pca_layers
@@ -60,7 +60,7 @@ class MainAnalysisDialog(QDialog, FORM_CLASS):
         MainAnalysisDialog.pca_stats = pca_stats
         MainAnalysisDialog.nodata = nodata
         # flags
-        self.setWindowFlags(self.windowFlags() | Qt.WindowMinimizeButtonHint | Qt.WindowMaximizeButtonHint)
+        self.setWindowFlags(self.windowFlags() | Qt.WindowType.WindowMinimizeButtonHint | Qt.WindowType.WindowMaximizeButtonHint)
 
         self.setupUi(self)
 
@@ -116,7 +116,7 @@ class MainAnalysisDialog(QDialog, FORM_CLASS):
         # configure the views layout
         views_layout = QGridLayout()
         views_layout.setSpacing(0)
-        views_layout.setMargin(0)
+        views_layout.setContentsMargins(0, 0, 0, 0)
         view_widgets = []
         for row in range(grid_rows):
             if row == 0:
@@ -143,16 +143,16 @@ class MainAnalysisDialog(QDialog, FORM_CLASS):
         for num_view, view_widget in enumerate(MainAnalysisDialog.view_widgets, start=1):
             if num_view == 2 and self.layer_a is not None:
                 view_widget.QLabel_ViewName.setText("Layer A")
-                file_index = view_widget.QCBox_RenderFile.findText(self.layer_a.name(), Qt.MatchFixedString)
+                file_index = view_widget.QCBox_RenderFile.findText(self.layer_a.name(), Qt.MatchFlag.MatchFixedString)
                 view_widget.QCBox_RenderFile.setCurrentIndex(file_index)
             if num_view == 3 and self.layer_b is not None:
                 view_widget.QLabel_ViewName.setText("Layer B")
-                file_index = view_widget.QCBox_RenderFile.findText(self.layer_b.name(), Qt.MatchFixedString)
+                file_index = view_widget.QCBox_RenderFile.findText(self.layer_b.name(), Qt.MatchFlag.MatchFixedString)
                 view_widget.QCBox_RenderFile.setCurrentIndex(file_index)
             if grid_columns < num_view <= len(self.pca_layers)+grid_columns:
                 view_widget.pc_id = num_view-grid_columns
                 view_widget.QLabel_ViewName.setText("Principal Component {}".format(view_widget.pc_id))
-                file_index = view_widget.QCBox_RenderFile.findText(self.pca_layers[num_view-grid_columns-1].name(), Qt.MatchFixedString)
+                file_index = view_widget.QCBox_RenderFile.findText(self.pca_layers[num_view-grid_columns-1].name(), Qt.MatchFlag.MatchFixedString)
                 view_widget.WidgetDetectionLayer.setEnabled(True)
                 view_widget.QCBox_RenderFile.setCurrentIndex(file_index)
                 view_widget.QCBox_RenderFile.setEnabled(False)
@@ -170,7 +170,7 @@ class MainAnalysisDialog(QDialog, FORM_CLASS):
                 view_widget.QLabel_ViewName.setPlaceholderText("Auxiliary View")
 
         self.MsgBar.pushMessage("{} principal components were generated and loaded successfully".format(len(self.pca_layers)),
-                                level=Qgis.Success)
+                                level=Qgis.MessageLevel.Success)
 
     def show(self):
         from pca4cd.pca4cd import PCA4CD as pca4cd
@@ -187,8 +187,8 @@ class MainAnalysisDialog(QDialog, FORM_CLASS):
         # first prompt
         quit_msg = "Are you sure you want to return to the main dialog? you will lose all the products generated"
         reply = QMessageBox.question(None, 'Return to Compute the Principal Components',
-                                     quit_msg, QMessageBox.Yes, QMessageBox.No)
-        if reply == QMessageBox.No:
+                                     quit_msg, QMessageBox.StandardButton.Yes, QMessageBox.StandardButton.No)
+        if reply == QMessageBox.StandardButton.No:
             return
 
         # clear/close components analysis
@@ -215,8 +215,8 @@ class MainAnalysisDialog(QDialog, FORM_CLASS):
         # first prompt
         quit_msg = "Are you sure you want close the PCA4CD plugin?"
         reply = QMessageBox.question(None, 'Closing the PCA4CD plugin',
-                                     quit_msg, QMessageBox.Yes, QMessageBox.No)
-        if reply == QMessageBox.No:
+                                     quit_msg, QMessageBox.StandardButton.Yes, QMessageBox.StandardButton.No)
+        if reply == QMessageBox.StandardButton.No:
             return
 
         # close components analysis opened
@@ -255,7 +255,7 @@ class MainAnalysisDialog(QDialog, FORM_CLASS):
                     continue
                 renderer = QgsSingleBandGrayRenderer(view_widget.render_widget.layer.dataProvider(), 1)
                 ce = QgsContrastEnhancement(view_widget.render_widget.layer.dataProvider().dataType(0))
-                ce.setContrastEnhancementAlgorithm(QgsContrastEnhancement.StretchToMinimumMaximum)
+                ce.setContrastEnhancementAlgorithm(QgsContrastEnhancement.ContrastEnhancementAlgorithm.StretchToMinimumMaximum)
                 ce.setMinimumValue(mean - 5*std)
                 ce.setMaximumValue(mean + 5*std)
                 renderer.setContrastEnhancement(ce)
@@ -279,7 +279,7 @@ class MainAnalysisDialog(QDialog, FORM_CLASS):
                   ['"{}"'.format(get_file_path_of_layer(layer)) for layer in self.pca_layers]
             subprocess.run(" ".join(cmd), shell=True)
 
-            self.MsgBar.pushMessage("PCA stack saved successfully: \"{}\"".format(os.path.basename(file_out)), level=Qgis.Success)
+            self.MsgBar.pushMessage("PCA stack saved successfully: \"{}\"".format(os.path.basename(file_out)), level=Qgis.MessageLevel.Success)
 
         if file_out != '':
             save()
@@ -297,7 +297,7 @@ class MainAnalysisDialog(QDialog, FORM_CLASS):
         if len(self.activated_change_layers) == 0:
             self.MsgBar.pushMessage(
                 "There is not change detection layers activated/generated in the Principal Components view",
-                level=Qgis.Warning)
+                level=Qgis.MessageLevel.Warning)
             return
         # suggested filename
         if self.layer_a is not None:
@@ -308,7 +308,7 @@ class MainAnalysisDialog(QDialog, FORM_CLASS):
         suggested_filename = os.path.splitext(Path(path, filename))[0] + "_pca4cd.tif"
         # merge dialog
         merge_dialog = MergeChangeLayersDialog(self.activated_ids, suggested_filename)
-        if merge_dialog.exec_():
+        if merge_dialog.exec():
             self.do_merge_change_layers(merge_dialog)
 
     @pyqtSlot()
@@ -366,9 +366,9 @@ class MainAnalysisDialog(QDialog, FORM_CLASS):
         if len(self.activated_ids) == 1:
             self.MsgBar.pushMessage(
                 "The change detection for {} was saved and loaded successfully".format(
-                    self.activated_ids[0]), level=Qgis.Success)
+                    self.activated_ids[0]), level=Qgis.MessageLevel.Success)
         else:
             self.MsgBar.pushMessage(
                 "The change detection for {} were merged, saved and loaded successfully".format(
-                    ", ".join(self.activated_ids)), level=Qgis.Success)
+                    ", ".join(self.activated_ids)), level=Qgis.MessageLevel.Success)
 

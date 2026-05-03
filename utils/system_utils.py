@@ -56,8 +56,8 @@ def error_handler(func):
                 msgBox.setInformativeText("If you consider this as an error of PCA4CD, report it in "
                                           "<a href='https://github.com/SMByC/PCA4CD/issues'>issue tracker</a>")
                 msgBox.setDetailedText(more_details)
-                msgBox.setTextFormat(Qt.RichText)
-                msgBox.setStandardButtons(QMessageBox.Ok)
+                msgBox.setTextFormat(Qt.TextFormat.RichText)
+                msgBox.setStandardButtons(QMessageBox.StandardButton.Ok)
                 msgBox.exec()
                 del msgBox
 
@@ -71,7 +71,7 @@ def error_handler(func):
             button.pressed.connect(lambda: details_message_box(error, more_details))
             widget.layout().addWidget(button)
 
-            msg_bar.pushWidget(widget, level=Qgis.Warning, duration=20)
+            msg_bar.pushWidget(widget, level=Qgis.MessageLevel.Warning, duration=20)
 
     return wrapper
 
@@ -81,7 +81,7 @@ def wait_process(func):
     @functools.wraps(func)
     def wrapper(*args, **kwargs):
         # mouse wait
-        QApplication.setOverrideCursor(QCursor(Qt.WaitCursor))
+        QApplication.setOverrideCursor(QCursor(Qt.CursorShape.WaitCursor))
         # do
         obj_returned = func(*args, **kwargs)
         # restore mouse

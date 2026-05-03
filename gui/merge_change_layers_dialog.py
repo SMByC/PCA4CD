@@ -40,7 +40,7 @@ class MergeChangeLayersDialog(QDialog, FORM_CLASS):
         self.LayersToProcess.setText(", ".join(activated_ids))
         self.MergeFileWidget.setDialogTitle("Save the merged layer")
         self.MergeFileWidget.setFilter("GeoTiff files (*.tif);;All files (*.*)")
-        self.MergeFileWidget.setStorageMode(QgsFileWidget.SaveFile)
+        self.MergeFileWidget.setStorageMode(QgsFileWidget.StorageMode.SaveFile)
         if MergeChangeLayersDialog.merged_file_path is not None:
             self.MergeFileWidget.setFilePath(str(MergeChangeLayersDialog.merged_file_path))
         else:

@@ -71,8 +71,11 @@ default: compile
 
 compile: $(COMPILED_RESOURCE_FILES)
 
+# Resource compiler: prefer pyrcc6 (Qt6) when available, fall back to pyrcc5 (Qt5).
+PYRCC := $(shell command -v pyrcc6 2>/dev/null || command -v pyrcc5 2>/dev/null)
+
 %.py : %.qrc $(RESOURCES_SRC)
-	pyrcc5 -o $*.py  $<
+	$(PYRCC) -o $*.py  $<
 
 %.qm : %.ts
 	$(LRELEASE) $<

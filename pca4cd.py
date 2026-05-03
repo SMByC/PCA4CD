@@ -134,7 +134,7 @@ class PCA4CD:
             # show the dialog
             PCA4CD.dialog.show()
             # Run the dialog event loop
-            result = PCA4CD.dialog.exec_()
+            result = PCA4CD.dialog.exec()
             # See if OK was pressed
             if result:
                 # Do something useful here - delete the line containing pass and
@@ -145,11 +145,11 @@ class PCA4CD:
             # brings that instance to front even if it is minimized
             if hasattr(PCA4CD.dialog, "main_analysis_dialog") and PCA4CD.dialog.main_analysis_dialog:  # main dialog
                 PCA4CD.dialog.main_analysis_dialog.setWindowState(PCA4CD.dialog.main_analysis_dialog.windowState()
-                                                                  & ~Qt.WindowMinimized | Qt.WindowActive)
+                                                                  & ~Qt.WindowState.WindowMinimized | Qt.WindowState.WindowActive)
                 PCA4CD.dialog.main_analysis_dialog.raise_()
                 PCA4CD.dialog.main_analysis_dialog.activateWindow()
             else:  # the init dialog
-                PCA4CD.dialog.setWindowState(PCA4CD.dialog.windowState() & ~Qt.WindowMinimized | Qt.WindowActive)
+                PCA4CD.dialog.setWindowState(PCA4CD.dialog.windowState() & ~Qt.WindowState.WindowMinimized | Qt.WindowState.WindowActive)
                 PCA4CD.dialog.raise_()
                 PCA4CD.dialog.activateWindow()
 

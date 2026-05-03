@@ -46,7 +46,7 @@ def valid_file_selected_in(combo_box, combobox_name=False):
     else:
         if combobox_name:
             iface.messageBar().pushMessage("PCA4CD", "Error, please browse/select a valid file in "
-                                           + combobox_name, level=Qgis.Warning)
+                                           + combobox_name, level=Qgis.MessageLevel.Warning)
         combo_box.setCurrentIndex(-1)
         return False
 
@@ -62,7 +62,7 @@ def get_current_file_path_in(combo_box, show_message=True):
     if file_path.is_file():
         return file_path
     elif show_message:
-        iface.messageBar().pushMessage("PCA4CD", "Error, please select a valid file", level=Qgis.Warning)
+        iface.messageBar().pushMessage("PCA4CD", "Error, please select a valid file", level=Qgis.MessageLevel.Warning)
     return None
 
 
@@ -73,7 +73,7 @@ def load_and_select_filepath_in(combo_box, file_path):
     if not layer:
         load_layer(file_path)
     # select the sampling file in combobox
-    selected_index = combo_box.findText(filename, Qt.MatchFixedString)
+    selected_index = combo_box.findText(filename, Qt.MatchFlag.MatchFixedString)
     combo_box.setCurrentIndex(selected_index)
 
     return get_layer_by_name(filename)
@@ -124,17 +124,17 @@ class StyleEditorDialog(QDialog, FORM_CLASS):
 
         self.setWindowTitle("{} - Style Editor".format(self.layer.name()))
 
-        if self.layer.type() == QgsMapLayer.VectorLayer:
+        if self.layer.type() == QgsMapLayer.LayerType.VectorLayer:
             self.StyleEditorWidget = QgsRendererPropertiesDialog(self.layer, QgsStyle(), True, parent)
 
-        if self.layer.type() == QgsMapLayer.RasterLayer:
+        if self.layer.type() == QgsMapLayer.LayerType.RasterLayer:
             self.StyleEditorWidget = QgsRendererRasterPropertiesWidget(self.layer, canvas, parent)
 
         self.scrollArea.setWidget(self.StyleEditorWidget)
 
-        self.DialogButtons.button(QDialogButtonBox.Cancel).clicked.connect(self.reject)
-        self.DialogButtons.button(QDialogButtonBox.Ok).clicked.connect(self.accept)
-        self.DialogButtons.button(QDialogButtonBox.Apply).clicked.connect(self.apply)
+        self.DialogButtons.button(QDialogButtonBox.StandardButton.Cancel).clicked.connect(self.reject)
+        self.DialogButtons.button(QDialogButtonBox.StandardButton.Ok).clicked.connect(self.accept)
+        self.DialogButtons.button(QDialogButtonBox.StandardButton.Apply).clicked.connect(self.apply)
 
     def apply(self):
         self.StyleEditorWidget.apply()

@@ -18,8 +18,8 @@ PCA4CD requires additional Python packages, that are generally not part of QGIS'
 * Python-Dask
 * PyQtGraph
 
-> *Warning:* 
-    This plugin only works in Qgis version >= 3.18
+> *Warning:*
+    This plugin requires QGIS >= 3.18 and is compatible with both QGIS 3.x (Qt5/PyQt5) and QGIS 4.x (Qt6/PyQt6).
 
 If you have issues with this try with the alternative installation below.
 

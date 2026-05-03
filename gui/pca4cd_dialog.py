@@ -69,7 +69,7 @@ class PCA4CDDialog(QDialog, FORM_CLASS):
 
     def keyPressEvent(self, event):
         # ignore esc key for close the main dialog
-        if not event.key() == Qt.Key_Escape:
+        if not event.key() == Qt.Key.Key_Escape:
             super(PCA4CDDialog, self).keyPressEvent(event)
 
     def check_dependencies(self):
@@ -77,11 +77,11 @@ class PCA4CDDialog(QDialog, FORM_CLASS):
             import pyqtgraph as pg
             import dask
         except:
-            self.MsgBar.pushMessage("Error: missing dependencies.", level=Qgis.Critical)
+            self.MsgBar.pushMessage("Error: missing dependencies.", level=Qgis.MessageLevel.Critical)
             msg = "\nError loading PCA4CD, this plugin requires additional Python packages to work. " \
                   "There are some alternatives to supply these dependencies. Read the install instructions here:\n\n" \
                   "https://github.com/SMByC/PCA4CD#installation\n\n"
-            QMessageBox.critical(None, 'Error loading PCA4CD', msg, QMessageBox.Ok)
+            QMessageBox.critical(None, 'Error loading PCA4CD', msg, QMessageBox.StandardButton.Ok)
 
     def setup_gui(self):
         # ######### plugin info ######### #
@@ -94,7 +94,7 @@ class PCA4CDDialog(QDialog, FORM_CLASS):
         ## A
         # set properties to QgsMapLayerComboBox
         self.QCBox_InputData_A.setCurrentIndex(-1)
-        self.QCBox_InputData_A.setFilters(QgsMapLayerProxyModel.RasterLayer)
+        self.QCBox_InputData_A.setFilters(QgsMapLayerProxyModel.Filter.RasterLayer)
         # call to browse the thematic raster file
         self.QPBtn_browseData_A.clicked.connect(lambda: self.browser_dialog_to_load_file(
             self.QCBox_InputData_A,
@@ -106,7 +106,7 @@ class PCA4CDDialog(QDialog, FORM_CLASS):
         ## B
         # set properties to QgsMapLayerComboBox
         self.QCBox_InputData_B.setCurrentIndex(-1)
-        self.QCBox_InputData_B.setFilters(QgsMapLayerProxyModel.RasterLayer)
+        self.QCBox_InputData_B.setFilters(QgsMapLayerProxyModel.Filter.RasterLayer)
         # call to browse the thematic raster file
         self.QPBtn_browseData_B.clicked.connect(lambda: self.browser_dialog_to_load_file(
             self.QCBox_InputData_B,
@@ -174,15 +174,15 @@ class PCA4CDDialog(QDialog, FORM_CLASS):
         if layer_B is None:
             return True
         if layer_A.crs() != layer_B.crs():
-            self.MsgBar.pushMessage("The layers don't have the same projection", level=Qgis.Warning)
+            self.MsgBar.pushMessage("The layers don't have the same projection", level=Qgis.MessageLevel.Warning)
             return False
         if layer_A.width() != layer_B.width() or \
            layer_A.height() != layer_B.height():
-            self.MsgBar.pushMessage("The layers don't have the same column/row", level=Qgis.Warning)
+            self.MsgBar.pushMessage("The layers don't have the same column/row", level=Qgis.MessageLevel.Warning)
             return False
         if round(layer_A.rasterUnitsPerPixelX(), 6) != round(layer_B.rasterUnitsPerPixelX(), 6) or \
            round(layer_A.rasterUnitsPerPixelY(), 6) != round(layer_B.rasterUnitsPerPixelY(), 6):
-            self.MsgBar.pushMessage("The layers don't have the same pixel size", level=Qgis.Warning)
+            self.MsgBar.pushMessage("The layers don't have the same pixel size", level=Qgis.MessageLevel.Warning)
             return False
         return True
 
@@ -192,7 +192,7 @@ class PCA4CDDialog(QDialog, FORM_CLASS):
         from pca4cd.pca4cd import PCA4CD as pca4cd
         # check if is valid the input raster layer
         if self.QCBox_InputData_A.currentLayer() is None:
-            self.MsgBar.pushMessage("Select a valid input raster layer", level=Qgis.Warning)
+            self.MsgBar.pushMessage("Select a valid input raster layer", level=Qgis.MessageLevel.Warning)
             return
         # check both layers
         if not self.check_input_layers(self.QCBox_InputData_A.currentLayer(), self.QCBox_InputData_B.currentLayer()):
@@ -205,7 +205,7 @@ class PCA4CDDialog(QDialog, FORM_CLASS):
                 if np.isnan(nodata):
                     nodata = np.nan
             except:
-                self.MsgBar.pushMessage("The nodata value is not valid", level=Qgis.Warning)
+                self.MsgBar.pushMessage("The nodata value is not valid", level=Qgis.MessageLevel.Warning)
                 return
 
         path_layer_A = get_file_path_of_layer(self.QCBox_InputData_A.currentLayer())
@@ -217,10 +217,10 @@ class PCA4CDDialog(QDialog, FORM_CLASS):
                                    self.nThreads.value(), self.BlockSize.value(), nodata)
 
         if pca_files is False and pca_stats is False:
-            self.MsgBar.pushMessage("Error calculating PCA", level=Qgis.Critical, duration=10)
+            self.MsgBar.pushMessage("Error calculating PCA", level=Qgis.MessageLevel.Critical, duration=10)
             quit_msg = "The estimation matrix is empty, that usually happens due to nodata values. " \
                        "Check the nodata value set in the plugin correspond to the nodata of the layer selected."
-            QMessageBox.critical(self, 'Error calculating PCA', quit_msg, QMessageBox.Ok)
+            QMessageBox.critical(self, 'Error calculating PCA', quit_msg, QMessageBox.StandardButton.Ok)
             return
 
         pca_layers = []
@@ -230,7 +230,7 @@ class PCA4CDDialog(QDialog, FORM_CLASS):
             # then, open main analysis dialog
             self.open_main_analysis_dialog(pca_layers, pca_stats, nodata)
         else:
-            self.MsgBar.pushMessage("Error while generating the principal components, check the Qgis log", level=Qgis.Critical)
+            self.MsgBar.pushMessage("Error while generating the principal components, check the Qgis log", level=Qgis.MessageLevel.Critical)
 
     @pyqtSlot()
     def open_main_analysis_dialog(self, pca_layers, pca_stats, nodata):
@@ -247,7 +247,7 @@ class PCA4CDDialog(QDialog, FORM_CLASS):
         from pca4cd.pca4cd import PCA4CD as pca4cd
         stack_path = self.QgsFile_LoadStackPCA.filePath()
         if not os.path.isfile(stack_path):
-            self.MsgBar.pushMessage("Select a valid stack for load", level=Qgis.Warning)
+            self.MsgBar.pushMessage("Select a valid stack for load", level=Qgis.MessageLevel.Warning)
             return False
         # check the nodata value
         nodata = self.NoData_LoadPCA.text() if self.NoData_LoadPCA.text() not in ["", "None", "nan"] else None
@@ -255,7 +255,7 @@ class PCA4CDDialog(QDialog, FORM_CLASS):
             try:
                 nodata = float(nodata)
             except:
-                self.MsgBar.pushMessage("The nodata value is not valid", level=Qgis.Warning)
+                self.MsgBar.pushMessage("The nodata value is not valid", level=Qgis.MessageLevel.Warning)
                 return
 
         # extract each band as component in tmp file

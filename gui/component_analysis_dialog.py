@@ -50,7 +50,7 @@ class PickerPixelPointTool(QgsMapTool):
         x = event.pos().x()
         y = event.pos().y()
         point = self.render_widget.canvas.getCoordinateTransform().toMapCoordinates(x, y)
-        pixel_value = self.render_widget.layer.dataProvider().identify(point, QgsRaster.IdentifyFormatValue).results()[1]
+        pixel_value = self.render_widget.layer.dataProvider().identify(point, QgsRaster.IdentifyFormat.IdentifyFormatValue).results()[1]
         if pixel_value is not None:
             self.picker_widget.setValue(pixel_value)
 
@@ -66,7 +66,7 @@ class PickerPixelPointTool(QgsMapTool):
         QTimer.singleShot(180, lambda: self.render_widget.canvas.setMapTool(self.render_widget.pan_zoom_tool))
 
     def keyReleaseEvent(self, event):
-        if event.key() in [Qt.Key_Up, Qt.Key_Down, Qt.Key_Right, Qt.Key_Left, Qt.Key_PageUp, Qt.Key_PageDown]:
+        if event.key() in [Qt.Key.Key_Up, Qt.Key.Key_Down, Qt.Key.Key_Right, Qt.Key.Key_Left, Qt.Key.Key_PageUp, Qt.Key.Key_PageDown]:
             QTimer.singleShot(10, self.render_widget.parent_view.canvas_changed)
 
 
@@ -78,14 +78,14 @@ class PickerAOIPointTool(QgsMapTool):
         color = QColor("red")
         color.setAlpha(70)
         # create the main polygon rubber band
-        self.rubber_band = QgsRubberBand(cad.render_widget.canvas, QgsWkbTypes.PolygonGeometry)
+        self.rubber_band = QgsRubberBand(cad.render_widget.canvas, QgsWkbTypes.GeometryType.PolygonGeometry)
         self.rubber_band.setColor(color)
         self.rubber_band.setWidth(3)
         # create the mouse/tmp polygon rubber band, this is main rubber band + current mouse position
-        self.tmp_rubber_band = QgsRubberBand(cad.render_widget.canvas, QgsWkbTypes.PolygonGeometry)
+        self.tmp_rubber_band = QgsRubberBand(cad.render_widget.canvas, QgsWkbTypes.GeometryType.PolygonGeometry)
         self.tmp_rubber_band.setColor(color)
         self.tmp_rubber_band.setWidth(3)
-        self.tmp_rubber_band.setLineStyle(Qt.DotLine)
+        self.tmp_rubber_band.setLineStyle(Qt.PenStyle.DotLine)
 
     def finish_drawing(self):
         self.rubber_band = None
@@ -106,26 +106,26 @@ class PickerAOIPointTool(QgsMapTool):
             self.tmp_rubber_band.addPoint(point)
 
     def keyPressEvent(self, event):
-        if event.key() == Qt.Key_Backspace or event.key() == Qt.Key_Delete:
+        if event.key() == Qt.Key.Key_Backspace or event.key() == Qt.Key.Key_Delete:
             self.rubber_band.removeLastPoint()
             self.tmp_rubber_band.removeLastPoint()
-        if event.key() == Qt.Key_Escape:
-            self.rubber_band.reset(QgsWkbTypes.PolygonGeometry)
-            self.tmp_rubber_band.reset(QgsWkbTypes.PolygonGeometry)
+        if event.key() == Qt.Key.Key_Escape:
+            self.rubber_band.reset(QgsWkbTypes.GeometryType.PolygonGeometry)
+            self.tmp_rubber_band.reset(QgsWkbTypes.GeometryType.PolygonGeometry)
 
     def canvasPressEvent(self, event):
         if self.rubber_band is None:
             self.finish_drawing()
             return
         # new point on polygon
-        if event.button() == Qt.LeftButton:
+        if event.button() == Qt.MouseButton.LeftButton:
             x = event.pos().x()
             y = event.pos().y()
             point = self.cad.render_widget.canvas.getCoordinateTransform().toMapCoordinates(x, y)
             self.rubber_band.addPoint(point)
             self.tmp_rubber_band.addPoint(point)
         # save polygon
-        if event.button() == Qt.RightButton:
+        if event.button() == Qt.MouseButton.RightButton:
             if self.rubber_band and self.rubber_band.numberOfVertices():
                 if self.rubber_band.numberOfVertices() < 3:
                     self.finish_drawing()
@@ -142,7 +142,7 @@ class PickerAOIPointTool(QgsMapTool):
                 self.cad.aoi_changes(new_feature)
 
     def keyReleaseEvent(self, event):
-        if event.key() in [Qt.Key_Up, Qt.Key_Down, Qt.Key_Right, Qt.Key_Left, Qt.Key_PageUp, Qt.Key_PageDown]:
+        if event.key() in [Qt.Key.Key_Up, Qt.Key.Key_Down, Qt.Key.Key_Right, Qt.Key.Key_Left, Qt.Key.Key_PageUp, Qt.Key.Key_PageDown]:
             QTimer.singleShot(10, self.cad.render_widget.parent_view.canvas_changed)
 
 
@@ -193,7 +193,7 @@ class ComponentAnalysisDialog(QWidget, FORM_CLASS):
         self.DeleteAllAOI.clicked.connect(self.delete_all_aoi)
         # set statistics from combobox
         self.QCBox_StatsLayer.addItems([self.pc_name, "Areas Of Interest"])
-        self.QCBox_StatsLayer.currentIndexChanged[str].connect(self.set_statistics)
+        self.QCBox_StatsLayer.currentTextChanged.connect(self.set_statistics)
 
         # init histogram plot
         self.hist_data = None
@@ -202,7 +202,7 @@ class ComponentAnalysisDialog(QWidget, FORM_CLASS):
         self.HistogramPlot.setTitle('Histogram', size='9pt')
         self.HistogramPlot.setBackground('w')
         self.HistogramPlot.showGrid(x=True, y=True, alpha=0.3)
-        self.HistogramTypeBins.currentIndexChanged[str].connect(lambda value: self.histogram_plot(bins=value))
+        self.HistogramTypeBins.currentTextChanged.connect(lambda value: self.histogram_plot(bins=value))
         self.HistogramCustomBins.hide()
         self.HistogramCustomBins.valueChanged.connect(lambda value: self.histogram_plot(bins=value))
         # init region and synchronize the region on plot with range values
@@ -231,7 +231,7 @@ class ComponentAnalysisDialog(QWidget, FORM_CLASS):
         self.render_widget.canvas.clearCache()
         # clear/reset all rubber bands
         for rubber_band in self.rubber_bands + self.tmp_rubber_band:
-            rubber_band.reset(QgsWkbTypes.PolygonGeometry)
+            rubber_band.reset(QgsWkbTypes.GeometryType.PolygonGeometry)
         self.rubber_bands = []
         self.tmp_rubber_band = []
         # remove all features in aoi
@@ -508,8 +508,8 @@ class ComponentAnalysisDialog(QWidget, FORM_CLASS):
         with edit(self.aoi_features):
             self.aoi_features.deleteFeature(features_ids[-1])
         # delete rubber bands
-        self.rubber_bands.pop().reset(QgsWkbTypes.PolygonGeometry)
-        self.tmp_rubber_band.pop().reset(QgsWkbTypes.PolygonGeometry)
+        self.rubber_bands.pop().reset(QgsWkbTypes.GeometryType.PolygonGeometry)
+        self.tmp_rubber_band.pop().reset(QgsWkbTypes.GeometryType.PolygonGeometry)
         # update
         if len(list(self.aoi_features.getFeatures())) > 0:
             self.aoi_changes()
@@ -521,7 +521,7 @@ class ComponentAnalysisDialog(QWidget, FORM_CLASS):
     def delete_all_aoi(self):
         # clear/reset all rubber bands
         for rubber_band in self.rubber_bands + self.tmp_rubber_band:
-            rubber_band.reset(QgsWkbTypes.PolygonGeometry)
+            rubber_band.reset(QgsWkbTypes.GeometryType.PolygonGeometry)
         self.rubber_bands = []
         self.tmp_rubber_band = []
         # remove all features in aoi

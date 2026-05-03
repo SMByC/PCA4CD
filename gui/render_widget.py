@@ -36,7 +36,7 @@ class PanAndZoomPointTool(QgsMapToolPan):
         self.render_widget.parent_view.canvas_changed()
 
     def canvasReleaseEvent(self, event):
-        if event.button() != Qt.RightButton:
+        if event.button() != Qt.MouseButton.RightButton:
             QgsMapToolPan.canvasReleaseEvent(self, event)
             self.update_canvas()
 
@@ -45,11 +45,11 @@ class PanAndZoomPointTool(QgsMapToolPan):
         QTimer.singleShot(10, self.update_canvas)
 
     def canvasPressEvent(self, event):
-        if event.button() != Qt.RightButton:
+        if event.button() != Qt.MouseButton.RightButton:
             QgsMapToolPan.canvasPressEvent(self, event)
 
     def keyReleaseEvent(self, event):
-        if event.key() in [Qt.Key_Up, Qt.Key_Down, Qt.Key_Right, Qt.Key_Left, Qt.Key_PageUp, Qt.Key_PageDown]:
+        if event.key() in [Qt.Key.Key_Up, Qt.Key.Key_Down, Qt.Key.Key_Right, Qt.Key.Key_Left, Qt.Key.Key_PageUp, Qt.Key.Key_PageDown]:
             QTimer.singleShot(10, self.render_widget.parent_view.canvas_changed)
 
 
@@ -127,5 +127,5 @@ class RenderWidget(QWidget):
     @pyqtSlot()
     def layer_style_editor(self):
         style_editor_dlg = StyleEditorDialog(self.layer, self.canvas, self.parent())
-        if style_editor_dlg.exec_():
+        if style_editor_dlg.exec():
             style_editor_dlg.apply()
