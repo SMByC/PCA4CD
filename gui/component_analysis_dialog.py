@@ -35,6 +35,8 @@ from qgis.core import QgsRaster, QgsWkbTypes, QgsFeature, QgsVectorLayer, QgsPro
 from qgis.gui import QgsMapTool, QgsRubberBand
 from qgis.core import edit
 
+import pyqtgraph as pg  # must be imported before uic.loadUiType to avoid partial-load issue with pyqtgraph.Qt
+
 from pca4cd.utils.others_utils import clip_raster_with_shape
 from pca4cd.utils.qgis_utils import get_file_path_of_layer, load_layer, apply_symbology
 from pca4cd.utils.system_utils import wait_process, block_signals_to
@@ -155,7 +157,6 @@ FORM_CLASS, _ = uic.loadUiType(Path(plugin_folder, 'ui', 'component_analysis_dia
 class ComponentAnalysisDialog(QWidget, FORM_CLASS):
     @wait_process
     def __init__(self, parent_view_widget, parent=None):
-        import pyqtgraph as pg
         QWidget.__init__(self, parent)
         self.setupUi(self)
         self.is_opened = False
