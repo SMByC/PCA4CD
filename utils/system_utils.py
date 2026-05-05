@@ -53,7 +53,7 @@ def error_handler(func):
                 msgBox = QMessageBox()
                 msgBox.setWindowTitle("PCA4CD - Error handler")
                 msgBox.setText("<i>{}</i>".format(error))
-                msgBox.setInformativeText("If you consider this as an error of PCA4CD, report it in "
+                msgBox.setInformativeText("If you consider this a PCA4CD bug, please report it in the "
                                           "<a href='https://github.com/SMByC/PCA4CD/issues'>issue tracker</a>")
                 msgBox.setDetailedText(more_details)
                 msgBox.setTextFormat(Qt.TextFormat.RichText)
@@ -61,7 +61,7 @@ def error_handler(func):
                 msgBox.exec()
                 del msgBox
 
-            msg_error = "Ups! an error has occurred in PCA4CD plugin"
+            msg_error = "Oops! An error occurred in the PCA4CD plugin"
             widget = msg_bar.createMessage("PCA4CD", msg_error)
             error = err
             more_details = traceback.format_exc()

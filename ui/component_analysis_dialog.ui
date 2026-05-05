@@ -189,7 +189,7 @@
           <item>
            <widget class="QToolButton" name="PickerRangeFrom">
             <property name="toolTip">
-             <string>Picker the pixel value using mouse cursor for set the initial change value</string>
+             <string>Pick the pixel value using the mouse cursor to set the minimum change value</string>
             </property>
             <property name="text">
              <string/>
@@ -206,7 +206,7 @@
           <item>
            <widget class="QDoubleSpinBox" name="RangeChangeFrom">
             <property name="toolTip">
-             <string>Generate the change layer from value</string>
+             <string>Minimum value for change detection</string>
             </property>
             <property name="frame">
              <bool>false</bool>
@@ -235,7 +235,7 @@
           <item>
            <widget class="QToolButton" name="PickerRangeTo">
             <property name="toolTip">
-             <string>Picker the pixel value using mouse cursor for set the final change value</string>
+             <string>Pick the pixel value using the mouse cursor to set the maximum change value</string>
             </property>
             <property name="text">
              <string/>
@@ -252,7 +252,7 @@
           <item>
            <widget class="QDoubleSpinBox" name="RangeChangeTo">
             <property name="toolTip">
-             <string>Generate the change layer to value</string>
+             <string>Maximum value for change detection</string>
             </property>
             <property name="frame">
              <bool>false</bool>
@@ -357,10 +357,10 @@
           <item>
            <widget class="QLabel" name="label_2">
             <property name="toolTip">
-             <string>Use min and max value of all pixels inside areas of interest for fill from/to range values</string>
+             <string>Use the min/max pixel values inside the areas of interest to fill the from/to range</string>
             </property>
             <property name="text">
-             <string>Use areas of interest for set the range values:</string>
+             <string>Use areas of interest to set the range values:</string>
             </property>
            </widget>
           </item>
@@ -407,7 +407,7 @@
              <bool>false</bool>
             </property>
             <property name="toolTip">
-             <string>Delete all AOI</string>
+             <string>Delete all AOIs</string>
             </property>
             <property name="icon">
              <iconset>
@@ -538,7 +538,7 @@
              <item>
               <widget class="QLabel" name="stats_header">
                <property name="text">
-                <string>eigen (nn%)</string>
+                <string>Eigenvalue (nn%)</string>
                </property>
                <property name="alignment">
                 <set>Qt::AlignCenter</set>

@@ -355,10 +355,10 @@ class ComponentAnalysisDialog(QWidget, FORM_CLASS):
             if pca_stats["eigenvals"] is not None:
                 self.stats_header.setText("Eigenvalue: {} ({}%)".format(round(pca_stats["eigenvals"][self.pc_id-1], 2),
                                                                         round(pca_stats["eigenvals_%"][self.pc_id-1], 2)))
-                self.stats_header.setToolTip("It shows how are the dispersion of the data with respect to its component")
+                self.stats_header.setToolTip("Shows the dispersion of the data relative to this component")
             else:
                 self.stats_header.setText("Eigenvalue: --")
-                self.stats_header.setToolTip("Is only available when the components are computed with the plugin")
+                self.stats_header.setToolTip("Only available when components are computed with this plugin")
         else:  # for aoi
             self.stats_header.setText("Pixels in AOI: {}".format(round(data.size if data.size > 1 else 0, 2)))
             self.stats_header.setToolTip("")
@@ -540,4 +540,3 @@ class ComponentAnalysisDialog(QWidget, FORM_CLASS):
         # clear the detection layer
         self.render_widget.set_detection_layer(None)
         self.parent_view_widget.render_widget.set_detection_layer(None)
-

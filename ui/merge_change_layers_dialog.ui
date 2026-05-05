@@ -72,7 +72,7 @@
    <item>
     <widget class="QLabel" name="LabelMergeMethod">
      <property name="text">
-      <string>Choose the method for merge the change layers:</string>
+      <string>Choose the method to merge the change layers:</string>
      </property>
      <property name="wordWrap">
       <bool>true</bool>
@@ -106,7 +106,7 @@
    <item>
     <widget class="QCheckBox" name="LoadInQgis">
      <property name="text">
-      <string>Load in Qgis</string>
+      <string>Load in QGIS</string>
      </property>
      <property name="checked">
       <bool>true</bool>

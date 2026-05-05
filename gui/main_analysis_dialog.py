@@ -158,8 +158,8 @@ class MainAnalysisDialog(QDialog, FORM_CLASS):
 
     def return_to_main_dialog(self):
         # first prompt
-        quit_msg = "Are you sure you want to return to the main dialog? you will lose all the products generated"
-        reply = QMessageBox.question(None, 'Return to Compute the Principal Components',
+        quit_msg = "Are you sure you want to return to the main dialog? You will lose all generated products."
+        reply = QMessageBox.question(None, 'Return to the Main Dialog',
                                      quit_msg, QMessageBox.StandardButton.Yes, QMessageBox.StandardButton.No)
         if reply == QMessageBox.StandardButton.No:
             return
@@ -186,7 +186,7 @@ class MainAnalysisDialog(QDialog, FORM_CLASS):
         Do this before close the dialog
         """
         # first prompt
-        quit_msg = "Are you sure you want close the PCA4CD plugin?"
+        quit_msg = "Are you sure you want to close the PCA4CD plugin?"
         reply = QMessageBox.question(None, 'Closing the PCA4CD plugin',
                                      quit_msg, QMessageBox.StandardButton.Yes, QMessageBox.StandardButton.No)
         if reply == QMessageBox.StandardButton.No:
@@ -274,7 +274,7 @@ class MainAnalysisDialog(QDialog, FORM_CLASS):
                 self.activated_change_layers.append(view_widget.render_widget.detection_layer)
         if len(self.activated_change_layers) == 0:
             self.MsgBar.pushMessage(
-                "There is not change detection layers activated/generated in the Principal Components view",
+                "There are no change detection layers activated or generated in the Principal Components view",
                 level=Qgis.MessageLevel.Warning)
             return
         # suggested filename
@@ -355,5 +355,5 @@ class MainAnalysisDialog(QDialog, FORM_CLASS):
                     self.activated_ids[0]), level=Qgis.MessageLevel.Success)
         else:
             self.MsgBar.pushMessage(
-                "The change detection for {} were merged, saved and loaded successfully".format(
+                "The change detection layers for {} were merged, saved, and loaded successfully".format(
                     ", ".join(self.activated_ids)), level=Qgis.MessageLevel.Success)

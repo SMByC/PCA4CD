@@ -178,7 +178,7 @@ class PCA4CDDialog(QDialog, FORM_CLASS):
             return False
         if layer_A.width() != layer_B.width() or \
            layer_A.height() != layer_B.height():
-            self.MsgBar.pushMessage("The layers don't have the same column/row", level=Qgis.MessageLevel.Warning)
+            self.MsgBar.pushMessage("The layers don't have the same dimensions (columns/rows)", level=Qgis.MessageLevel.Warning)
             return False
         if round(layer_A.rasterUnitsPerPixelX(), 6) != round(layer_B.rasterUnitsPerPixelX(), 6) or \
            round(layer_A.rasterUnitsPerPixelY(), 6) != round(layer_B.rasterUnitsPerPixelY(), 6):
@@ -203,7 +203,7 @@ class PCA4CDDialog(QDialog, FORM_CLASS):
             try:
                 nodata = float(nodata)
             except ValueError:
-                self.MsgBar.pushMessage("The nodata value is not valid", level=Qgis.MessageLevel.Warning)
+                self.MsgBar.pushMessage("The NoData value is not valid", level=Qgis.MessageLevel.Warning)
                 return
 
         path_layer_A = get_file_path_of_layer(self.QCBox_InputData_A.currentLayer())
@@ -216,8 +216,8 @@ class PCA4CDDialog(QDialog, FORM_CLASS):
 
         if pca_files is False and pca_stats is False:
             self.MsgBar.pushMessage("Error calculating PCA", level=Qgis.MessageLevel.Critical, duration=10)
-            quit_msg = "The estimation matrix is empty, that usually happens due to nodata values. " \
-                       "Check the nodata value set in the plugin correspond to the nodata of the layer selected."
+            quit_msg = "The estimation matrix is empty, which usually happens due to NoData values. " \
+                       "Check that the NoData value set in the plugin matches the NoData value of the selected layer."
             QMessageBox.critical(self, 'Error calculating PCA', quit_msg, QMessageBox.StandardButton.Ok)
             return
 
@@ -228,7 +228,7 @@ class PCA4CDDialog(QDialog, FORM_CLASS):
             # then, open main analysis dialog
             self.open_main_analysis_dialog(pca_layers, pca_stats, nodata)
         else:
-            self.MsgBar.pushMessage("Error while generating the principal components, check the Qgis log", level=Qgis.MessageLevel.Critical)
+            self.MsgBar.pushMessage("Error while generating the principal components; check the QGIS log", level=Qgis.MessageLevel.Critical)
 
     @pyqtSlot()
     def open_main_analysis_dialog(self, pca_layers, pca_stats, nodata):
@@ -245,7 +245,7 @@ class PCA4CDDialog(QDialog, FORM_CLASS):
         from pca4cd.pca4cd import PCA4CD as pca4cd
         stack_path = self.QgsFile_LoadStackPCA.filePath()
         if not os.path.isfile(stack_path):
-            self.MsgBar.pushMessage("Select a valid stack for load", level=Qgis.MessageLevel.Warning)
+            self.MsgBar.pushMessage("Select a valid stack to load", level=Qgis.MessageLevel.Warning)
             return False
         # check the nodata value
         nodata = self.NoData_LoadPCA.text() if self.NoData_LoadPCA.text() not in ["", "None", "nan"] else None
@@ -253,7 +253,7 @@ class PCA4CDDialog(QDialog, FORM_CLASS):
             try:
                 nodata = float(nodata)
             except ValueError:
-                self.MsgBar.pushMessage("The nodata value is not valid", level=Qgis.MessageLevel.Warning)
+                self.MsgBar.pushMessage("The NoData value is not valid", level=Qgis.MessageLevel.Warning)
                 return
 
         # extract each band as component in tmp file

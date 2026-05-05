@@ -85,13 +85,13 @@
        <item>
         <widget class="QGroupBox" name="QGBox_InputData">
          <property name="title">
-          <string>Input Rasters Data</string>
+          <string>Input Raster Data</string>
          </property>
          <layout class="QVBoxLayout" name="verticalLayout_3">
           <item>
            <widget class="QLabel" name="label_5">
             <property name="text">
-             <string>Select one or two (as reference and target) input layer. Each band in A (and B) is a variable for the PCA:</string>
+             <string>Select one or two (as reference and target) input layers. Each band in A (and B) is a variable for the PCA:</string>
             </property>
             <property name="alignment">
              <set>Qt::AlignJustify|Qt::AlignVCenter</set>
@@ -296,14 +296,14 @@
              <item>
               <widget class="QLabel" name="label_8">
                <property name="text">
-                <string>nodata value:</string>
+                <string>NoData value:</string>
                </property>
               </widget>
              </item>
              <item>
               <widget class="QLineEdit" name="NoData_ComputePCA">
                <property name="toolTip">
-                <string>The nodata value set automatically from the stack A if this has the nodata value set</string>
+                <string>The NoData value is set automatically from stack A if it has a NoData value in the file metadata</string>
                </property>
                <property name="frame">
                 <bool>false</bool>
@@ -408,7 +408,7 @@
           <item>
            <widget class="QGroupBox" name="groupBox_2">
             <property name="title">
-             <string>Process Se&amp;ttings</string>
+             <string>Process &amp;Settings</string>
             </property>
             <property name="checkable">
              <bool>true</bool>
@@ -512,7 +512,7 @@
        <item>
         <widget class="QGroupBox" name="groupBox">
          <property name="title">
-          <string>Select &amp;the stack for load</string>
+          <string>Select the &amp;Stack to Load</string>
          </property>
          <property name="checked">
           <bool>false</bool>
@@ -577,14 +577,14 @@
                 <item>
                  <widget class="QLabel" name="label_9">
                   <property name="text">
-                   <string>nodata value:</string>
+                   <string>NoData value:</string>
                   </property>
                  </widget>
                 </item>
                 <item>
                  <widget class="QLineEdit" name="NoData_LoadPCA">
                   <property name="toolTip">
-                   <string>The nodata value set automatically from the stack if this has the nodata value set</string>
+                   <string>The NoData value is set automatically from the stack if it has a NoData value in the file metadata</string>
                   </property>
                   <property name="frame">
                    <bool>false</bool>
