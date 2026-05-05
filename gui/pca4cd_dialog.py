@@ -74,9 +74,9 @@ class PCA4CDDialog(QDialog, FORM_CLASS):
 
     def check_dependencies(self):
         try:
-            import pyqtgraph as pg
-            import dask
-        except:
+            import pyqtgraph  # noqa: F401
+            import dask  # noqa: F401
+        except ImportError:
             self.MsgBar.pushMessage("Error: missing dependencies.", level=Qgis.MessageLevel.Critical)
             msg = "\nError loading PCA4CD, this plugin requires additional Python packages to work. " \
                   "There are some alternatives to supply these dependencies. Read the install instructions here:\n\n" \
@@ -150,7 +150,7 @@ class PCA4CDDialog(QDialog, FORM_CLASS):
         nodata_value = src_ds.GetRasterBand(1).GetNoDataValue()
         nodata_value = str(nodata_value) if nodata_value not in [None, "nan"] else ""
         self.NoData_LoadPCA.setText(nodata_value)
-        del src_ds
+        src_ds = None
 
     @pyqtSlot()
     def set_number_of_components(self):
@@ -202,9 +202,7 @@ class PCA4CDDialog(QDialog, FORM_CLASS):
         if nodata is not None:
             try:
                 nodata = float(nodata)
-                if np.isnan(nodata):
-                    nodata = np.nan
-            except:
+            except ValueError:
                 self.MsgBar.pushMessage("The nodata value is not valid", level=Qgis.MessageLevel.Warning)
                 return
 
@@ -254,7 +252,7 @@ class PCA4CDDialog(QDialog, FORM_CLASS):
         if nodata is not None:
             try:
                 nodata = float(nodata)
-            except:
+            except ValueError:
                 self.MsgBar.pushMessage("The nodata value is not valid", level=Qgis.MessageLevel.Warning)
                 return
 

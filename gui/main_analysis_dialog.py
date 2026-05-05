@@ -19,10 +19,8 @@
  ***************************************************************************/
 """
 import os
-import platform
 import shutil
 import tempfile
-import subprocess
 
 import numpy as np
 from pathlib import Path
@@ -77,41 +75,16 @@ class MainAnalysisDialog(QDialog, FORM_CLASS):
         self.OpenMergeChangeLayers.clicked.connect(self.open_merge_change_layers)
 
         # size of the grid with view render widgets windows
-        if self.layer_b is not None:
-            if len(pca_layers) <= 4:
-                grid_rows = 2
-                grid_columns = 4
-            elif len(pca_layers) <= 8:
-                grid_rows = 3
-                grid_columns = 4
-            elif len(pca_layers) <= 12:
-                grid_rows = 4
-                grid_columns = 4
-            elif len(pca_layers) <= 16:
-                grid_rows = 5
-                grid_columns = 4
-            elif len(pca_layers) <= 20:
-                grid_rows = 5
-                grid_columns = 5
-        if self.layer_b is None:
-            if len(pca_layers) <= 3:
-                grid_rows = 2
-                grid_columns = 3
-            elif len(pca_layers) <= 6:
-                grid_rows = 3
-                grid_columns = 3
-            elif len(pca_layers) <= 9:
-                grid_rows = 4
-                grid_columns = 3
-            elif len(pca_layers) <= 12:
-                grid_rows = 4
-                grid_columns = 4
-            elif len(pca_layers) <= 16:
-                grid_rows = 5
-                grid_columns = 4
-            elif len(pca_layers) <= 20:
-                grid_rows = 5
-                grid_columns = 5
+        # one extra row above the principal components row holds the input layers
+        from math import ceil
+        grid_columns = 4 if self.layer_b is not None else 3
+        # widen to 4 columns for >=10 components when no layer B, to keep grid compact
+        if self.layer_b is None and len(pca_layers) > 9:
+            grid_columns = 4
+        # cap at 5 columns for very large component sets
+        if len(pca_layers) > 16:
+            grid_columns = 5
+        grid_rows = 1 + ceil(len(pca_layers) / grid_columns)
 
         # configure the views layout
         views_layout = QGridLayout()
@@ -243,24 +216,28 @@ class MainAnalysisDialog(QDialog, FORM_CLASS):
         for view_widget in MainAnalysisDialog.view_widgets:
             if view_widget.pc_id is not None:
                 src_ds = gdal.Open(str(get_file_path_of_layer(view_widget.render_widget.layer)), gdal.GA_ReadOnly)
-                ds = src_ds.GetRasterBand(1).ReadAsArray().flatten().astype(np.float32)
-                if np.isnan(nodata):
-                    ds = ds[~np.isnan(ds)]
-                else:
-                    ds = ds[ds != nodata]
-                try:
-                    mean = np.mean(ds)
-                    std = np.std(ds)
-                except:
+                if src_ds is None:
                     continue
+                ds = src_ds.GetRasterBand(1).ReadAsArray().flatten().astype(np.float32)
+                # always strip NaNs; also strip the explicit nodata sentinel if set
+                ds = ds[~np.isnan(ds)]
+                if nodata is not None and not np.isnan(nodata):
+                    ds = ds[ds != nodata]
+                if ds.size == 0:
+                    src_ds = None
+                    continue
+                mean = np.mean(ds)
+                std = np.std(ds)
                 renderer = QgsSingleBandGrayRenderer(view_widget.render_widget.layer.dataProvider(), 1)
                 ce = QgsContrastEnhancement(view_widget.render_widget.layer.dataProvider().dataType(0))
                 ce.setContrastEnhancementAlgorithm(QgsContrastEnhancement.ContrastEnhancementAlgorithm.StretchToMinimumMaximum)
-                ce.setMinimumValue(mean - 5*std)
-                ce.setMaximumValue(mean + 5*std)
+                ce.setMinimumValue(mean - 5 * std)
+                ce.setMaximumValue(mean + 5 * std)
                 renderer.setContrastEnhancement(ce)
                 view_widget.render_widget.layer.setRenderer(renderer)
-                del src_ds, ds
+                # release GDAL handle (assigning None is the canonical close idiom)
+                src_ds = None
+                del ds
 
     @pyqtSlot()
     def save_pca(self):
@@ -273,11 +250,12 @@ class MainAnalysisDialog(QDialog, FORM_CLASS):
 
         @wait_process
         def save():
-            nodata = ['-a_nodata', '0'] if MainAnalysisDialog.nodata is not None else []
-            cmd = ['gdal_merge' if platform.system() == 'Windows' else 'gdal_merge.py', '-q'] + \
-                  ['', '-separate', '-of', 'GTiff', '-o', '"{}"'.format(file_out)] + nodata + \
-                  ['"{}"'.format(get_file_path_of_layer(layer)) for layer in self.pca_layers]
-            subprocess.run(" ".join(cmd), shell=True)
+            input_files = [str(get_file_path_of_layer(layer)) for layer in self.pca_layers]
+            nodata_val = 0 if MainAnalysisDialog.nodata is not None else None
+            vrt = gdal.BuildVRT('', input_files, separate=True)
+            translate_opts = gdal.TranslateOptions(format='GTiff', noData=nodata_val)
+            gdal.Translate(str(file_out), vrt, options=translate_opts)
+            vrt = None
 
             self.MsgBar.pushMessage("PCA stack saved successfully: \"{}\"".format(os.path.basename(file_out)), level=Qgis.MessageLevel.Success)
 
@@ -324,29 +302,37 @@ class MainAnalysisDialog(QDialog, FORM_CLASS):
             shutil.copy(get_file_path_of_layer(self.activated_change_layers[0]), merged_change_layer)
 
         if len(self.activated_change_layers) > 1 and merge_method == "Union":
-            cmd = ['gdal_merge' if platform.system() == 'Windows' else 'gdal_merge.py',
-                   '-of', 'GTiff', '-o', '"{}"'.format(merged_change_layer), '-n', '0', '-a_nodata', '0', '-ot',
-                   'Byte'] + ['"{}"'.format(get_file_path_of_layer(layer)) for layer in self.activated_change_layers]
-            subprocess.run(" ".join(cmd), shell=True)
+            input_files = [str(get_file_path_of_layer(layer)) for layer in self.activated_change_layers]
+            vrt_opts = gdal.BuildVRTOptions(srcNodata=0, VRTNodata=0)
+            vrt = gdal.BuildVRT('', input_files, options=vrt_opts)
+            translate_opts = gdal.TranslateOptions(format='GTiff', outputType=gdal.GDT_Byte, noData=0)
+            gdal.Translate(str(merged_change_layer), vrt, options=translate_opts)
+            vrt = None
 
         if len(self.activated_change_layers) > 1 and merge_method == "Intersection":
-            alpha_list = ["A", "B", "C", "D", "E", "F", "G", "H", "I", "J", "K", "L", "M", "N", "O", "P", "Q", "R", "S",
-                          "T", "U", "V", "W", "X", "Y", "Z"]
-            input_files = {alpha_list[x]: str(get_file_path_of_layer(f)) for x, f in enumerate(self.activated_change_layers)}
-            filter_ones = ",".join([alpha_list[x] + "==1" for x in range(len(self.activated_change_layers))])
-            filter_zeros = ",".join([alpha_list[x] + "==0" for x in range(len(self.activated_change_layers))])
-
-            cmd = ['gdal_calc' if platform.system() == 'Windows' else 'gdal_calc.py', '--overwrite',
-                   '--calc', '"0*(numpy.any([{filter_zeros}], axis=0)) + 1*(numpy.all([{filter_ones}], axis=0))"'
-                       .format(filter_zeros=filter_zeros, filter_ones=filter_ones),
-                   '--outfile', '"{}"'.format(merged_change_layer), '--NoDataValue=0', '--type=Byte'] + \
-                  [i for sl in [["-{}".format(letter), '"{}"'.format(filepath)] for letter, filepath in input_files.items()] for i in sl]
-            subprocess.run(" ".join(cmd), shell=True)
+            input_files = [str(get_file_path_of_layer(f)) for f in self.activated_change_layers]
+            ref_ds = gdal.Open(input_files[0])
+            arrays = []
+            for fpath in input_files:
+                ds = gdal.Open(fpath)
+                arrays.append(ds.GetRasterBand(1).ReadAsArray())
+                ds = None
+            result = np.all(np.stack(arrays) == 1, axis=0).astype(np.uint8)
+            driver = gdal.GetDriverByName('GTiff')
+            out_ds = driver.Create(str(merged_change_layer), ref_ds.RasterXSize, ref_ds.RasterYSize, 1, gdal.GDT_Byte)
+            out_ds.SetGeoTransform(ref_ds.GetGeoTransform())
+            out_ds.SetProjection(ref_ds.GetProjection())
+            ref_ds = None
+            out_band = out_ds.GetRasterBand(1)
+            out_band.WriteArray(result)
+            out_band.SetNoDataValue(0)
+            out_ds.FlushCache()
+            out_ds = None
 
         # unset nodata
-        cmd = ['gdal_edit' if platform.system() == 'Windows' else 'gdal_edit.py',
-               '"{}"'.format(merged_change_layer), '-unsetnodata']
-        subprocess.run(" ".join(cmd), shell=True)
+        ds = gdal.Open(str(merged_change_layer), gdal.GA_Update)
+        ds.GetRasterBand(1).DeleteNoDataValue()
+        ds = None
         # apply style
         merged_layer = load_layer(merged_change_layer, add_to_legend=True if merge_dialog.LoadInQgis.isChecked() else False)
         apply_symbology(merged_layer, [("0", 0, (255, 255, 255, 0)), ("1", 1, (255, 255, 0, 255))])
@@ -371,4 +357,3 @@ class MainAnalysisDialog(QDialog, FORM_CLASS):
             self.MsgBar.pushMessage(
                 "The change detection for {} were merged, saved and loaded successfully".format(
                     ", ".join(self.activated_ids)), level=Qgis.MessageLevel.Success)
-

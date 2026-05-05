@@ -29,8 +29,8 @@ from qgis.PyQt.QtWidgets import QAction
 from qgis.PyQt.QtGui import QIcon
 from qgis.utils import iface
 
-# Initialize Qt resources from file resources.py
-from .resources import *
+# Initialize Qt resources from file resources.py (registers icons under :/plugins/pca4cd/)
+from . import resources  # noqa: F401
 
 from pca4cd.gui.pca4cd_dialog import PCA4CDDialog
 from pca4cd.gui.about_dialog import AboutDialog
@@ -59,7 +59,7 @@ class PCA4CD:
         # initialize locale
         try:
             locale = QSettings().value('locale/userLocale', QLocale().name(), type=str)[0:2]
-        except:
+        except (TypeError, AttributeError):
             locale = 'en'
         locale_path = os.path.join(self.plugin_dir, 'i18n', 'PCA4CD_{}.qm'.format(locale))
 

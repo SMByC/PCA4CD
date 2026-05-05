@@ -22,7 +22,6 @@ from pathlib import Path
 import numpy as np
 from osgeo import gdal
 from multiprocessing.pool import ThreadPool
-from subprocess import call
 
 from pca4cd.utils.system_utils import wait_process
 
@@ -158,8 +157,12 @@ def pca(A, B, n_pc, estimator_matrix, out_dir, n_threads, block_size, nodata=Non
     del src_ds_A, nodata_mask
 
     # compute the pyramids for each pc image
+    gdal.SetConfigOption('BIGTIFF_OVERVIEW', 'YES')
     for pca_file in pca_files:
-        call('gdaladdo -q --config BIGTIFF_OVERVIEW YES "{}"'.format(pca_file), shell=True)
+        ds = gdal.Open(str(pca_file), gdal.GA_Update)
+        ds.BuildOverviews('AVERAGE', [2, 4, 8, 16, 32])
+        ds = None
+    gdal.SetConfigOption('BIGTIFF_OVERVIEW', None)
 
     ########
     # pca statistics

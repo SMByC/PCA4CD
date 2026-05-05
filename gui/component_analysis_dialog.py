@@ -237,8 +237,11 @@ class ComponentAnalysisDialog(QWidget, FORM_CLASS):
         self.tmp_rubber_band = []
         # remove all features in aoi
         self.aoi_features.dataProvider().truncate()
+        # release GDAL handles before dropping references
+        self.pc_gdal_ds = None
+        self.driver_detection_layer = None
         del self.pc_data, self.pc_data_flat, self.aoi_data, self.HistogramPlot, self.hist_data, \
-            self.hist_data_pc, self.driver_detection_layer
+            self.hist_data_pc
 
     @pyqtSlot()
     def show(self):
@@ -359,6 +362,10 @@ class ComponentAnalysisDialog(QWidget, FORM_CLASS):
         else:  # for aoi
             self.stats_header.setText("Pixels in AOI: {}".format(round(data.size if data.size > 1 else 0, 2)))
             self.stats_header.setToolTip("")
+            if data.size <= 1:
+                for w in [self.stats_min, self.stats_max, self.stats_std, self.stats_p25, self.stats_p50, self.stats_p75]:
+                    w.setText("--")
+                return
         # restore or compute the statistics
         if self.QCBox_StatsLayer.currentText() == self.pc_name and self.stats_pc is not None:
             min, max, std, p25, p50, p75 = self.stats_pc
@@ -367,9 +374,9 @@ class ComponentAnalysisDialog(QWidget, FORM_CLASS):
             min = da.min(da_data).compute()
             max = da.max(da_data).compute()
             std = da.std(da_data).compute()
-            p25 = da.percentile(da_data, 25).compute()[0]
-            p50 = da.percentile(da_data, 50).compute()[0]
-            p75 = da.percentile(da_data, 75).compute()[0]
+            p25 = float(da.percentile(da_data, 25).compute())
+            p50 = float(da.percentile(da_data, 50).compute())
+            p75 = float(da.percentile(da_data, 75).compute())
             if self.QCBox_StatsLayer.currentText() == self.pc_name:
                 self.stats_pc = (min, max, std, p25, p50, p75)
         # set in dialog
@@ -423,26 +430,20 @@ class ComponentAnalysisDialog(QWidget, FORM_CLASS):
                 with block_signals_to(self.HistogramTypeBins):
                     self.HistogramTypeBins.setCurrentIndex(self.HistogramTypeBins.findText(hist_bins["type"]))
         # plot
+        def _histogram(data, bins):
+            bin_edges = np.histogram_bin_edges(data, bins=bins)
+            da_hist_data = da.from_array(data, chunks=(8000000,))
+            counts, edges = da.histogram(da_hist_data, bins=bin_edges)
+            return counts.compute(scheduler='threads', num_workers=cpu_count()), edges
+
         if stats_for == self.pc_name and set_bins in ["auto", "doane", "scott", "rice"]:
             if self.hist_data_pc[set_bins] is not None:
                 y, x = self.hist_data_pc[set_bins]  # restore histogram values
             else:
-                try:
-                    bin_edges = np.histogram_bin_edges(self.hist_data, bins=set_bins)
-                    da_hist_data = da.from_array(self.hist_data, chunks=(8000000,))
-                    y, x = da.histogram(da_hist_data, bins=bin_edges)
-                    y = y.compute(scheduler='threads', num_workers=cpu_count())
-                except:  # TODO: after some time delete, compatibility to old numpy version Qgis < 3.4
-                    y, x = np.histogram(self.hist_data, bins=set_bins)
+                y, x = _histogram(self.hist_data, set_bins)
                 self.hist_data_pc[set_bins] = (y, x)
         else:
-            try:
-                bin_edges = np.histogram_bin_edges(self.hist_data, bins=set_bins)
-                da_hist_data = da.from_array(self.hist_data, chunks=(8000000,))
-                y, x = da.histogram(da_hist_data, bins=bin_edges)
-                y = y.compute(scheduler='threads', num_workers=cpu_count())
-            except:  # TODO: after some time delete, compatibility to old numpy version Qgis < 3.4
-                y, x = np.histogram(self.hist_data, bins=set_bins)
+            y, x = _histogram(self.hist_data, set_bins)
         self.HistogramPlot.clear()
         self.HistogramPlot.plot(x, y, stepMode=True, fillLevel=0, brush=(80, 80, 80))
         self.HistogramPlot.autoRange()
@@ -475,6 +476,9 @@ class ComponentAnalysisDialog(QWidget, FORM_CLASS):
         pc_aoi = Path(pca4cd.tmp_dir, self.pc_layer.name() + "_clip_aoi.tif")
         clip_raster_with_shape(self.pc_layer, self.aoi_features, str(pc_aoi), MainAnalysisDialog.nodata)
         dataset = gdal.Open(str(pc_aoi), gdal.GA_ReadOnly)
+        if dataset is None:
+            self.aoi_data = np.array([np.nan])
+            return
         self.aoi_data = dataset.GetRasterBand(1).ReadAsArray().flatten()
         if MainAnalysisDialog.nodata is not None and not np.isnan(MainAnalysisDialog.nodata):
             self.aoi_data = np.delete(self.aoi_data, np.where(self.aoi_data == MainAnalysisDialog.nodata))
@@ -497,7 +501,7 @@ class ComponentAnalysisDialog(QWidget, FORM_CLASS):
         self.UndoAOI.setEnabled(True)
         self.DeleteAllAOI.setEnabled(True)
 
-        del dataset
+        dataset = None
         if pc_aoi.is_file():
             os.remove(pc_aoi)
 

@@ -21,7 +21,7 @@
 import os
 import tempfile
 from pathlib import Path
-from subprocess import call
+from osgeo import gdal
 
 from qgis.core import QgsVectorFileWriter
 
@@ -45,23 +45,28 @@ def mask(input_list, boolean_mask):
 def clip_raster_with_shape(target_layer, shape_layer, out_path, dst_nodata=None):
     from pca4cd.pca4cd import PCA4CD as pca4cd
     target_file = get_file_path_of_layer(target_layer)
-    # set the nodata
-    dst_nodata = "-dstnodata {}".format(dst_nodata) if dst_nodata is not None else ""
     # set the file path for the area of interest
     # check if the shape is a memory layer, then save and used it
-    if get_file_path_of_layer(shape_layer).is_file():
-        shape_file = get_file_path_of_layer(shape_layer)
+    shape_path = get_file_path_of_layer(shape_layer)
+    tmp_memory_file = None
+    if shape_path and shape_path.is_file():
+        shape_file = shape_path
     else:
         tmp_memory_file = pca4cd.tmp_dir / "memory_layer_aoi.gpkg"
         QgsVectorFileWriter.writeAsVectorFormat(shape_layer, str(tmp_memory_file), "System", shape_layer.crs(), "GPKG")
         shape_file = tmp_memory_file
 
     # clipping in shape
-    return_code = call('gdalwarp --config GDALWARP_IGNORE_BAD_CUTLINE YES -crop_to_cutline '
-                       '-cutline "{}" {} "{}" "{}"'.format(shape_file, dst_nodata, target_file, out_path),
-                       shell=True)
+    warp_opts = gdal.WarpOptions(
+        options=['--config', 'GDALWARP_IGNORE_BAD_CUTLINE', 'YES'],
+        cutlineDSName=str(shape_file),
+        cropToCutline=True,
+        dstNodata=dst_nodata,
+    )
+    result_ds = gdal.Warp(str(out_path), str(target_file), options=warp_opts)
+    result_ds = None
 
     # clean tmp file
-    if not get_file_path_of_layer(shape_layer).is_file() and tmp_memory_file.is_file():
+    if tmp_memory_file is not None and tmp_memory_file.is_file():
         os.remove(tmp_memory_file)
 

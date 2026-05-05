@@ -59,9 +59,9 @@ def get_layer_by_name(layer_name):
 
 def get_current_file_path_in(combo_box, show_message=True):
     file_path = get_file_path_of_layer(combo_box.currentLayer())
-    if file_path.is_file():
+    if file_path is not None and file_path.is_file():
         return file_path
-    elif show_message:
+    if show_message:
         iface.messageBar().pushMessage("PCA4CD", "Error, please select a valid file", level=Qgis.MessageLevel.Warning)
     return None
 
@@ -105,9 +105,12 @@ def load_layer(file_path, name=None, add_to_legend=True):
 
 
 def unload_layer(layer_path):
-    layers_loaded = QgsProject.instance().mapLayers().values()
-    for layer_loaded in layers_loaded:
-        if layer_loaded.isValid() and layer_path.resolve() == get_file_path_of_layer(layer_loaded).resolve():
+    layer_path = Path(layer_path).resolve()
+    for layer_loaded in QgsProject.instance().mapLayers().values():
+        if not layer_loaded.isValid():
+            continue
+        loaded_path = get_file_path_of_layer(layer_loaded)
+        if loaded_path and loaded_path.resolve() == layer_path:
             QgsProject.instance().removeMapLayer(layer_loaded.id())
 
 
@@ -176,6 +179,4 @@ def apply_symbology(rlayer, symbology, transparent=None):
             rlayer.dataProvider().setUserNoDataValue(1, nodata)
 
     # Repaint
-    if hasattr(rlayer, 'setCacheImage'):
-        rlayer.setCacheImage(None)
     rlayer.triggerRepaint()

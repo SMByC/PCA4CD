@@ -50,4 +50,3 @@ def classFactory(iface):  # pylint: disable=invalid-name
     # start
     from .pca4cd import PCA4CD
     return PCA4CD(iface)
-
