@@ -3,7 +3,7 @@
 #
 # Principal components analysis for change detection
 #                             -------------------
-#        copyright            : (C) 2018-2023 by Xavier Corredor Llano, SMByC
+#        copyright            : (C) 2018-2026 by Xavier Corredor Llano, SMByC
 #        email                : xavier.corredor.llano@gmail.com
 # ***************************************************************************/
 #
@@ -44,7 +44,7 @@ PY_FILES = \
     __init__.py \
     pca4cd.py
 
-UI_FILES = 
+UI_FILES =
 
 EXTRAS = metadata.txt
 

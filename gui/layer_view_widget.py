@@ -5,7 +5,7 @@
                                  A QGIS plugin
  Principal components analysis for change detection
                               -------------------
-        copyright            : (C) 2018-2023 by Xavier Corredor Llano, SMByC
+        copyright            : (C) 2018-2026 by Xavier Corredor Llano, SMByC
         email                : xavier.corredor.llano@gmail.com
  ***************************************************************************/
 
@@ -154,4 +154,3 @@ class LayerViewWidget(QWidget, FORM_CLASS):
         # synchronize extent canvas for the component analysis dialog respect to parent view widget
         new_extent = self.render_widget.canvas.extent()
         self.component_analysis_dialog.render_widget.update_canvas_to(new_extent)
-

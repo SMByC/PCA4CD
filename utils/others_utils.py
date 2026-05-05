@@ -5,7 +5,7 @@
                                  A QGIS plugin
  Principal components analysis for change detection
                               -------------------
-        copyright            : (C) 2018-2023 by Xavier Corredor Llano, SMByC
+        copyright            : (C) 2018-2026 by Xavier Corredor Llano, SMByC
         email                : xavier.corredor.llano@gmail.com
  ***************************************************************************/
 
@@ -69,4 +69,3 @@ def clip_raster_with_shape(target_layer, shape_layer, out_path, dst_nodata=None)
     # clean tmp file
     if tmp_memory_file is not None and tmp_memory_file.is_file():
         os.remove(tmp_memory_file)
-

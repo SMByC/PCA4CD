@@ -5,7 +5,7 @@
                                  A QGIS plugin
  Principal components analysis for change detection
                               -------------------
-        copyright            : (C) 2018-2023 by Xavier Corredor Llano, SMByC
+        copyright            : (C) 2018-2026 by Xavier Corredor Llano, SMByC
         email                : xavier.corredor.llano@gmail.com
  ***************************************************************************/
 
@@ -172,4 +172,3 @@ def pca(A, B, n_pc, estimator_matrix, out_dir, n_threads, block_size, nodata=Non
     pca_stats["eigenvectors"] = eigenvectors
 
     return pca_files, pca_stats
-
