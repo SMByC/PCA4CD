@@ -2,21 +2,21 @@
 
 ![](img/overview.png)
 
-PCA4CD is a QGIS plugin that computes Principal Component Analysis (PCA) and can create a change detection layer using PCA's dimensionality reduction properties. Designed mainly with the goal of:
+PCA4CD is a QGIS plugin that computes Principal Component Analysis (PCA) and builds change detection layers using PCA's dimensionality reduction properties. The workflow has two stages:
 
-1. Generate (or load) the principal components (PCA) of the input layers
-2. (optional) Build the change detection layer based on the dimensionality reduction properties of PCA.
+1. Generate (or load) the principal components of the input layers
+2. (Optional) Build a change detection layer from the components
 
-First, the main window is divided by two sections:
+The main window handles the first stage:
 
 * [Compute the principal components](#1a-compute-the-principal-components)
 * [Load the principal components](#1b-load-the-principal-components)
 
-The following steps are:
+The second stage:
 
 * [Change Detection Analysis](#2-change-detection-analysis)
   * [Generate the change layer by component](#2a-generate-the-change-layer-by-component)
-  * [Generate the merge change layer](#2b-generate-the-merge-change-layer)
+  * [Generate the merged change layer](#2b-generate-the-merged-change-layer)
 
 ## 1a. Compute the principal components
 
@@ -24,110 +24,104 @@ The following steps are:
 
 ### Input layers
 
-Select one or two input layer with or without multi-bands. If you use one layer (A) you must have all bands to process in it, instead if you want, for example, analysis two different periods for the same region is better use two layers, you can put the reference layer in (A) and the target layer in (B).
+Select one or two raster layers (each can be single or multi-band). Use a single layer (A) when all bands to analyze are already stacked. Use two layers (A + B) when comparing two time periods — place the reference image in A and the target in B.
 
-> *Warning:* 
-    If you use A and B layers,the plugin required that both layers have the same extent, the same pixel size and same projection.
+> **Note:** When using both A and B, both layers must share the same extent, pixel size, and projection.
 
-Is important to know that each band in A (and B if enabled) is a variable for PCA, then the maximum number of components for compute is the total of bands in A (plus bands in B).
+Each band in A (and B, if enabled) is one variable for the PCA, so the maximum number of components equals the total band count across both layers.
 
 ### Nodata value
 
-The no data value is very important to set if the image have no valid value, else the PCA will be very affected by it. The nodata value set automatically from the stack A if this has the nodata value set as metadata inside the file.
+Always set the nodata value if the image contains invalid pixels — incorrect or missing nodata will distort the PCA. The value is auto-detected from layer A's file metadata when available.
 
-### The estimator matrix
+### Estimator matrix
 
-Use _Correlation_ or _Covariance_ depend on the data and of type of data (by default and recommended is the correlation). Some points about the use of these two specific estimators in the dimensionality reduction process:
+Choose _Correlation_ (default, recommended) or _Covariance_ based on your data:
 
-* The covariance is dependent on the scale of the variables
-
-* The correlation coefficients are insensitive to the variation of the dispersion of the data, so the covariance produces structures of better defined factors (Tinsley & Tinsley, 1987)
-
-* Use covariance to preserve variance if the range and scale of the variables are similar or in the same units of measure.
-
-* Use the correlation when the range within the variable and the scale differ widely (variables such as temperature, pressure, humidity, etc.)
+* **Covariance** is scale-dependent — use it when all variables share the same units and similar value ranges, as it preserves the original variance structure.
+* **Correlation** normalizes each variable to unit variance — recommended when variables have different scales or units (e.g., temperature, pressure, multiple spectral bands). Correlation is insensitive to differences in dispersion, producing more stable factor structures (Tinsley & Tinsley, 1987).
 
 ### Process settings
 
-To compute the principal components for a image, like a Landsat scene or bigger, required relatively a heavy computation, **the PCA4CD compute the PCA in parallel process** for reducing the time and the memory usage. However, good free RAM memory is required for not crash in the process, if this happens, try to use lower values in these parameters.
+Computing PCA on large images (e.g., a full Landsat scene) is computationally intensive. **PCA4CD runs the computation in parallel** to reduce processing time and memory usage. If the process runs out of memory, reduce the thread count or block size in these settings.
 
 ## 1b. Load the principal components
 
 <img src="img/1b.png" width="50%">
 
-This is for analysis and creates the change layer of the principal components already generated, then you must load the principal components externally, this could have been generated with this plugin or not, but is important that bands are in order respect to the components of PCA.
+Use this section to load a pre-computed PCA stack — generated by this plugin or any other tool — and go directly to change detection. The bands must be ordered to match the PCA component sequence.
 
-The no data value is very important to set if the image have no valid value. The nodata value set automatically from the stack A if this has the nodata value set as metadata inside the file.
+Set the nodata value if applicable; it is auto-detected from the file metadata when present.
 
 ## 2. Change Detection Analysis
 
-After compute or load the principal components, the plugin open the following change detection analysis dialog:
+After computing or loading the principal components, the change detection dialog opens:
 
 <img src="img/2a.png" width="100%">
 
-**A. Principal row:** In the center in the first row, the original input layer A (and B) is shown, these could be used as a reference of analysis, however you can change it if you want.
+**A. Principal row:** The first row shows the original input layers (A and B) as a visual reference. The displayed layer can be changed freely.
 
-**B. Components rows:** The next rows are for the principal components computed or loaded. The size of the dialog is changed based of the number of principal components.
+**B. Component rows:** Each subsequent row corresponds to one principal component. The number of rows adjusts to the number of components.
 
-**C. Save PCA:** (Optional) This button is for save all the principal components generated as bands in one stack.
+**C. Save PCA:** (Optional) Saves all principal components as a single multi-band GeoTIFF stack.
 
-**D. Generate/Save the Merged Change Layer:** Merge all created and activated change layers of the principal components views (use this as the last step of the process, see below)
+**D. Generate/Save the Merged Change Layer:** Merges all activated component change layers into the final output (the last step — see below).
 
 ### 2a. Generate the change layer by component
 
-Use the principal row (input and auxiliary layers) in the "change detection analysis" dialog to find and choose the better components (one or more) that capture the changes you want.
+Use the principal row as a reference to identify which components best capture the changes of interest.
 
 <img src="img/2b.png" width="50%">
 
-In this example, I picked the component 3 and 8
+*Example: components 3 and 8 were selected.*
 
-**E. Enable/disable the change layer:** When the change layer is created this is useful for show/hide the change layer. You must activate this for enable the "change detection layer" (F) button.
+**E. Enable/disable the change layer:** Toggles visibility of the change layer for this component and enables button (F).
 
-**F. Change detection layer:** This open the "Component Analysis" dialog for this principal component.
+**F. Change detection layer:** Opens the Component Analysis dialog for this component.
 
 <img src="img/2c.png" width="90%">
 
-With this dialog, you can generate the change detection layer using a range of values (lower and upper). The plugin provides three ways for choosing the correct range of values depends on you looking for.
+Define the change range (lower and upper bounds) using one of three methods:
 
-1. **Using the mouse picker:** Pick the value using the mouse over the image using the _from value_ picker and _to value_ picker mouse tool. The value is fixed using the left mouse button. When the two values are set, click in _Generate_ for compute the change detection layer.
+1. **Mouse picker:** Use the _from value_ and _to value_ picker tools to click directly on the map. Confirm each value with the left mouse button, then click _Generate_.
 
     <img src="img/2d.png" width="75%">
 
-2. **Using AOI picker:** You can use several areas of interest using the AOI picker to capturing the values in the image that represent the change you want of this component. The plugin updates the statistics automatically for the pixels inside the AOIs and computes the minimum and maximum as the range of the change detection layer.
+2. **AOI picker:** Draw one or more areas of interest over pixels representing the changes to capture. The plugin automatically derives the min/max range from the AOI pixels and updates the change layer after each new AOI.
 
-    Tips for the AOI picker: _left mouse button_ for create new point of the AOI, _esc_ or _backspace_ keyboard key for delete the last point, _right mouse button_ for finish the current AOI. The change detection layer is automatically created/updated every new AOI.
+    *Controls: left-click to add a vertex, Esc/Backspace to remove the last vertex, right-click to close the AOI.*
 
     <img src="img/2e.png" width="90%">
 
-3. **Using the histogram:** The histogram is interactive, you can zoom in/out and stretch. The range values is the yellow area, you can change it manually with the mouse, when the yellow area is changed the range values change automatically (and vice versa), then do click in _Generate_ for compute the change detection layer.
+3. **Histogram:** The interactive histogram shows the value distribution. Drag the yellow region to adjust the range — the numeric fields update in real time (and vice versa). Click _Generate_ to apply.
 
     <img src="img/2f.png" width="90%">
 
-### 2b. Generate the merge change layer
+### 2b. Generate the merged change layer
 
-When you have generated all change layers by components, you must active/enable the change detection layers (E button) for all layer that you want inside the final change layer.
+Once all desired component change layers are generated, enable each one with button (E), then click **Generate/Save the Merged Change Layer**.
 
 <img src="img/2g.png" width="90%">
 
-then do click on "Generate/Save the Merged Change Layer" button, this open the merge dialog:
+The merge dialog opens:
 
 <img src="img/2h.png" width="60%">
 
-Choose the method for merge, select the file for store the final merge layer and do click in Ok button.
+Select the merge method, choose the output file path, and click OK.
 
 <img src="img/2i.png" width="90%">
 
-The merged change layer is saved and loaded for all view in the first row, is loaded (if was activated) in Qgis too. You can adjust/regenerate it changing the detection layer by components and merge again.
+The merged layer is saved, displayed in all first-row views, and optionally loaded into QGIS. You can refine individual component layers and re-merge at any time.
 
-Finally, you can close the plugin and continue the analysis and adjustments of the final layer in Qgis.
+When the result is satisfactory, close the plugin and continue working with the merged layer in QGIS.
 
 ## About us
 
-PCA4CD was developing, designed and implemented by the Group of Forest and Carbon Monitoring System (SMByC), operated by the Institute of Hydrology, Meteorology and Environmental Studies (IDEAM) - Colombia.
+PCA4CD was developed and implemented by the Group of Forest and Carbon Monitoring System (SMByC), operated by the Institute of Hydrology, Meteorology and Environmental Studies (IDEAM) — Colombia.
 
 Author and developer: *Xavier C. Llano* *<xavier.corredor.llano@gmail.com>*  
-Theoretical support, tester and product verification: SMByC-PDI group
+Theoretical support, testing and product verification: SMByC-PDI group
 
 ## License
 
-PCA4CD is a free/libre software and is licensed under the GNU General Public License.
+PCA4CD is free/libre software licensed under the GNU General Public License.

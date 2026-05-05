@@ -2,49 +2,44 @@
 
 ![](icons/pca4cd.svg)
 
-PCA4CD is a QGIS plugin that computes Principal Component Analysis (PCA) and can create a change detection layer using PCA's dimensionality reduction properties. Designed mainly with the goal of:
+PCA4CD is a QGIS plugin that computes Principal Component Analysis (PCA) and builds change detection layers using PCA's dimensionality reduction properties:
 
-1. Generate (or load) the principal components (PCA) of the input layers
-2. (optional) Build the change detection layer based on the dimensionality reduction properties of PCA.
+1. Generate (or load) the principal components of the input layers
+2. (Optional) Build a change detection layer from the components
 
 ![](docs/img/overview.png)
 
-Read more in: [https://smbyc.github.io/PCA4CD](https://smbyc.github.io/PCA4CD)
+Read more at: [https://smbyc.github.io/PCA4CD](https://smbyc.github.io/PCA4CD)
 
 ## Installation
 
-PCA4CD requires additional Python packages, that are generally not part of QGIS's Python, however the plugin has all the libs and dependencies inside, it must work on a 64bit system. The libraries are:
+The plugin bundles its required Python dependencies and should work out of the box:
 
-* Python-Dask
+* Dask
 * PyQtGraph
 
-> *Warning:*
-    This plugin requires QGIS >= 3.18 and is compatible with both QGIS 3.x (Qt5/PyQt5) and QGIS 4.x (Qt6/PyQt6).
+> **Requirements:** QGIS >= 3.18. Compatible with both QGIS 3.x (Qt5/PyQt5) and QGIS 4.x (Qt6/PyQt6).
 
-If you have issues with this try with the alternative installation below.
-
-#### Using Conda
-
-If you have problems with the dependencies, the best options to solve it is use [conda](https://docs.conda.io/en/latest/miniconda.html) and install Arosics and Qgis (from the conda shell):
+If dependency loading fails, install them manually using [conda](https://docs.conda.io/en/latest/miniconda.html):
 
 ```bash
 conda install -c conda-forge dask pyqtgraph qgis
 ```
 
-After that open Qgis from the shell with `qgis` command. Then install the plugin.
+Then open QGIS from the conda shell with the `qgis` command and install the plugin.
 
 ## Source code
 
-Source code, issue tracker, QA and ideas: [https://github.com/SMByC/PCA4CD](https://github.com/SMByC/PCA4CD)
-The home plugin in plugins.qgis.org: [https://plugins.qgis.org/plugins/pca4cd/](https://plugins.qgis.org/plugins/pca4cd/)
+Source code, issue tracker, and ideas: [https://github.com/SMByC/PCA4CD](https://github.com/SMByC/PCA4CD)  
+Plugin page: [https://plugins.qgis.org/plugins/pca4cd/](https://plugins.qgis.org/plugins/pca4cd/)
 
 ## About us
 
-PCA4CD was developing, designed and implemented by the Group of Forest and Carbon Monitoring System (SMByC), operated by the Institute of Hydrology, Meteorology and Environmental Studies (IDEAM) - Colombia.
+PCA4CD was developed and implemented by the Group of Forest and Carbon Monitoring System (SMByC), operated by the Institute of Hydrology, Meteorology and Environmental Studies (IDEAM) — Colombia.
 
 Author and developer: *Xavier C. Llano* *<xavier.corredor.llano@gmail.com>*  
-Theoretical support, tester and product verification: SMByC-PDI group
+Theoretical support, testing and product verification: SMByC-PDI group
 
 ## License
 
-PCA4CD is a free/libre software and is licensed under the GNU General Public License.
+PCA4CD is free/libre software licensed under the GNU General Public License.
