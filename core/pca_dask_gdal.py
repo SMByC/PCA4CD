@@ -49,7 +49,7 @@ def pca(A, B, n_pc, estimator_matrix, out_dir, n_threads, block_size, nodata=Non
     src_ds_B = None
     for band in range(src_ds_A.RasterCount):
         ds = src_ds_A.GetRasterBand(band + 1).ReadAsArray().flatten().astype(np.float32)
-        if np.isnan(nodata):
+        if nodata is not None and np.isnan(nodata):
             nodata_mask = np.isnan(ds) if nodata_mask is None else np.logical_or(nodata_mask, np.isnan(ds))
         elif nodata is not None:
             nodata_mask = ds==nodata if nodata_mask is None else np.logical_or(nodata_mask, ds==nodata)
@@ -58,7 +58,7 @@ def pca(A, B, n_pc, estimator_matrix, out_dir, n_threads, block_size, nodata=Non
         src_ds_B = gdal.Open(str(B), gdal.GA_ReadOnly)
         for band in range(src_ds_B.RasterCount):
             ds = src_ds_B.GetRasterBand(band + 1).ReadAsArray().flatten().astype(np.float32)
-            if np.isnan(nodata):
+            if nodata is not None and np.isnan(nodata):
                 nodata_mask = np.logical_or(nodata_mask, np.isnan(ds))
             elif nodata is not None:
                 nodata_mask = np.logical_or(nodata_mask, ds==nodata)
@@ -100,6 +100,8 @@ def pca(A, B, n_pc, estimator_matrix, out_dir, n_threads, block_size, nodata=Non
     del raw_image, flat_dims, ds
 
     if estimation_matrix[~np.isnan(estimation_matrix)].size == 0:
+        src_ds_A = None
+        src_ds_B = None
         return False, False
 
     ########
@@ -154,7 +156,9 @@ def pca(A, B, n_pc, estimator_matrix, out_dir, n_threads, block_size, nodata=Non
         pca_files.append(tmp_pca_file)
 
     # free mem
-    del src_ds_A, nodata_mask
+    src_ds_A = None
+    src_ds_B = None
+    del nodata_mask
 
     # compute the pyramids for each pc image
     gdal.SetConfigOption('BIGTIFF_OVERVIEW', 'YES')

@@ -52,7 +52,7 @@ class PickerPixelPointTool(QgsMapTool):
         x = event.pos().x()
         y = event.pos().y()
         point = self.render_widget.canvas.getCoordinateTransform().toMapCoordinates(x, y)
-        pixel_value = self.render_widget.layer.dataProvider().identify(point, QgsRaster.IdentifyFormat.IdentifyFormatValue).results()[1]
+        pixel_value = self.render_widget.layer.dataProvider().identify(point, QgsRaster.IdentifyFormat.IdentifyFormatValue).results().get(1)
         if pixel_value is not None:
             self.picker_widget.setValue(pixel_value)
 
@@ -218,6 +218,8 @@ class ComponentAnalysisDialog(QWidget, FORM_CLASS):
         self.RangeChangeTo.valueChanged.connect(self.update_region_from_values)
         # statistics for current principal component
         self.pc_gdal_ds = gdal.Open(str(get_file_path_of_layer(self.pc_layer)), gdal.GA_ReadOnly)
+        if self.pc_gdal_ds is None:
+            raise RuntimeError("Could not open raster file for component: {}".format(self.pc_layer.name()))
         self.pc_data = self.pc_gdal_ds.GetRasterBand(1).ReadAsArray()
         self.pc_data_flat = self.pc_data.flatten()
         self.pc_data_flat = self.pc_data_flat[~np.isnan(self.pc_data_flat)]
@@ -485,7 +487,10 @@ class ComponentAnalysisDialog(QWidget, FORM_CLASS):
         if dataset is None:
             self.aoi_data = np.array([np.nan])
             return
-        self.aoi_data = dataset.GetRasterBand(1).ReadAsArray().flatten()
+        try:
+            self.aoi_data = dataset.GetRasterBand(1).ReadAsArray().flatten()
+        finally:
+            dataset = None
         if MainAnalysisDialog.nodata is not None and not np.isnan(MainAnalysisDialog.nodata):
             self.aoi_data = np.delete(self.aoi_data, np.where(self.aoi_data == MainAnalysisDialog.nodata))
         self.aoi_data = np.delete(self.aoi_data, np.where(np.isnan(self.aoi_data)))
@@ -493,21 +498,21 @@ class ComponentAnalysisDialog(QWidget, FORM_CLASS):
             self.aoi_data = np.array([np.nan])
         # update statistics and histogram plot
         self.set_statistics()
-        # update range values using min/max of AOI with decimal adjusted for include in change layer
-        range_from = np.floor(np.min(self.aoi_data)*1000000000)/1000000000
-        range_to = np.ceil(np.max(self.aoi_data)*1000000000)/1000000000
-        # double set due the synchronization values from plot min/max adjust
-        self.RangeChangeFrom.setValue(range_from)
-        self.RangeChangeTo.setValue(range_to)
-        self.RangeChangeFrom.setValue(range_from)
-        self.RangeChangeTo.setValue(range_to)
-        # auto generate/update the detection layer
-        self.generate_detection_layer()
+        # update range values using min/max of AOI (skip when all data is NaN)
+        if self.aoi_data.size > 1:
+            range_from = np.floor(np.min(self.aoi_data)*1000000000)/1000000000
+            range_to = np.ceil(np.max(self.aoi_data)*1000000000)/1000000000
+            # double set due the synchronization values from plot min/max adjust
+            self.RangeChangeFrom.setValue(range_from)
+            self.RangeChangeTo.setValue(range_to)
+            self.RangeChangeFrom.setValue(range_from)
+            self.RangeChangeTo.setValue(range_to)
+            # auto generate/update the detection layer
+            self.generate_detection_layer()
         # enable undo and delete buttons
         self.UndoAOI.setEnabled(True)
         self.DeleteAllAOI.setEnabled(True)
 
-        dataset = None
         if pc_aoi.is_file():
             os.remove(pc_aoi)
 

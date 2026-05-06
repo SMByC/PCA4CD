@@ -45,6 +45,8 @@ def mask(input_list, boolean_mask):
 def clip_raster_with_shape(target_layer, shape_layer, out_path, dst_nodata=None):
     from pca4cd.pca4cd import PCA4CD as pca4cd
     target_file = get_file_path_of_layer(target_layer)
+    if target_file is None:
+        return
     # set the file path for the area of interest
     # check if the shape is a memory layer, then save and used it
     shape_path = get_file_path_of_layer(shape_layer)
