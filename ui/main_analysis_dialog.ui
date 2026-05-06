@@ -114,6 +114,26 @@
           </widget>
          </item>
          <item>
+          <widget class="QToolButton" name="ShowPCAInfo">
+           <property name="toolTip">
+            <string>Show eigenvalues and eigenvectors of the computed PCA</string>
+           </property>
+           <property name="text">
+            <string>PCA Info</string>
+           </property>
+           <property name="icon">
+            <iconset>
+             <normaloff>:/plugins/pca4cd/icons/about.svg</normaloff>:/plugins/pca4cd/icons/about.svg</iconset>
+           </property>
+           <property name="toolButtonStyle">
+            <enum>Qt::ToolButtonTextBesideIcon</enum>
+           </property>
+           <property name="autoRaise">
+            <bool>true</bool>
+           </property>
+          </widget>
+         </item>
+         <item>
           <widget class="QToolButton" name="OpenMergeChangeLayers">
            <property name="toolTip">
             <string>Merge all created and activated change layers of the principal components views</string>

@@ -34,6 +34,7 @@ from qgis.utils import iface
 
 from pca4cd.gui.layer_view_widget import LayerViewWidget
 from pca4cd.gui.merge_change_layers_dialog import MergeChangeLayersDialog
+from pca4cd.gui.pca_info_dialog import PCAInfoDialog
 from pca4cd.utils.qgis_utils import load_layer, apply_symbology, get_file_path_of_layer, unload_layer
 from pca4cd.utils.system_utils import wait_process
 
@@ -71,6 +72,12 @@ class MainAnalysisDialog(QDialog, FORM_CLASS):
         if self.layer_a is None:
             self.SavePCA.setDisabled(True)
             self.SavePCA.setToolTip("Not available if the components are loaded externally")
+        # show eigenvalues / eigenvectors
+        self.ShowPCAInfo.clicked.connect(self.show_pca_info)
+        if pca_stats is None or pca_stats.get("eigenvals") is None:
+            self.ShowPCAInfo.setDisabled(True)
+            self.ShowPCAInfo.setToolTip("Not available if the components are loaded externally")
+        self._pca_info_dialog = None
         # merge change layer
         self.OpenMergeChangeLayers.clicked.connect(self.open_merge_change_layers)
 
@@ -261,6 +268,18 @@ class MainAnalysisDialog(QDialog, FORM_CLASS):
 
         if file_out != '':
             save()
+
+    @pyqtSlot()
+    def show_pca_info(self):
+        """Open (or raise) a modeless dialog with eigenvalues and eigenvectors."""
+        if self._pca_info_dialog is not None and self._pca_info_dialog.isVisible():
+            self._pca_info_dialog.raise_()
+            self._pca_info_dialog.activateWindow()
+            return
+        self._pca_info_dialog = PCAInfoDialog(MainAnalysisDialog.pca_stats, parent=self)
+        self._pca_info_dialog.setAttribute(Qt.WidgetAttribute.WA_DeleteOnClose, True)
+        self._pca_info_dialog.destroyed.connect(lambda: setattr(self, "_pca_info_dialog", None))
+        self._pca_info_dialog.show()
 
     @pyqtSlot()
     def open_merge_change_layers(self):

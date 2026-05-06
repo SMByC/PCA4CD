@@ -45,6 +45,7 @@ def pca(A, B, n_pc, estimator_matrix, out_dir, n_threads, block_size, nodata=Non
 
     raw_image = []
     nodata_mask = None
+    band_labels = []
     src_ds_A = gdal.Open(str(A), gdal.GA_ReadOnly)
     src_ds_B = None
     for band in range(src_ds_A.RasterCount):
@@ -54,6 +55,7 @@ def pca(A, B, n_pc, estimator_matrix, out_dir, n_threads, block_size, nodata=Non
         elif nodata is not None:
             nodata_mask = ds==nodata if nodata_mask is None else np.logical_or(nodata_mask, ds==nodata)
         raw_image.append(ds)
+        band_labels.append("A·B{}".format(band + 1) if B else "B{}".format(band + 1))
     if B:
         src_ds_B = gdal.Open(str(B), gdal.GA_ReadOnly)
         for band in range(src_ds_B.RasterCount):
@@ -63,6 +65,7 @@ def pca(A, B, n_pc, estimator_matrix, out_dir, n_threads, block_size, nodata=Non
             elif nodata is not None:
                 nodata_mask = np.logical_or(nodata_mask, ds==nodata)
             raw_image.append(ds)
+            band_labels.append("B·B{}".format(band + 1))
 
     # pair-masking data, let only the valid data across all dimensions/bands
     if nodata is not None:
@@ -171,8 +174,10 @@ def pca(A, B, n_pc, estimator_matrix, out_dir, n_threads, block_size, nodata=Non
     ########
     # pca statistics
     pca_stats = {}
+    pca_stats["estimator"] = estimator_matrix
     pca_stats["eigenvals"] = eigenvals
     pca_stats["eigenvals_%"] = eigenvals*100/n_bands
     pca_stats["eigenvectors"] = eigenvectors
+    pca_stats["band_labels"] = band_labels
 
     return pca_files, pca_stats
