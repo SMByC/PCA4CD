@@ -200,14 +200,18 @@ class ComponentAnalysisDialog(QWidget, FORM_CLASS):
         self.hist_data = None
         self.hist_data_pc = {"auto": None, "doane": None, "scott": None, "rice": None}  # store histogram done for principal components
         self.hist_bins = {"pc": {"type": "auto", "bins": None}, "aoi": {"type": "auto", "bins": None}}
-        self.HistogramPlot.setTitle('Histogram', size='9pt')
-        self.HistogramPlot.setBackground('w')
-        self.HistogramPlot.showGrid(x=True, y=True, alpha=0.3)
+        self.HistogramPlot.setBackground((245, 245, 245))
+        self.HistogramPlot.showGrid(x=True, y=True, alpha=0.5)
+        self.HistogramPlot.setLabel('bottom', 'Value', size='8pt')
+        self.HistogramPlot.setLabel('left', 'Count', size='8pt')
+        self.HistogramPlot.showAxis('right', False)
+        self.HistogramPlot.showAxis('top', False)
+        self.HistogramPlot.hideButtons()
         self.HistogramTypeBins.currentTextChanged.connect(lambda value: self.histogram_plot(bins=value))
         self.HistogramCustomBins.hide()
         self.HistogramCustomBins.valueChanged.connect(lambda value: self.histogram_plot(bins=value))
         # init region and synchronize the region on plot with range values
-        self.linear_region = pg.LinearRegionItem(brush=(255, 255, 0, 40))
+        self.linear_region = pg.LinearRegionItem(brush=(255, 210, 0, 55))
         self.HistogramPlot.addItem(self.linear_region)
         self.linear_region.sigRegionChanged.connect(self.update_region_from_plot)
         self.RangeChangeFrom.valueChanged.connect(self.update_region_from_values)
@@ -445,7 +449,9 @@ class ComponentAnalysisDialog(QWidget, FORM_CLASS):
         else:
             y, x = _histogram(self.hist_data, set_bins)
         self.HistogramPlot.clear()
-        self.HistogramPlot.plot(x, y, stepMode=True, fillLevel=0, brush=(80, 80, 80))
+        self.HistogramPlot.plot(x, y, stepMode=True, fillLevel=0,
+                                brush=(100, 160, 220, 180),
+                                pen=pg.mkPen(color=(60, 120, 180), width=0.8))
         self.HistogramPlot.autoRange()
         self.HistogramPlot.addItem(self.linear_region)
         hist_bins["bins"] = len(y)  # store bins
