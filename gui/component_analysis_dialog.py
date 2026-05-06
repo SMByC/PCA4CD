@@ -211,7 +211,11 @@ class ComponentAnalysisDialog(QWidget, FORM_CLASS):
         self.HistogramCustomBins.hide()
         self.HistogramCustomBins.valueChanged.connect(lambda value: self.histogram_plot(bins=value))
         # init region and synchronize the region on plot with range values
-        self.linear_region = pg.LinearRegionItem(brush=(255, 210, 0, 55))
+        self.linear_region = pg.LinearRegionItem(
+            brush=(255, 210, 0, 55),
+            pen=pg.mkPen(color=(180, 140, 0), width=2),
+            hoverPen=pg.mkPen(color=(220, 170, 0), width=3),
+        )
         self.HistogramPlot.addItem(self.linear_region)
         self.linear_region.sigRegionChanged.connect(self.update_region_from_plot)
         self.RangeChangeFrom.valueChanged.connect(self.update_region_from_values)
