@@ -22,16 +22,33 @@
 import os
 import site
 
+from qgis.PyQt.QtWidgets import QMessageBox
 
-def pre_init_plugin_libs_inside():
-    extra_libs_path = os.path.abspath(os.path.join(os.path.dirname(__file__), "extlibs"))
+from pca4cd.utils import extralibs
 
+
+def check_dependencies() -> bool:
+    """Return True if all required extra libraries are importable."""
+    try:
+        import dask  # noqa: F401
+        import pyqtgraph  # noqa: F401
+        return True
+    except ImportError:
+        return False
+
+
+def pre_init_plugin() -> None:
+    """Add the bundled *extlibs* directory into plugin folder so that extra
+    Python packages can be imported before loading the plugin.
+    """
+    extra_libs_path = os.path.abspath(
+        os.path.join(os.path.dirname(__file__), "extlibs")
+    )
     if os.path.isdir(extra_libs_path):
-        # add to python path
         site.addsitedir(extra_libs_path)
-        # keep pkg_resources working set in sync if it is in use
+        # Register with pkg_resources when available (removed in Python 3.12+)
         try:
-            import pkg_resources
+            import pkg_resources  # noqa: F401
             pkg_resources.working_set.add_entry(extra_libs_path)
         except ImportError:
             pass
@@ -44,9 +61,26 @@ def classFactory(iface):  # pylint: disable=invalid-name
     :param iface: A QGIS interface instance.
     :type iface: QgsInterface
     """
-    # load/install extra python dependencies
-    pre_init_plugin_libs_inside()
+    # Attempt to load bundled extra dependencies first
+    pre_init_plugin()
 
-    # start
+    if not check_dependencies():
+        # Extra libs missing – download and install them, then retry
+        extralibs.install()
+        pre_init_plugin()
+
+        if not check_dependencies():
+            msg = (
+                "Error loading libraries for PCA4CD.\n\n"
+                "Read the install instructions here:\n"
+                "https://github.com/SMByC/PCA4CD#installation"
+            )
+            QMessageBox.critical(
+                None,
+                "PCA4CD: Error loading",
+                msg,
+                QMessageBox.StandardButton.Ok,
+            )
+
     from .pca4cd import PCA4CD
     return PCA4CD(iface)

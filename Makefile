@@ -48,7 +48,7 @@ UI_FILES =
 
 EXTRAS = metadata.txt LICENSE
 
-EXTRA_DIRS = core utils gui libs ui icons extlibs
+EXTRA_DIRS = core utils gui libs ui icons
 
 COMPILED_RESOURCE_FILES = resources.py
 
@@ -94,6 +94,19 @@ test: compile transcompile
 	@echo "e.g. source run-env-linux.sh <path to qgis install>; make test"
 	@echo "----------------------"
 
+extlibs:
+	@echo
+	@echo "---------------------------"
+	@echo "Building extlibs.zip"
+	@echo "---------------------------"
+	rm -rf extlibs extlibs.zip
+	pip install --target=extlibs --no-deps -r requirements.txt
+	find extlibs -type d \( -name "__pycache__" -o -name "*.egg-info" -o -name "tests" -o -name "test" -o -name "bin" -o -name "examples" \) -prune -exec rm -rf {} +
+	find extlibs -type f \( -name "*.pyc" -o -name "*.pyo" -o -name "*.so" -o -name "*.dll" -o -name "*.dylib" \) -delete
+	cd extlibs && zip -9r ../extlibs.zip .
+	rm -rf extlibs
+	@echo "Created package: extlibs.zip"
+
 zip: compile
 	@echo
 	@echo "---------------------------"
@@ -106,7 +119,7 @@ zip: compile
 		if [ -d "$$d" ]; then cp -rf $$d .pkg_tmp/$(PLUGINNAME)/; fi; \
 	done
 	find .pkg_tmp -type d \( -name "__pycache__" -o -name "*.dist-info" -o -name "*.egg-info" \) -prune -exec rm -rf {} \;
-	find .pkg_tmp -type f \( -name "*.pyc" -o -name "*.pyo" \) -delete
+	find .pkg_tmp -type f \( -name "*.pyc" -o -name "*.pyo" -o -name "*.sh" -o -name "*.db" \) -delete
 	cd .pkg_tmp && zip -9r ../$(PLUGINNAME).zip $(PLUGINNAME)
 	rm -rf .pkg_tmp
 	@echo "Created package: $(PLUGINNAME).zip"
