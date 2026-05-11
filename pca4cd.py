@@ -90,7 +90,7 @@ class PCA4CD:
         return QCoreApplication.translate('PCA4CD', message)
 
     def initGui(self):
-        ### Main dialog menu
+        # Main dialog menu
         # Create action that will start plugin configuration
         icon_path = ':/plugins/pca4cd/icons/pca4cd.svg'
         self.dockable_action = QAction(QIcon(icon_path), "PCA4CD", self.iface.mainWindow())
@@ -112,7 +112,7 @@ class PCA4CD:
     def about(self):
         self.about_dialog.show()
 
-    #--------------------------------------------------------------------------
+    # --------------------------------------------------------------------------
 
     def run(self):
         """Run method that loads and starts the plugin"""
@@ -153,7 +153,7 @@ class PCA4CD:
                 PCA4CD.dialog.raise_()
                 PCA4CD.dialog.activateWindow()
 
-    #--------------------------------------------------------------------------
+    # --------------------------------------------------------------------------
 
     def onClosePlugin(self):
         """Cleanup necessary items here when plugin is closed"""

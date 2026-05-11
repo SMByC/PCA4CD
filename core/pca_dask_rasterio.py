@@ -92,7 +92,7 @@ def pca(A, B, n_pc, estimator_matrix, out_dir, n_threads, block_size):
 
     # sort eigenvalue in decreasing order
     idx_eigenvals = np.argsort(eigenvals)[::-1]
-    eigenvectors = eigenvectors[:,idx_eigenvals]
+    eigenvectors = eigenvectors[:, idx_eigenvals]
     # sort eigenvectors according to same index
     eigenvals = eigenvals[idx_eigenvals]
     # select the first n eigenvectors (n is desired dimension
@@ -115,7 +115,7 @@ def pca(A, B, n_pc, estimator_matrix, out_dir, n_threads, block_size):
         pc = dask.delayed(sum)([get_principal_component(i, j) for j in range(n_bands)])
         pc = pc.astype(np.float32)
         # save component as file
-        tmp_pca_file = Path(out_dir, 'pc_{}.tif'.format(i+1))
+        tmp_pca_file = Path(out_dir, 'pc_{}.tif'.format(i + 1))
         write_raster(tmp_pca_file, pc.compute(), **prof)
         pca_files.append(tmp_pca_file)
 
@@ -132,7 +132,7 @@ def pca(A, B, n_pc, estimator_matrix, out_dir, n_threads, block_size):
     # pca statistics
     pca_stats = {}
     pca_stats["eigenvals"] = eigenvals
-    pca_stats["eigenvals_%"] = eigenvals*100/n_bands
+    pca_stats["eigenvals_%"] = eigenvals * 100 / n_bands
     pca_stats["eigenvectors"] = eigenvectors
 
     return pca_files, pca_stats

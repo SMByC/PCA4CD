@@ -19,8 +19,6 @@
  ***************************************************************************/
 """
 import os
-import tempfile
-from pathlib import Path
 from osgeo import gdal
 
 from qgis.core import QgsVectorFileWriter
@@ -65,8 +63,7 @@ def clip_raster_with_shape(target_layer, shape_layer, out_path, dst_nodata=None)
         cropToCutline=True,
         dstNodata=dst_nodata,
     )
-    result_ds = gdal.Warp(str(out_path), str(target_file), options=warp_opts)
-    result_ds = None
+    gdal.Warp(str(out_path), str(target_file), options=warp_opts)
 
     # clean tmp file
     if tmp_memory_file is not None and tmp_memory_file.is_file():

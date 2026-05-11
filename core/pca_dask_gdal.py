@@ -53,7 +53,7 @@ def pca(A, B, n_pc, estimator_matrix, out_dir, n_threads, block_size, nodata=Non
         if nodata is not None and np.isnan(nodata):
             nodata_mask = np.isnan(ds) if nodata_mask is None else np.logical_or(nodata_mask, np.isnan(ds))
         elif nodata is not None:
-            nodata_mask = ds==nodata if nodata_mask is None else np.logical_or(nodata_mask, ds==nodata)
+            nodata_mask = ds == nodata if nodata_mask is None else np.logical_or(nodata_mask, ds == nodata)
         raw_image.append(ds)
         band_labels.append("A·B{}".format(band + 1) if B else "B{}".format(band + 1))
     if B:
@@ -63,7 +63,7 @@ def pca(A, B, n_pc, estimator_matrix, out_dir, n_threads, block_size, nodata=Non
             if nodata is not None and np.isnan(nodata):
                 nodata_mask = np.logical_or(nodata_mask, np.isnan(ds))
             elif nodata is not None:
-                nodata_mask = np.logical_or(nodata_mask, ds==nodata)
+                nodata_mask = np.logical_or(nodata_mask, ds == nodata)
             raw_image.append(ds)
             band_labels.append("B·B{}".format(band + 1))
 
@@ -115,7 +115,7 @@ def pca(A, B, n_pc, estimator_matrix, out_dir, n_threads, block_size, nodata=Non
 
     # sort eigenvalue in decreasing order
     idx_eigenvals = np.argsort(eigenvals)[::-1]
-    eigenvectors = eigenvectors[:,idx_eigenvals]
+    eigenvectors = eigenvectors[:, idx_eigenvals]
     # sort eigenvectors according to same index
     eigenvals = eigenvals[idx_eigenvals]
     # select the first n eigenvectors (n is desired dimension
@@ -141,7 +141,7 @@ def pca(A, B, n_pc, estimator_matrix, out_dir, n_threads, block_size, nodata=Non
             pc[nodata_mask] = nodata
         pc = pc.reshape((src_ds_A.RasterYSize, src_ds_A.RasterXSize))
         # save component as file
-        tmp_pca_file = Path(out_dir) / 'pc_{}.tif'.format(i+1)
+        tmp_pca_file = Path(out_dir) / 'pc_{}.tif'.format(i + 1)
         driver = gdal.GetDriverByName("GTiff")
         out_pc = driver.Create(str(tmp_pca_file), src_ds_A.RasterXSize, src_ds_A.RasterYSize, 1, gdal.GDT_Float32)
         pcband = out_pc.GetRasterBand(1)
@@ -176,7 +176,7 @@ def pca(A, B, n_pc, estimator_matrix, out_dir, n_threads, block_size, nodata=Non
     pca_stats = {}
     pca_stats["estimator"] = estimator_matrix
     pca_stats["eigenvals"] = eigenvals
-    pca_stats["eigenvals_%"] = eigenvals*100/n_bands
+    pca_stats["eigenvals_%"] = eigenvals * 100 / n_bands
     pca_stats["eigenvectors"] = eigenvectors
     pca_stats["band_labels"] = band_labels
 

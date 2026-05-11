@@ -148,7 +148,6 @@ class PickerAOIPointTool(QgsMapTool):
             QTimer.singleShot(10, self.cad.render_widget.parent_view.canvas_changed)
 
 
-
 # plugin path
 plugin_folder = os.path.dirname(os.path.dirname(__file__))
 FORM_CLASS, _ = uic.loadUiType(Path(plugin_folder, 'ui', 'component_analysis_dialog.ui'))
@@ -301,7 +300,7 @@ class ComponentAnalysisDialog(QWidget, FORM_CLASS):
         from pca4cd.pca4cd import PCA4CD as pca4cd
         detection_from = self.RangeChangeFrom.value()
         detection_to = self.RangeChangeTo.value()
-        output_change_layer = Path(pca4cd.tmp_dir, self.pc_layer.name()+"_detection.tif")
+        output_change_layer = Path(pca4cd.tmp_dir, self.pc_layer.name() + "_detection.tif")
 
         # compute the detection layer between range values
         da_pc = da.from_array(self.pc_data, chunks=(2000, 2000))
@@ -363,8 +362,8 @@ class ComponentAnalysisDialog(QWidget, FORM_CLASS):
         # set headers
         if pca_stats:  # for pca
             if pca_stats["eigenvals"] is not None:
-                self.stats_header.setText("Eigenvalue: {} ({}%)".format(round(pca_stats["eigenvals"][self.pc_id-1], 2),
-                                                                        round(pca_stats["eigenvals_%"][self.pc_id-1], 2)))
+                self.stats_header.setText("Eigenvalue: {} ({}%)".format(round(pca_stats["eigenvals"][self.pc_id - 1], 2),
+                                                                        round(pca_stats["eigenvals_%"][self.pc_id - 1], 2)))
                 self.stats_header.setToolTip("Shows the dispersion of the data relative to this component")
             else:
                 self.stats_header.setText("Eigenvalue: --")
@@ -440,6 +439,7 @@ class ComponentAnalysisDialog(QWidget, FORM_CLASS):
                 with block_signals_to(self.HistogramTypeBins):
                     self.HistogramTypeBins.setCurrentIndex(self.HistogramTypeBins.findText(hist_bins["type"]))
         # plot
+
         def _histogram(data, bins):
             bin_edges = np.histogram_bin_edges(data, bins=bins)
             da_hist_data = da.from_array(data, chunks=(8000000,))
@@ -504,8 +504,8 @@ class ComponentAnalysisDialog(QWidget, FORM_CLASS):
         self.set_statistics()
         # update range values using min/max of AOI (skip when all data is NaN)
         if self.aoi_data.size > 1:
-            range_from = np.floor(np.min(self.aoi_data)*1000000000)/1000000000
-            range_to = np.ceil(np.max(self.aoi_data)*1000000000)/1000000000
+            range_from = np.floor(np.min(self.aoi_data) * 1000000000) / 1000000000
+            range_to = np.ceil(np.max(self.aoi_data) * 1000000000) / 1000000000
             # double set due the synchronization values from plot min/max adjust
             self.RangeChangeFrom.setValue(range_from)
             self.RangeChangeTo.setValue(range_to)

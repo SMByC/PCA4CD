@@ -22,7 +22,6 @@
 import os
 import configparser
 import webbrowser
-import numpy as np
 from multiprocessing import cpu_count
 from pathlib import Path
 from osgeo import gdal
@@ -91,7 +90,7 @@ class PCA4CDDialog(QDialog, FORM_CLASS):
         self.QPBtn_PluginDocs.clicked.connect(lambda: webbrowser.open("https://smbyc.github.io/PCA4CD/"))
 
         # ######### Input Raster Data ######### #
-        ## A
+        # A
         # set properties to QgsMapLayerComboBox
         self.QCBox_InputData_A.setCurrentIndex(-1)
         self.QCBox_InputData_A.setFilters(QgsMapLayerProxyModel.Filter.RasterLayer)
@@ -103,7 +102,7 @@ class PCA4CDDialog(QDialog, FORM_CLASS):
         self.QCBox_InputData_A.currentIndexChanged.connect(self.set_number_of_components)
         self.QCBox_InputData_A.currentIndexChanged.connect(self.set_nodata_value_in_computePC)
         self.EnableInputData_A.toggled.connect(lambda: self.EnableInputData_A.setChecked(True))
-        ## B
+        # B
         # set properties to QgsMapLayerComboBox
         self.QCBox_InputData_B.setCurrentIndex(-1)
         self.QCBox_InputData_B.setFilters(QgsMapLayerProxyModel.Filter.RasterLayer)

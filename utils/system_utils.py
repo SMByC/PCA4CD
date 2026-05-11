@@ -20,7 +20,9 @@
 """
 import functools
 import traceback
-import os, sys, subprocess
+import os
+import sys
+import subprocess
 
 from qgis.PyQt.QtCore import Qt
 from qgis.PyQt.QtWidgets import QApplication, QPushButton, QMessageBox
