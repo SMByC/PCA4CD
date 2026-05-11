@@ -53,7 +53,9 @@ def clip_raster_with_shape(target_layer, shape_layer, out_path, dst_nodata=None)
         shape_file = shape_path
     else:
         tmp_memory_file = pca4cd.tmp_dir / "memory_layer_aoi.gpkg"
-        QgsVectorFileWriter.writeAsVectorFormat(shape_layer, str(tmp_memory_file), "System", shape_layer.crs(), "GPKG")
+        error, msg = QgsVectorFileWriter.writeAsVectorFormat(shape_layer, str(tmp_memory_file), "System", shape_layer.crs(), "GPKG")
+        if error != QgsVectorFileWriter.WriterError.NoError:
+            raise RuntimeError("Failed to save memory layer to disk: {}".format(msg))
         shape_file = tmp_memory_file
 
     # clipping in shape

@@ -80,7 +80,9 @@ def load_and_select_filepath_in(combo_box, file_path):
 
 
 def add_layer(layer, add_to_legend=True):
-    QgsProject.instance().addMapLayer(layer, add_to_legend)
+    result = QgsProject.instance().addMapLayer(layer, add_to_legend)
+    if result is None:
+        raise RuntimeError("Failed to add layer '{}' to the project".format(layer.name()))
 
 
 def load_layer(file_path, name=None, add_to_legend=True):

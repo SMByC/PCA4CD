@@ -1,0 +1,18 @@
+[project]
+name = "pca4cd"
+version = "26.5"
+description = "QGIS plugin that computes PCA and creates change detection layers"
+authors = [{ name = "Xavier Corredor Llano, SMByC", email = "xavier.corredor.llano@gmail.com" }]
+requires-python = ">=3.9"
+
+[project.optional-dependencies]
+dev = [
+    "flake8",
+    "flake8-qgis",
+]
+
+[dependency-groups]
+dev = [
+    "flake8",
+    "flake8-qgis",
+]
