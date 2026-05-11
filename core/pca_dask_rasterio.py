@@ -26,7 +26,7 @@ from dask import array as da
 import rasterio
 from multiprocessing.pool import ThreadPool
 from dask_rasterio import read_raster, write_raster
-from subprocess import call
+from osgeo import gdal
 
 from pca4cd.utils.system_utils import wait_process
 
@@ -120,11 +120,13 @@ def pca(A, B, n_pc, estimator_matrix, out_dir, n_threads, block_size):
         pca_files.append(tmp_pca_file)
 
     # compute the pyramids for each pc image
-    @dask.delayed
-    def pyramids(pca_file):
-        call('gdaladdo --config BIGTIFF_OVERVIEW YES "{}"'.format(pca_file), shell=True)
-
-    dask.compute(*[pyramids(pca_file) for pca_file in pca_files], num_workers=2)
+    # compute the pyramids for each pc image
+    gdal.SetConfigOption('BIGTIFF_OVERVIEW', 'YES')
+    for pca_file in pca_files:
+        ds = gdal.Open(str(pca_file), gdal.GA_Update)
+        ds.BuildOverviews('AVERAGE', [2, 4, 8, 16, 32])
+        ds = None
+    gdal.SetConfigOption('BIGTIFF_OVERVIEW', None)
 
     ########
     # pca statistics
