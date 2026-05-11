@@ -45,8 +45,8 @@ def valid_file_selected_in(combo_box, combobox_name=False):
         return True
     else:
         if combobox_name:
-            iface.messageBar().pushMessage("PCA4CD", "Error, please browse/select a valid file in " +
-                                           combobox_name, level=Qgis.MessageLevel.Warning)
+            iface.messageBar().pushMessage("PCA4CD", "Error, please browse/select a valid file in "
+                                           + combobox_name, level=Qgis.MessageLevel.Warning)
         combo_box.setCurrentIndex(-1)
         return False
 

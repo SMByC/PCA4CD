@@ -1,4 +1,4 @@
 [flake8]
 exclude = extlibs, resources.py
-ignore = E501, W504
-extend-select = E226, W503
+ignore = E501, W503
+extend-select = E226, W504

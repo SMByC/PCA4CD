@@ -207,8 +207,8 @@ class DownloadAndUnzip(QDialog):
                         os.path.join(real_output, member.filename)
                     )
                     if not (
-                        member_dest == real_output or
-                        member_dest.startswith(real_output + os.sep)
+                        member_dest == real_output
+                        or member_dest.startswith(real_output + os.sep)
                     ):
                         raise ValueError(
                             f"Zip-slip rejected for entry: {member.filename!r}"

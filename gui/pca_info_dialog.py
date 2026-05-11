@@ -37,8 +37,8 @@ class PCAInfoDialog(QDialog):
     def __init__(self, pca_stats, parent=None):
         super().__init__(parent)
         self.setWindowTitle("PCA Information — Eigenvalues & Eigenvectors")
-        self.setWindowFlags(self.windowFlags() | Qt.WindowType.WindowMinimizeButtonHint |
-                            Qt.WindowType.WindowMaximizeButtonHint)
+        self.setWindowFlags(self.windowFlags() | Qt.WindowType.WindowMinimizeButtonHint
+                            | Qt.WindowType.WindowMaximizeButtonHint)
 
         self._pca_stats = pca_stats
 
