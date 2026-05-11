@@ -145,8 +145,8 @@ class LayerViewWidget(QWidget, FORM_CLASS):
         if not self.component_analysis_dialog:
             self.component_analysis_dialog = ComponentAnalysisDialog(parent_view_widget=self)
         if self.component_analysis_dialog.is_opened:
-            self.component_analysis_dialog.setWindowState(self.component_analysis_dialog.windowState()
-                                                          & ~Qt.WindowState.WindowMinimized | Qt.WindowState.WindowActive)
+            self.component_analysis_dialog.setWindowState(self.component_analysis_dialog.windowState() &
+                                                          ~Qt.WindowState.WindowMinimized | Qt.WindowState.WindowActive)
             self.component_analysis_dialog.raise_()
             self.component_analysis_dialog.activateWindow()
             return

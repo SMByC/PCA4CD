@@ -167,7 +167,7 @@ class PCA4CDDialog(QDialog, FORM_CLASS):
             # set number of components to combobox
             self.QCBox_nComponents.addItems([str(x) for x in range(1, number_components + 1)])
             # select the last item
-            self.QCBox_nComponents.setCurrentIndex(number_components-1)
+            self.QCBox_nComponents.setCurrentIndex(number_components - 1)
 
     def check_input_layers(self, layer_A, layer_B):
         if layer_B is None:

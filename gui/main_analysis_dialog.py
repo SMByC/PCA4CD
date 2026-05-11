@@ -106,7 +106,7 @@ class MainAnalysisDialog(QDialog, FORM_CLASS):
                     view_widgets.append(new_view_widget)
             else:
                 for column in range(grid_columns):
-                    if (row-1)*grid_columns + column < len(pca_layers):
+                    if (row - 1) * grid_columns + column < len(pca_layers):
                         new_view_widget = LayerViewWidget()
                         views_layout.addWidget(new_view_widget, row, column)
                         view_widgets.append(new_view_widget)
@@ -129,10 +129,10 @@ class MainAnalysisDialog(QDialog, FORM_CLASS):
                 view_widget.QLabel_ViewName.setText("Layer B")
                 file_index = view_widget.QCBox_RenderFile.findText(self.layer_b.name(), Qt.MatchFlag.MatchFixedString)
                 view_widget.QCBox_RenderFile.setCurrentIndex(file_index)
-            if grid_columns < num_view <= len(self.pca_layers)+grid_columns:
-                view_widget.pc_id = num_view-grid_columns
+            if grid_columns < num_view <= len(self.pca_layers) + grid_columns:
+                view_widget.pc_id = num_view - grid_columns
                 view_widget.QLabel_ViewName.setText("Principal Component {}".format(view_widget.pc_id))
-                file_index = view_widget.QCBox_RenderFile.findText(self.pca_layers[num_view-grid_columns-1].name(), Qt.MatchFlag.MatchFixedString)
+                file_index = view_widget.QCBox_RenderFile.findText(self.pca_layers[num_view - grid_columns - 1].name(), Qt.MatchFlag.MatchFixedString)
                 view_widget.WidgetDetectionLayer.setEnabled(True)
                 view_widget.QCBox_RenderFile.setCurrentIndex(file_index)
                 view_widget.QCBox_RenderFile.setEnabled(False)
