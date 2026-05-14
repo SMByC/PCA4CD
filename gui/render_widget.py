@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 """
 /***************************************************************************
  PCA4CD
@@ -18,10 +17,11 @@
  *                                                                         *
  ***************************************************************************/
 """
-from qgis.PyQt.QtCore import Qt, QTimer, QSettings, pyqtSlot
+
+from qgis.gui import QgsMapCanvas, QgsMapToolPan
+from qgis.PyQt.QtCore import QSettings, Qt, QTimer, pyqtSlot
 from qgis.PyQt.QtGui import QColor
-from qgis.PyQt.QtWidgets import QWidget, QGridLayout
-from qgis.gui import QgsMapToolPan, QgsMapCanvas
+from qgis.PyQt.QtWidgets import QGridLayout, QWidget
 
 from pca4cd.utils.qgis_utils import StyleEditorDialog
 from pca4cd.utils.system_utils import block_signals_to
@@ -49,7 +49,14 @@ class PanAndZoomPointTool(QgsMapToolPan):
             QgsMapToolPan.canvasPressEvent(self, event)
 
     def keyReleaseEvent(self, event):
-        if event.key() in [Qt.Key.Key_Up, Qt.Key.Key_Down, Qt.Key.Key_Right, Qt.Key.Key_Left, Qt.Key.Key_PageUp, Qt.Key.Key_PageDown]:
+        if event.key() in [
+            Qt.Key.Key_Up,
+            Qt.Key.Key_Down,
+            Qt.Key.Key_Right,
+            Qt.Key.Key_Left,
+            Qt.Key.Key_PageUp,
+            Qt.Key.Key_PageDown,
+        ]:
             QTimer.singleShot(10, self.render_widget.parent_view.canvas_changed)
 
 
@@ -85,8 +92,12 @@ class RenderWidget(QWidget):
             self.canvas.setLayers([layer])
             # set init extent from other view if any is activated else set layer extent
             from pca4cd.gui.main_analysis_dialog import MainAnalysisDialog
-            others_view = [view_widget.render_widget.canvas.extent() for view_widget in MainAnalysisDialog.view_widgets
-                           if not view_widget.render_widget.canvas.extent().isEmpty()]
+
+            others_view = [
+                view_widget.render_widget.canvas.extent()
+                for view_widget in MainAnalysisDialog.view_widgets
+                if not view_widget.render_widget.canvas.extent().isEmpty()
+            ]
             if others_view:
                 extent = others_view[0]
                 self.update_canvas_to(extent)
@@ -106,9 +117,12 @@ class RenderWidget(QWidget):
         self.show_detection_layer()
         # hide the detection layer in combobox menu
         from pca4cd.gui.main_analysis_dialog import MainAnalysisDialog
+
         detection_layers = [
-            view_widget.render_widget.detection_layer for view_widget in MainAnalysisDialog.view_widgets
-            if view_widget.pc_id is not None and view_widget.render_widget.detection_layer is not None
+            view_widget.render_widget.detection_layer
+            for view_widget in MainAnalysisDialog.view_widgets
+            if view_widget.pc_id is not None
+            and view_widget.render_widget.detection_layer is not None
             and view_widget.id != self.parent_view.id
         ] + ([self.detection_layer] if self.detection_layer else [])
         for view_widget in MainAnalysisDialog.view_widgets:

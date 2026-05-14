@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 """
 /***************************************************************************
  PCA4CD
@@ -18,6 +17,7 @@
  *                                                                         *
  ***************************************************************************/
 """
+
 from __future__ import annotations
 
 import configparser
@@ -28,10 +28,18 @@ import tempfile
 import urllib.request
 import zipfile
 
-from qgis.PyQt.QtCore import Qt
-from qgis.PyQt.QtWidgets import (QApplication, QDialog, QHBoxLayout, QLabel,
-                                 QMessageBox, QProgressBar, QPushButton, QVBoxLayout)
 from qgis.core import Qgis, QgsApplication, QgsMessageLog
+from qgis.PyQt.QtCore import Qt
+from qgis.PyQt.QtWidgets import (
+    QApplication,
+    QDialog,
+    QHBoxLayout,
+    QLabel,
+    QMessageBox,
+    QProgressBar,
+    QPushButton,
+    QVBoxLayout,
+)
 
 
 def _get_plugin_version() -> str:
@@ -45,10 +53,7 @@ def _get_plugin_version() -> str:
     return config["general"]["version"]
 
 
-EXTLIBS_DOWNLOAD_URL = (
-    f"https://github.com/SMByC/PCA4CD/releases/download/"
-    f"{_get_plugin_version()}/extlibs.zip"
-)
+EXTLIBS_DOWNLOAD_URL = f"https://github.com/SMByC/PCA4CD/releases/download/{_get_plugin_version()}/extlibs.zip"
 
 
 def _log(msg: str, level: str = "Info") -> None:
@@ -203,16 +208,9 @@ class DownloadAndUnzip(QDialog):
             with zipfile.ZipFile(self._zip_path, "r") as zf:
                 # Validate every entry before writing anything
                 for member in zf.infolist():
-                    member_dest = os.path.realpath(
-                        os.path.join(real_output, member.filename)
-                    )
-                    if not (
-                        member_dest == real_output
-                        or member_dest.startswith(real_output + os.sep)
-                    ):
-                        raise ValueError(
-                            f"Zip-slip rejected for entry: {member.filename!r}"
-                        )
+                    member_dest = os.path.realpath(os.path.join(real_output, member.filename))
+                    if not (member_dest == real_output or member_dest.startswith(real_output + os.sep)):
+                        raise ValueError(f"Zip-slip rejected for entry: {member.filename!r}")
                 zf.extractall(real_output)
             return True
         except Exception as exc:
@@ -224,7 +222,10 @@ def get_extlibs_install_path() -> str:
     """Return the ``extlibs`` directory inside this plugin."""
     return os.path.join(
         QgsApplication.qgisSettingsDirPath(),
-        "python", "plugins", "pca4cd", "extlibs",
+        "python",
+        "plugins",
+        "pca4cd",
+        "extlibs",
     )
 
 

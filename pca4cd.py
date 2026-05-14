@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 """
 /***************************************************************************
  PCA4CD
@@ -24,21 +23,22 @@ import shutil
 import tempfile
 from pathlib import Path
 
-from qgis.PyQt.QtCore import QSettings, QTranslator, QCoreApplication, Qt, QLocale
-from qgis.PyQt.QtWidgets import QAction
+from qgis.PyQt.QtCore import QCoreApplication, QLocale, QSettings, Qt, QTranslator
 from qgis.PyQt.QtGui import QIcon
+from qgis.PyQt.QtWidgets import QAction
 from qgis.utils import iface
+
+from pca4cd.gui.about_dialog import AboutDialog
+from pca4cd.gui.pca4cd_dialog import PCA4CDDialog
+from pca4cd.utils.qgis_utils import unload_layer
 
 # Initialize Qt resources from file resources.py (registers icons under :/plugins/pca4cd/)
 from . import resources  # noqa: F401
 
-from pca4cd.gui.pca4cd_dialog import PCA4CDDialog
-from pca4cd.gui.about_dialog import AboutDialog
-from pca4cd.utils.qgis_utils import unload_layer
-
 
 class PCA4CD:
     """QGIS Plugin Implementation."""
+
     dialog = None
     tmp_dir = None
 
@@ -58,10 +58,10 @@ class PCA4CD:
 
         # initialize locale
         try:
-            locale = QSettings().value('locale/userLocale', QLocale().name(), type=str)[0:2]
+            locale = QSettings().value("locale/userLocale", QLocale().name(), type=str)[0:2]
         except (TypeError, AttributeError):
-            locale = 'en'
-        locale_path = os.path.join(self.plugin_dir, 'i18n', 'PCA4CD_{}.qm'.format(locale))
+            locale = "en"
+        locale_path = os.path.join(self.plugin_dir, "i18n", f"PCA4CD_{locale}.qm")
 
         if os.path.exists(locale_path):
             self.translator = QTranslator()
@@ -87,12 +87,12 @@ class PCA4CD:
         :rtype: QString
         """
         # noinspection PyTypeChecker,PyArgumentList,PyCallByClass
-        return QCoreApplication.translate('PCA4CD', message)
+        return QCoreApplication.translate("PCA4CD", message)
 
     def initGui(self):
         # Main dialog menu
         # Create action that will start plugin configuration
-        icon_path = ':/plugins/pca4cd/icons/pca4cd.svg'
+        icon_path = ":/plugins/pca4cd/icons/pca4cd.svg"
         self.dockable_action = QAction(QIcon(icon_path), "PCA4CD", self.iface.mainWindow())
         # connect the action to the run method
         self.dockable_action.triggered.connect(self.run)
@@ -102,8 +102,8 @@ class PCA4CD:
 
         # Plugin info
         # Create action that will start plugin configuration
-        icon_path = ':/plugins/pca4cd/icons/about.svg'
-        self.about_action = QAction(QIcon(icon_path), self.tr('About'), self.iface.mainWindow())
+        icon_path = ":/plugins/pca4cd/icons/about.svg"
+        self.about_action = QAction(QIcon(icon_path), self.tr("About"), self.iface.mainWindow())
         # connect the action to the run method
         self.about_action.triggered.connect(self.about)
         # Add toolbar button and menu item
@@ -144,12 +144,16 @@ class PCA4CD:
             # an instance of PCA4CD is already created
             # brings that instance to front even if it is minimized
             if hasattr(PCA4CD.dialog, "main_analysis_dialog") and PCA4CD.dialog.main_analysis_dialog:  # main dialog
-                PCA4CD.dialog.main_analysis_dialog.setWindowState(PCA4CD.dialog.main_analysis_dialog.windowState()
-                                                                  & ~Qt.WindowState.WindowMinimized | Qt.WindowState.WindowActive)
+                PCA4CD.dialog.main_analysis_dialog.setWindowState(
+                    PCA4CD.dialog.main_analysis_dialog.windowState() & ~Qt.WindowState.WindowMinimized
+                    | Qt.WindowState.WindowActive
+                )
                 PCA4CD.dialog.main_analysis_dialog.raise_()
                 PCA4CD.dialog.main_analysis_dialog.activateWindow()
             else:  # the init dialog
-                PCA4CD.dialog.setWindowState(PCA4CD.dialog.windowState() & ~Qt.WindowState.WindowMinimized | Qt.WindowState.WindowActive)
+                PCA4CD.dialog.setWindowState(
+                    PCA4CD.dialog.windowState() & ~Qt.WindowState.WindowMinimized | Qt.WindowState.WindowActive
+                )
                 PCA4CD.dialog.raise_()
                 PCA4CD.dialog.activateWindow()
 
@@ -173,6 +177,7 @@ class PCA4CD:
         self.pluginIsActive = False
 
         from qgis.utils import reloadPlugin
+
         reloadPlugin("PCA4CD - PCA for change detection")
 
     def unload(self):

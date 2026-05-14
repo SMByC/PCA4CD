@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 """
 /***************************************************************************
  PCA4CD
@@ -18,33 +17,34 @@
  *                                                                         *
  ***************************************************************************/
 """
+
 import os
 import shutil
 import tempfile
+from pathlib import Path
+from typing import ClassVar
 
 import numpy as np
-from pathlib import Path
 from osgeo import gdal
-
-from qgis.core import Qgis, QgsSingleBandGrayRenderer, QgsContrastEnhancement
+from qgis.core import Qgis, QgsContrastEnhancement, QgsSingleBandGrayRenderer
 from qgis.PyQt import uic
 from qgis.PyQt.QtCore import Qt, pyqtSlot
-from qgis.PyQt.QtWidgets import QDialog, QGridLayout, QMessageBox, QFileDialog
+from qgis.PyQt.QtWidgets import QDialog, QFileDialog, QGridLayout, QMessageBox
 from qgis.utils import iface
 
 from pca4cd.gui.layer_view_widget import LayerViewWidget
 from pca4cd.gui.merge_change_layers_dialog import MergeChangeLayersDialog
 from pca4cd.gui.pca_info_dialog import PCAInfoDialog
-from pca4cd.utils.qgis_utils import load_layer, apply_symbology, get_file_path_of_layer, unload_layer
+from pca4cd.utils.qgis_utils import apply_symbology, get_file_path_of_layer, load_layer, unload_layer
 from pca4cd.utils.system_utils import wait_process
 
 # plugin path
 plugin_folder = os.path.dirname(os.path.dirname(__file__))
-FORM_CLASS, _ = uic.loadUiType(Path(plugin_folder, 'ui', 'main_analysis_dialog.ui'))
+FORM_CLASS, _ = uic.loadUiType(Path(plugin_folder, "ui", "main_analysis_dialog.ui"))
 
 
 class MainAnalysisDialog(QDialog, FORM_CLASS):
-    view_widgets = []
+    view_widgets: ClassVar[list] = []
     pca_layers = None
     pca_stats = None
     nodata = None
@@ -59,7 +59,9 @@ class MainAnalysisDialog(QDialog, FORM_CLASS):
         MainAnalysisDialog.pca_stats = pca_stats
         MainAnalysisDialog.nodata = nodata
         # flags
-        self.setWindowFlags(self.windowFlags() | Qt.WindowType.WindowMinimizeButtonHint | Qt.WindowType.WindowMaximizeButtonHint)
+        self.setWindowFlags(
+            self.windowFlags() | Qt.WindowType.WindowMinimizeButtonHint | Qt.WindowType.WindowMaximizeButtonHint
+        )
 
         self.setupUi(self)
 
@@ -84,6 +86,7 @@ class MainAnalysisDialog(QDialog, FORM_CLASS):
         # size of the grid with view render widgets windows
         # one extra row above the principal components row holds the input layers
         from math import ceil
+
         grid_columns = 4 if self.layer_b is not None else 3
         # widen to 4 columns for >=10 components when no layer B, to keep grid compact
         if self.layer_b is None and len(pca_layers) > 9:
@@ -131,8 +134,10 @@ class MainAnalysisDialog(QDialog, FORM_CLASS):
                 view_widget.QCBox_RenderFile.setCurrentIndex(file_index)
             if grid_columns < num_view <= len(self.pca_layers) + grid_columns:
                 view_widget.pc_id = num_view - grid_columns
-                view_widget.QLabel_ViewName.setText("Principal Component {}".format(view_widget.pc_id))
-                file_index = view_widget.QCBox_RenderFile.findText(self.pca_layers[num_view - grid_columns - 1].name(), Qt.MatchFlag.MatchFixedString)
+                view_widget.QLabel_ViewName.setText(f"Principal Component {view_widget.pc_id}")
+                file_index = view_widget.QCBox_RenderFile.findText(
+                    self.pca_layers[num_view - grid_columns - 1].name(), Qt.MatchFlag.MatchFixedString
+                )
                 view_widget.WidgetDetectionLayer.setEnabled(True)
                 view_widget.QCBox_RenderFile.setCurrentIndex(file_index)
                 view_widget.QCBox_RenderFile.setEnabled(False)
@@ -143,21 +148,26 @@ class MainAnalysisDialog(QDialog, FORM_CLASS):
                 view_widget.QCBox_RenderFile.setExceptedLayerList(self.pca_layers)  # hide pca layers in combobox menu
                 view_widget.EnableChangeDetection.setToolTip("Show/hide the merged change layer")
                 view_widget.QPBtn_ComponentAnalysisDialog.setText("Merged change layer")
-                view_widget.QPBtn_ComponentAnalysisDialog.setToolTip("The merged change layer has not been generated yet")
+                view_widget.QPBtn_ComponentAnalysisDialog.setToolTip(
+                    "The merged change layer has not been generated yet"
+                )
                 # disconnect button action
                 view_widget.QPBtn_ComponentAnalysisDialog.clicked.disconnect()
             if not view_widget.QLabel_ViewName.text():
                 view_widget.QLabel_ViewName.setPlaceholderText("Auxiliary View")
 
-        self.MsgBar.pushMessage("{} principal components were generated and loaded successfully".format(len(self.pca_layers)),
-                                level=Qgis.MessageLevel.Success)
+        self.MsgBar.pushMessage(
+            f"{len(self.pca_layers)} principal components were generated and loaded successfully",
+            level=Qgis.MessageLevel.Success,
+        )
 
     def show(self):
         from pca4cd.pca4cd import PCA4CD as pca4cd
+
         # hide main dialog
         pca4cd.dialog.hide()
         # show dialog
-        super(MainAnalysisDialog, self).show()
+        super().show()
 
     def closeEvent(self, event):
         self.closing()
@@ -166,8 +176,9 @@ class MainAnalysisDialog(QDialog, FORM_CLASS):
     def return_to_main_dialog(self):
         # first prompt
         quit_msg = "Are you sure you want to return to the main dialog? You will lose all generated products."
-        reply = QMessageBox.question(None, 'Return to the Main Dialog',
-                                     quit_msg, QMessageBox.StandardButton.Yes, QMessageBox.StandardButton.No)
+        reply = QMessageBox.question(
+            None, "Return to the Main Dialog", quit_msg, QMessageBox.StandardButton.Yes, QMessageBox.StandardButton.No
+        )
         if reply == QMessageBox.StandardButton.No:
             return
 
@@ -180,6 +191,7 @@ class MainAnalysisDialog(QDialog, FORM_CLASS):
 
         # clear and recover
         from pca4cd.pca4cd import PCA4CD as pca4cd
+
         self.reject(is_ok_to_close=True)
         self.deleteLater()
         pca4cd.removes_temporary_files()
@@ -194,8 +206,9 @@ class MainAnalysisDialog(QDialog, FORM_CLASS):
         """
         # first prompt
         quit_msg = "Are you sure you want to close the PCA4CD plugin?"
-        reply = QMessageBox.question(None, 'Closing the PCA4CD plugin',
-                                     quit_msg, QMessageBox.StandardButton.Yes, QMessageBox.StandardButton.No)
+        reply = QMessageBox.question(
+            None, "Closing the PCA4CD plugin", quit_msg, QMessageBox.StandardButton.Yes, QMessageBox.StandardButton.No
+        )
         if reply == QMessageBox.StandardButton.No:
             return
 
@@ -208,18 +221,18 @@ class MainAnalysisDialog(QDialog, FORM_CLASS):
 
         # clear and close main dialog
         from pca4cd.pca4cd import PCA4CD as pca4cd
+
         pca4cd.dialog.close()
         iface.mapCanvas().clearCache()
         self.reject(is_ok_to_close=True)
 
     def reject(self, is_ok_to_close=False):
         if is_ok_to_close:
-            super(MainAnalysisDialog, self).reject()
+            super().reject()
 
     @wait_process
     def update_pc_style(self, nodata):
-        """Update the grey style using mean+-5*std for all principal components
-        """
+        """Update the grey style using mean+-5*std for all principal components"""
         for view_widget in MainAnalysisDialog.view_widgets:
             if view_widget.pc_id is not None:
                 src_ds = gdal.Open(str(get_file_path_of_layer(view_widget.render_widget.layer)), gdal.GA_ReadOnly)
@@ -237,7 +250,9 @@ class MainAnalysisDialog(QDialog, FORM_CLASS):
                 std = np.std(ds)
                 renderer = QgsSingleBandGrayRenderer(view_widget.render_widget.layer.dataProvider(), 1)
                 ce = QgsContrastEnhancement(view_widget.render_widget.layer.dataProvider().dataType(0))
-                ce.setContrastEnhancementAlgorithm(QgsContrastEnhancement.ContrastEnhancementAlgorithm.StretchToMinimumMaximum)
+                ce.setContrastEnhancementAlgorithm(
+                    QgsContrastEnhancement.ContrastEnhancementAlgorithm.StretchToMinimumMaximum
+                )
                 ce.setMinimumValue(mean - 5 * std)
                 ce.setMaximumValue(mean + 5 * std)
                 renderer.setContrastEnhancement(ce)
@@ -252,21 +267,24 @@ class MainAnalysisDialog(QDialog, FORM_CLASS):
         path, filename = os.path.split(get_file_path_of_layer(self.layer_a))
         suggested_filename = os.path.splitext(Path(path, filename))[0] + "_pca.tif"
         # filesave dialog
-        file_out, _ = QFileDialog.getSaveFileName(self, self.tr("Save the PCA stack"), suggested_filename,
-                                                  self.tr("GeoTiff files (*.tif);;All files (*.*)"))
+        file_out, _ = QFileDialog.getSaveFileName(
+            self, self.tr("Save the PCA stack"), suggested_filename, self.tr("GeoTiff files (*.tif);;All files (*.*)")
+        )
 
         @wait_process
         def save():
             input_files = [str(get_file_path_of_layer(layer)) for layer in self.pca_layers]
             nodata_val = 0 if MainAnalysisDialog.nodata is not None else None
-            vrt = gdal.BuildVRT('', input_files, separate=True)
-            translate_opts = gdal.TranslateOptions(format='GTiff', noData=nodata_val)
+            vrt = gdal.BuildVRT("", input_files, separate=True)
+            translate_opts = gdal.TranslateOptions(format="GTiff", noData=nodata_val)
             gdal.Translate(str(file_out), vrt, options=translate_opts)
             vrt = None
 
-            self.MsgBar.pushMessage("PCA stack saved successfully: \"{}\"".format(os.path.basename(file_out)), level=Qgis.MessageLevel.Success)
+            self.MsgBar.pushMessage(
+                f'PCA stack saved successfully: "{os.path.basename(file_out)}"', level=Qgis.MessageLevel.Success
+            )
 
-        if file_out != '':
+        if file_out != "":
             save()
 
     @pyqtSlot()
@@ -287,20 +305,25 @@ class MainAnalysisDialog(QDialog, FORM_CLASS):
         self.activated_ids = []
         self.activated_change_layers = []
         for view_widget in MainAnalysisDialog.view_widgets:
-            if view_widget.pc_id is not None and view_widget.render_widget.detection_layer is not None \
-                    and view_widget.EnableChangeDetection.isChecked():
-                self.activated_ids.append("PC{}".format(view_widget.pc_id))
+            if (
+                view_widget.pc_id is not None
+                and view_widget.render_widget.detection_layer is not None
+                and view_widget.EnableChangeDetection.isChecked()
+            ):
+                self.activated_ids.append(f"PC{view_widget.pc_id}")
                 self.activated_change_layers.append(view_widget.render_widget.detection_layer)
         if len(self.activated_change_layers) == 0:
             self.MsgBar.pushMessage(
                 "There are no change detection layers activated or generated in the Principal Components view",
-                level=Qgis.MessageLevel.Warning)
+                level=Qgis.MessageLevel.Warning,
+            )
             return
         # suggested filename
         if self.layer_a is not None:
             path, filename = os.path.split(str(get_file_path_of_layer(self.layer_a)))
         else:
             from pca4cd.pca4cd import PCA4CD as pca4cd
+
             path, filename = os.path.split(str(get_file_path_of_layer(pca4cd.dialog.QCBox_LoadStackPCA.currentLayer())))
         suggested_filename = os.path.splitext(Path(path, filename))[0] + "_pca4cd.tif"
         # merge dialog
@@ -323,8 +346,8 @@ class MainAnalysisDialog(QDialog, FORM_CLASS):
         if len(self.activated_change_layers) > 1 and merge_method == "Union":
             input_files = [str(get_file_path_of_layer(layer)) for layer in self.activated_change_layers]
             vrt_opts = gdal.BuildVRTOptions(srcNodata=0, VRTNodata=0)
-            vrt = gdal.BuildVRT('', input_files, options=vrt_opts)
-            translate_opts = gdal.TranslateOptions(format='GTiff', outputType=gdal.GDT_Byte, noData=0)
+            vrt = gdal.BuildVRT("", input_files, options=vrt_opts)
+            translate_opts = gdal.TranslateOptions(format="GTiff", outputType=gdal.GDT_Byte, noData=0)
             gdal.Translate(str(merged_change_layer), vrt, options=translate_opts)
             vrt = None
 
@@ -337,7 +360,7 @@ class MainAnalysisDialog(QDialog, FORM_CLASS):
                 arrays.append(ds.GetRasterBand(1).ReadAsArray())
                 ds = None
             result = np.all(np.stack(arrays) == 1, axis=0).astype(np.uint8)
-            driver = gdal.GetDriverByName('GTiff')
+            driver = gdal.GetDriverByName("GTiff")
             out_ds = driver.Create(str(merged_change_layer), ref_ds.RasterXSize, ref_ds.RasterYSize, 1, gdal.GDT_Byte)
             out_ds.SetGeoTransform(ref_ds.GetGeoTransform())
             out_ds.SetProjection(ref_ds.GetProjection())
@@ -353,7 +376,7 @@ class MainAnalysisDialog(QDialog, FORM_CLASS):
         ds.GetRasterBand(1).DeleteNoDataValue()
         ds = None
         # apply style
-        merged_layer = load_layer(merged_change_layer, add_to_legend=True if merge_dialog.LoadInQgis.isChecked() else False)
+        merged_layer = load_layer(merged_change_layer, add_to_legend=bool(merge_dialog.LoadInQgis.isChecked()))
         apply_symbology(merged_layer, [("0", 0, (255, 255, 255, 0)), ("1", 1, (255, 255, 0, 255))])
         # save named style in QML aux file
         merged_layer.saveNamedStyle(str(merged_change_layer.with_suffix(".qml")))
@@ -370,9 +393,13 @@ class MainAnalysisDialog(QDialog, FORM_CLASS):
 
         if len(self.activated_ids) == 1:
             self.MsgBar.pushMessage(
-                "The change detection for {} was saved and loaded successfully".format(
-                    self.activated_ids[0]), level=Qgis.MessageLevel.Success)
+                f"The change detection for {self.activated_ids[0]} was saved and loaded successfully",
+                level=Qgis.MessageLevel.Success,
+            )
         else:
             self.MsgBar.pushMessage(
                 "The change detection layers for {} were merged, saved, and loaded successfully".format(
-                    ", ".join(self.activated_ids)), level=Qgis.MessageLevel.Success)
+                    ", ".join(self.activated_ids)
+                ),
+                level=Qgis.MessageLevel.Success,
+            )

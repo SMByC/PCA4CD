@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 """
 /***************************************************************************
  PCA4CD
@@ -18,9 +17,10 @@
  *                                                                         *
  ***************************************************************************/
 """
-import os
-from osgeo import gdal
 
+import os
+
+from osgeo import gdal
 from qgis.core import QgsVectorFileWriter
 
 from pca4cd.utils.qgis_utils import get_file_path_of_layer
@@ -34,14 +34,15 @@ def mask(input_list, boolean_mask):
         boolean_mask (list): The boolean mask list
 
     Examples:
-        >>> mask(['A','B','C','D'], [1,0,1,0])
+        >>> mask(["A", "B", "C", "D"], [1, 0, 1, 0])
         ['A', 'C']
     """
-    return [i for i, b in zip(input_list, boolean_mask) if b]
+    return [i for i, b in zip(input_list, boolean_mask, strict=True) if b]
 
 
 def clip_raster_with_shape(target_layer, shape_layer, out_path, dst_nodata=None):
     from pca4cd.pca4cd import PCA4CD as pca4cd
+
     target_file = get_file_path_of_layer(target_layer)
     if target_file is None:
         return
@@ -53,14 +54,16 @@ def clip_raster_with_shape(target_layer, shape_layer, out_path, dst_nodata=None)
         shape_file = shape_path
     else:
         tmp_memory_file = pca4cd.tmp_dir / "memory_layer_aoi.gpkg"
-        error, msg = QgsVectorFileWriter.writeAsVectorFormat(shape_layer, str(tmp_memory_file), "System", shape_layer.crs(), "GPKG")
+        error, msg = QgsVectorFileWriter.writeAsVectorFormat(
+            shape_layer, str(tmp_memory_file), "System", shape_layer.crs(), "GPKG"
+        )
         if error != QgsVectorFileWriter.WriterError.NoError:
-            raise RuntimeError("Failed to save memory layer to disk: {}".format(msg))
+            raise RuntimeError(f"Failed to save memory layer to disk: {msg}")
         shape_file = tmp_memory_file
 
     # clipping in shape
     warp_opts = gdal.WarpOptions(
-        options=['--config', 'GDALWARP_IGNORE_BAD_CUTLINE', 'YES'],
+        options=["--config", "GDALWARP_IGNORE_BAD_CUTLINE", "YES"],
         cutlineDSName=str(shape_file),
         cropToCutline=True,
         dstNodata=dst_nodata,

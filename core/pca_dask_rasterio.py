@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 """
 /***************************************************************************
  PCA4CD
@@ -18,13 +17,14 @@
  *                                                                         *
  ***************************************************************************/
 """
+
+from multiprocessing.pool import ThreadPool
 from pathlib import Path
 
-import numpy as np
 import dask
-from dask import array as da
+import numpy as np
 import rasterio
-from multiprocessing.pool import ThreadPool
+from dask import array as da
 from dask_rasterio import read_raster, write_raster
 from osgeo import gdal
 
@@ -78,11 +78,13 @@ def pca(A, B, n_pc, estimator_matrix, out_dir, n_threads, block_size):
         for j in range(i, n_bands):
             deviation_scores_band_j = flat_dims[j] - band_mean[j]
             if estimator_matrix == "Correlation":
-                estimation_matrix[j][i] = estimation_matrix[i][j] = \
-                    da.corrcoef(deviation_scores_band_i, deviation_scores_band_j)[0][1]
+                estimation_matrix[j][i] = estimation_matrix[i][j] = da.corrcoef(
+                    deviation_scores_band_i, deviation_scores_band_j
+                )[0][1]
             if estimator_matrix == "Covariance":
-                estimation_matrix[j][i] = estimation_matrix[i][j] = \
-                    da.cov(deviation_scores_band_i, deviation_scores_band_j)[0][1]
+                estimation_matrix[j][i] = estimation_matrix[i][j] = da.cov(
+                    deviation_scores_band_i, deviation_scores_band_j
+                )[0][1]
 
     ########
     # calculate eigenvectors & eigenvalues of the matrix
@@ -104,7 +106,7 @@ def pca(A, B, n_pc, estimator_matrix, out_dir, n_threads, block_size):
 
     # output image profile
     prof = get_profile(A)
-    prof.update(count=1, driver='GTiff', dtype=np.float32)
+    prof.update(count=1, driver="GTiff", dtype=np.float32)
 
     @dask.delayed
     def get_principal_component(i, j):
@@ -115,18 +117,18 @@ def pca(A, B, n_pc, estimator_matrix, out_dir, n_threads, block_size):
         pc = dask.delayed(sum)([get_principal_component(i, j) for j in range(n_bands)])
         pc = pc.astype(np.float32)
         # save component as file
-        tmp_pca_file = Path(out_dir, 'pc_{}.tif'.format(i + 1))
+        tmp_pca_file = Path(out_dir, f"pc_{i + 1}.tif")
         write_raster(tmp_pca_file, pc.compute(), **prof)
         pca_files.append(tmp_pca_file)
 
     # compute the pyramids for each pc image
     # compute the pyramids for each pc image
-    gdal.SetConfigOption('BIGTIFF_OVERVIEW', 'YES')
+    gdal.SetConfigOption("BIGTIFF_OVERVIEW", "YES")
     for pca_file in pca_files:
         ds = gdal.Open(str(pca_file), gdal.GA_Update)
-        ds.BuildOverviews('AVERAGE', [2, 4, 8, 16, 32])
+        ds.BuildOverviews("AVERAGE", [2, 4, 8, 16, 32])
         ds = None
-    gdal.SetConfigOption('BIGTIFF_OVERVIEW', None)
+    gdal.SetConfigOption("BIGTIFF_OVERVIEW", None)
 
     ########
     # pca statistics

@@ -1,18 +1,36 @@
 [project]
 name = "pca4cd"
 version = "26.5"
-description = "QGIS plugin that computes PCA and creates change detection layers"
+description = "QGIS plugin that computes Principal Component Analysis (PCA) and creates change detection layers using PCA dimensionality reduction properties"
 authors = [{ name = "Xavier Corredor Llano, SMByC", email = "xavier.corredor.llano@gmail.com" }]
-requires-python = ">=3.9"
+license = { text = "GPL-2.0-or-later" }
+keywords = ["qgis", "pca", "principal components analysis", "change detection", "raster", "remote sensing"]
+requires-python = ">=3.12"
 
-[project.optional-dependencies]
-dev = [
-    "flake8",
-    "flake8-qgis",
-]
+[project.urls]
+Homepage = "https://github.com/SMByC/PCA4CD"
+Repository = "https://github.com/SMByC/PCA4CD"
+Issues = "https://github.com/SMByC/PCA4CD/issues"
+Changelog = "https://github.com/SMByC/PCA4CD/commits"
 
-[dependency-groups]
-dev = [
-    "flake8",
-    "flake8-qgis",
-]
+[tool.pyright]
+extraPaths = [".."]  # include project folder
+# venv = ".venv"
+
+[tool.ruff]
+target-version = "py312"
+line-length = 120
+extend-exclude = ["extlibs", "resources_rc.py"]
+
+[tool.ruff.lint]
+preview = true
+explicit-preview-rules = true
+select = ["E", "W", "F", "I", "UP", "B", "C4", "RUF", "SIM"]
+extend-select = ["E226"]
+ignore = ["B904", "SIM102", "SIM105"]
+
+[tool.ruff.format]
+quote-style = "double"
+indent-style = "space"
+line-ending = "auto"
+docstring-code-format = true

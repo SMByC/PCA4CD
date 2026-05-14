@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 """
 /***************************************************************************
  PCA4CD
@@ -27,14 +26,14 @@ from qgis.PyQt.QtWidgets import QDialog
 
 # plugin path
 plugin_folder = os.path.dirname(os.path.dirname(__file__))
-FORM_CLASS, _ = uic.loadUiType(Path(plugin_folder, 'ui', 'about_dialog.ui'))
+FORM_CLASS, _ = uic.loadUiType(Path(plugin_folder, "ui", "about_dialog.ui"))
 
 
 class AboutDialog(QDialog, FORM_CLASS):
     def __init__(self):
         QDialog.__init__(self)
         self.setupUi(self)
-        about_file = Path(plugin_folder, 'gui', 'about.html')
-        html_text = about_file.read_text(encoding='utf-8')
+        about_file = Path(plugin_folder, "gui", "about.html")
+        html_text = about_file.read_text(encoding="utf-8")
         self.about_html.setHtml(html_text)
         self.about_html.setOpenExternalLinks(True)

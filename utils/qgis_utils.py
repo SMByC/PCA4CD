@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 """
 /***************************************************************************
  PCA4CD
@@ -18,16 +17,27 @@
  *                                                                         *
  ***************************************************************************/
 """
+
 import os
 from pathlib import Path
 
-from qgis.PyQt.QtWidgets import QDialog, QDialogButtonBox
+from qgis.core import (
+    Qgis,
+    QgsColorRampShader,
+    QgsMapLayer,
+    QgsProject,
+    QgsRasterLayer,
+    QgsRasterRange,
+    QgsRasterShader,
+    QgsSingleBandPseudoColorRenderer,
+    QgsStyle,
+    QgsVectorLayer,
+)
+from qgis.gui import QgsRendererPropertiesDialog, QgsRendererRasterPropertiesWidget
 from qgis.PyQt import uic
 from qgis.PyQt.QtCore import Qt
 from qgis.PyQt.QtGui import QColor
-from qgis.gui import QgsRendererPropertiesDialog, QgsRendererRasterPropertiesWidget
-from qgis.core import QgsProject, QgsRasterLayer, QgsVectorLayer, Qgis, QgsStyle, QgsMapLayer, QgsRasterShader, \
-    QgsColorRampShader, QgsSingleBandPseudoColorRenderer, QgsRasterRange
+from qgis.PyQt.QtWidgets import QDialog, QDialogButtonBox
 from qgis.utils import iface
 
 
@@ -45,8 +55,11 @@ def valid_file_selected_in(combo_box, combobox_name=False):
         return True
     else:
         if combobox_name:
-            iface.messageBar().pushMessage("PCA4CD", "Error, please browse/select a valid file in "
-                                           + combobox_name, level=Qgis.MessageLevel.Warning)
+            iface.messageBar().pushMessage(
+                "PCA4CD",
+                "Error, please browse/select a valid file in " + combobox_name,
+                level=Qgis.MessageLevel.Warning,
+            )
         combo_box.setCurrentIndex(-1)
         return False
 
@@ -82,7 +95,7 @@ def load_and_select_filepath_in(combo_box, file_path):
 def add_layer(layer, add_to_legend=True):
     result = QgsProject.instance().addMapLayer(layer, add_to_legend)
     if result is None:
-        raise RuntimeError("Failed to add layer '{}' to the project".format(layer.name()))
+        raise RuntimeError(f"Failed to add layer '{layer.name()}' to the project")
 
 
 def load_layer(file_path, name=None, add_to_legend=True):
@@ -101,7 +114,7 @@ def load_layer(file_path, name=None, add_to_legend=True):
     if qgslayer.isValid():
         add_layer(qgslayer, add_to_legend)
     else:
-        iface.messageBar().pushMessage("PCA4CD", "Could not load layer: {}".format(file_path))
+        iface.messageBar().pushMessage("PCA4CD", f"Could not load layer: {file_path}")
 
     return qgslayer
 
@@ -118,7 +131,7 @@ def unload_layer(layer_path):
 
 # plugin path
 plugin_folder = os.path.dirname(os.path.dirname(__file__))
-FORM_CLASS, _ = uic.loadUiType(Path(plugin_folder, 'ui', 'style_editor.ui'))
+FORM_CLASS, _ = uic.loadUiType(Path(plugin_folder, "ui", "style_editor.ui"))
 
 
 class StyleEditorDialog(QDialog, FORM_CLASS):
@@ -127,7 +140,7 @@ class StyleEditorDialog(QDialog, FORM_CLASS):
         self.setupUi(self)
         self.layer = layer
 
-        self.setWindowTitle("{} - Style Editor".format(self.layer.name()))
+        self.setWindowTitle(f"{self.layer.name()} - Style Editor")
 
         if self.layer.type() == QgsMapLayer.LayerType.VectorLayer:
             self.StyleEditorWidget = QgsRendererPropertiesDialog(self.layer, QgsStyle(), True, parent)
@@ -147,7 +160,7 @@ class StyleEditorDialog(QDialog, FORM_CLASS):
 
 
 def apply_symbology(rlayer, symbology, transparent=None):
-    """ Apply classification symbology to raster layer """
+    """Apply classification symbology to raster layer"""
     # See: QgsRasterRenderer* QgsSingleBandPseudoColorRendererWidget::renderer()
     # https://github.com/qgis/QGIS/blob/master/src/gui/raster/qgssinglebandpseudocolorrendererwidget.cpp
     # Get raster shader
@@ -164,7 +177,7 @@ def apply_symbology(rlayer, symbology, transparent=None):
     # After getting list of color ramp items
     color_ramp_shader.setColorRampItemList(color_ramp_item_list)
     # Exact color ramp
-    color_ramp_shader.setColorRampType('EXACT')
+    color_ramp_shader.setColorRampType("EXACT")
     # Add color ramp shader to raster shader
     raster_shader.setRasterShaderFunction(color_ramp_shader)
     # Create color renderer for raster layer

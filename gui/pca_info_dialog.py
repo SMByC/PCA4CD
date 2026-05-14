@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 """
 /***************************************************************************
  PCA4CD
@@ -18,15 +17,25 @@
  *                                                                         *
  ***************************************************************************/
 """
+
 import csv
 
 import numpy as np
 from qgis.PyQt.QtCore import Qt
 from qgis.PyQt.QtGui import QGuiApplication
-from qgis.PyQt.QtWidgets import (QAbstractItemView, QDialog, QDialogButtonBox,
-                                 QFileDialog, QHBoxLayout, QHeaderView, QLabel,
-                                 QPushButton, QTableWidget, QTableWidgetItem,
-                                 QVBoxLayout)
+from qgis.PyQt.QtWidgets import (
+    QAbstractItemView,
+    QDialog,
+    QDialogButtonBox,
+    QFileDialog,
+    QHBoxLayout,
+    QHeaderView,
+    QLabel,
+    QPushButton,
+    QTableWidget,
+    QTableWidgetItem,
+    QVBoxLayout,
+)
 
 
 class PCAInfoDialog(QDialog):
@@ -37,8 +46,9 @@ class PCAInfoDialog(QDialog):
     def __init__(self, pca_stats, parent=None):
         super().__init__(parent)
         self.setWindowTitle("PCA Information — Eigenvalues & Eigenvectors")
-        self.setWindowFlags(self.windowFlags() | Qt.WindowType.WindowMinimizeButtonHint
-                            | Qt.WindowType.WindowMaximizeButtonHint)
+        self.setWindowFlags(
+            self.windowFlags() | Qt.WindowType.WindowMinimizeButtonHint | Qt.WindowType.WindowMaximizeButtonHint
+        )
 
         self._pca_stats = pca_stats
 
@@ -46,9 +56,7 @@ class PCAInfoDialog(QDialog):
         eigenvals_pct = np.asarray(pca_stats["eigenvals_%"])
         eigenvectors = np.asarray(pca_stats["eigenvectors"])
         estimator = pca_stats.get("estimator", "")
-        band_labels = pca_stats.get("band_labels") or [
-            "B{}".format(i + 1) for i in range(eigenvectors.shape[0])
-        ]
+        band_labels = pca_stats.get("band_labels") or [f"B{i + 1}" for i in range(eigenvectors.shape[0])]
 
         n_bands, n_pc = eigenvectors.shape
         cumulative_pct = np.cumsum(eigenvals_pct)
@@ -60,9 +68,7 @@ class PCAInfoDialog(QDialog):
         header = QLabel(
             "<b>Estimator:</b> {estimator} &nbsp;&nbsp; "
             "<b>Bands:</b> {n_bands} &nbsp;&nbsp; "
-            "<b>Components computed:</b> {n_pc}".format(
-                estimator=estimator or "—", n_bands=n_bands, n_pc=n_pc
-            )
+            "<b>Components computed:</b> {n_pc}".format(estimator=estimator or "—", n_bands=n_bands, n_pc=n_pc)
         )
         header.setTextFormat(Qt.TextFormat.RichText)
         layout.addWidget(header)
@@ -70,19 +76,16 @@ class PCAInfoDialog(QDialog):
         eig_label = QLabel("<b>Eigenvalues</b>")
         eig_label.setToolTip("Variance captured by each principal component.")
         layout.addWidget(eig_label)
-        self.eigenvalues_table = self._build_eigenvalues_table(
-            eigenvals, eigenvals_pct, cumulative_pct
-        )
+        self.eigenvalues_table = self._build_eigenvalues_table(eigenvals, eigenvals_pct, cumulative_pct)
         layout.addWidget(self.eigenvalues_table)
         self._fit_table_to_contents(self.eigenvalues_table)
 
         vec_label = QLabel("<b>Eigenvectors</b>")
-        vec_label.setToolTip("Each column is one principal component expressed as a "
-                             "unit-length linear combination of the input bands.")
-        layout.addWidget(vec_label)
-        self.eigenvectors_table = self._build_eigenvectors_table(
-            eigenvectors, band_labels, n_pc
+        vec_label.setToolTip(
+            "Each column is one principal component expressed as a unit-length linear combination of the input bands."
         )
+        layout.addWidget(vec_label)
+        self.eigenvectors_table = self._build_eigenvectors_table(eigenvectors, band_labels, n_pc)
         layout.addWidget(self.eigenvectors_table)
         self._fit_table_to_contents(self.eigenvectors_table)
 
@@ -141,22 +144,22 @@ class PCAInfoDialog(QDialog):
 
     def _build_eigenvalues_table(self, eigenvals, eigenvals_pct, cumulative_pct):
         rows = len(eigenvals)
-        v_headers = ["PC{}".format(i + 1) for i in range(rows)]
+        v_headers = [f"PC{i + 1}" for i in range(rows)]
         table = self._make_table(rows, 3, ["Eigenvalue", "Variance (%)", "Cumulative (%)"], v_headers)
         for i in range(rows):
             for j, val in enumerate((eigenvals[i], eigenvals_pct[i], cumulative_pct[i])):
-                item = QTableWidgetItem("{:.6g}".format(float(val)))
+                item = QTableWidgetItem(f"{float(val):.6g}")
                 item.setTextAlignment(Qt.AlignmentFlag.AlignRight | Qt.AlignmentFlag.AlignVCenter)
                 table.setItem(i, j, item)
         return table
 
     def _build_eigenvectors_table(self, eigenvectors, band_labels, n_pc):
         n_bands = eigenvectors.shape[0]
-        h_headers = ["PC{}".format(i + 1) for i in range(n_pc)]
+        h_headers = [f"PC{i + 1}" for i in range(n_pc)]
         table = self._make_table(n_bands, n_pc, h_headers, list(band_labels))
         for i in range(n_bands):
             for j in range(n_pc):
-                item = QTableWidgetItem("{:.6g}".format(float(eigenvectors[i, j])))
+                item = QTableWidgetItem(f"{float(eigenvectors[i, j]):.6g}")
                 item.setTextAlignment(Qt.AlignmentFlag.AlignRight | Qt.AlignmentFlag.AlignVCenter)
                 table.setItem(i, j, item)
         return table
@@ -168,26 +171,28 @@ class PCAInfoDialog(QDialog):
         eigenvals_pct = np.asarray(self._pca_stats["eigenvals_%"])
         eigenvectors = np.asarray(self._pca_stats["eigenvectors"])
         cumulative_pct = np.cumsum(eigenvals_pct)
-        band_labels = self._pca_stats.get("band_labels") or [
-            "B{}".format(i + 1) for i in range(eigenvectors.shape[0])
-        ]
+        band_labels = self._pca_stats.get("band_labels") or [f"B{i + 1}" for i in range(eigenvectors.shape[0])]
         n_pc = eigenvectors.shape[1]
 
         lines = []
         lines.append(sep.join(["Eigenvalues"]))
         lines.append(sep.join(["Component", "Eigenvalue", "Variance (%)", "Cumulative (%)"]))
         for i in range(len(eigenvals)):
-            lines.append(sep.join([
-                "PC{}".format(i + 1),
-                "{:.10g}".format(float(eigenvals[i])),
-                "{:.10g}".format(float(eigenvals_pct[i])),
-                "{:.10g}".format(float(cumulative_pct[i])),
-            ]))
+            lines.append(
+                sep.join(
+                    [
+                        f"PC{i + 1}",
+                        f"{float(eigenvals[i]):.10g}",
+                        f"{float(eigenvals_pct[i]):.10g}",
+                        f"{float(cumulative_pct[i]):.10g}",
+                    ]
+                )
+            )
         lines.append("")
         lines.append(sep.join(["Eigenvectors"]))
-        lines.append(sep.join(["Band"] + ["PC{}".format(i + 1) for i in range(n_pc)]))
+        lines.append(sep.join(["Band"] + [f"PC{i + 1}" for i in range(n_pc)]))
         for i, label in enumerate(band_labels):
-            row = [label] + ["{:.10g}".format(float(eigenvectors[i, j])) for j in range(n_pc)]
+            row = [label] + [f"{float(eigenvectors[i, j]):.10g}" for j in range(n_pc)]
             lines.append(sep.join(row))
         return "\n".join(lines)
 
@@ -196,8 +201,7 @@ class PCAInfoDialog(QDialog):
 
     def _save_csv(self):
         path, _ = QFileDialog.getSaveFileName(
-            self, "Save PCA statistics as CSV", "pca_stats.csv",
-            "CSV files (*.csv);;All files (*.*)"
+            self, "Save PCA statistics as CSV", "pca_stats.csv", "CSV files (*.csv);;All files (*.*)"
         )
         if not path:
             return
@@ -205,9 +209,7 @@ class PCAInfoDialog(QDialog):
         eigenvals_pct = np.asarray(self._pca_stats["eigenvals_%"])
         eigenvectors = np.asarray(self._pca_stats["eigenvectors"])
         cumulative_pct = np.cumsum(eigenvals_pct)
-        band_labels = self._pca_stats.get("band_labels") or [
-            "B{}".format(i + 1) for i in range(eigenvectors.shape[0])
-        ]
+        band_labels = self._pca_stats.get("band_labels") or [f"B{i + 1}" for i in range(eigenvectors.shape[0])]
         n_pc = eigenvectors.shape[1]
         with open(path, "w", newline="", encoding="utf-8") as fh:
             writer = csv.writer(fh)
@@ -216,14 +218,16 @@ class PCAInfoDialog(QDialog):
             writer.writerow(["Eigenvalues"])
             writer.writerow(["Component", "Eigenvalue", "Variance (%)", "Cumulative (%)"])
             for i in range(len(eigenvals)):
-                writer.writerow([
-                    "PC{}".format(i + 1),
-                    float(eigenvals[i]),
-                    float(eigenvals_pct[i]),
-                    float(cumulative_pct[i]),
-                ])
+                writer.writerow(
+                    [
+                        f"PC{i + 1}",
+                        float(eigenvals[i]),
+                        float(eigenvals_pct[i]),
+                        float(cumulative_pct[i]),
+                    ]
+                )
             writer.writerow([])
             writer.writerow(["Eigenvectors"])
-            writer.writerow(["Band"] + ["PC{}".format(i + 1) for i in range(n_pc)])
+            writer.writerow(["Band"] + [f"PC{i + 1}" for i in range(n_pc)])
             for i, label in enumerate(band_labels):
                 writer.writerow([label] + [float(eigenvectors[i, j]) for j in range(n_pc)])

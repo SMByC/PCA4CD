@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 """
 /***************************************************************************
  PCA4CD
@@ -18,16 +17,17 @@
  *                                                                         *
  ***************************************************************************/
 """
-import functools
-import traceback
-import os
-import sys
-import subprocess
 
-from qgis.PyQt.QtCore import Qt
-from qgis.PyQt.QtWidgets import QApplication, QPushButton, QMessageBox
-from qgis.PyQt.QtGui import QCursor
+import functools
+import os
+import subprocess
+import sys
+import traceback
+
 from qgis.core import Qgis
+from qgis.PyQt.QtCore import Qt
+from qgis.PyQt.QtGui import QCursor
+from qgis.PyQt.QtWidgets import QApplication, QMessageBox, QPushButton
 from qgis.utils import iface
 
 
@@ -43,6 +43,7 @@ def error_handler(func):
 
             # select the message bar
             from pca4cd.pca4cd import PCA4CD as pca4cd
+
             if hasattr(pca4cd.dialog, "main_analysis_dialog") and pca4cd.dialog.main_analysis_dialog:
                 msg_bar = pca4cd.dialog.main_analysis_dialog.MsgBar
             else:
@@ -54,9 +55,11 @@ def error_handler(func):
             def details_message_box(error, more_details):
                 msgBox = QMessageBox()
                 msgBox.setWindowTitle("PCA4CD - Error handler")
-                msgBox.setText("<i>{}</i>".format(error))
-                msgBox.setInformativeText("If you consider this a PCA4CD bug, please report it in the "
-                                          "<a href='https://github.com/SMByC/PCA4CD/issues'>issue tracker</a>")
+                msgBox.setText(f"<i>{error}</i>")
+                msgBox.setInformativeText(
+                    "If you consider this a PCA4CD bug, please report it in the "
+                    "<a href='https://github.com/SMByC/PCA4CD/issues'>issue tracker</a>"
+                )
                 msgBox.setDetailedText(more_details)
                 msgBox.setTextFormat(Qt.TextFormat.RichText)
                 msgBox.setStandardButtons(QMessageBox.StandardButton.Ok)
@@ -91,6 +94,7 @@ def wait_process(func):
         QApplication.processEvents()
         # finally return the object by f
         return obj_returned
+
     return wrapper
 
 
@@ -109,8 +113,9 @@ def open_file(filename):
         os.startfile(filename)
 
 
-class block_signals_to(object):
+class block_signals_to:
     """Block all signals emits from specific QT object"""
+
     def __init__(self, object_to_block):
         self.object_to_block = object_to_block
 

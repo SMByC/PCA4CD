@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 """
 /***************************************************************************
  PCA4CD
@@ -18,14 +17,15 @@
  *                                                                         *
  ***************************************************************************/
 """
+
 import os
 from pathlib import Path
 
-from qgis.PyQt import uic
-from qgis.PyQt.QtGui import QColor
-from qgis.PyQt.QtWidgets import QWidget, QFileDialog
-from qgis.PyQt.QtCore import pyqtSlot, Qt
 from qgis.core import QgsProject
+from qgis.PyQt import uic
+from qgis.PyQt.QtCore import Qt, pyqtSlot
+from qgis.PyQt.QtGui import QColor
+from qgis.PyQt.QtWidgets import QFileDialog, QWidget
 
 from pca4cd.gui.component_analysis_dialog import ComponentAnalysisDialog
 from pca4cd.utils.qgis_utils import load_and_select_filepath_in
@@ -33,7 +33,7 @@ from pca4cd.utils.system_utils import block_signals_to
 
 # plugin path
 plugin_folder = os.path.dirname(os.path.dirname(__file__))
-FORM_CLASS, _ = uic.loadUiType(Path(plugin_folder, 'ui', 'layer_view_widget.ui'))
+FORM_CLASS, _ = uic.loadUiType(Path(plugin_folder, "ui", "layer_view_widget.ui"))
 
 
 class LayerViewWidget(QWidget, FORM_CLASS):
@@ -53,12 +53,17 @@ class LayerViewWidget(QWidget, FORM_CLASS):
         # set properties to QgsMapLayerComboBox
         self.QCBox_RenderFile.setCurrentIndex(-1)
         # handle connect layer selection with render canvas
-        self.QCBox_RenderFile.currentIndexChanged.connect(lambda: self.set_render_layer(self.QCBox_RenderFile.currentLayer()))
+        self.QCBox_RenderFile.currentIndexChanged.connect(
+            lambda: self.set_render_layer(self.QCBox_RenderFile.currentLayer())
+        )
         # call to browse the render file
-        self.QCBox_browseRenderFile.clicked.connect(lambda: self.browser_dialog_to_load_file(
-            self.QCBox_RenderFile,
-            dialog_title=self.tr("Select the file for this view"),
-            file_filters=self.tr("Raster or vector files (*.tif *.img *.gpkg *.shp);;All files (*.*)")))
+        self.QCBox_browseRenderFile.clicked.connect(
+            lambda: self.browser_dialog_to_load_file(
+                self.QCBox_RenderFile,
+                dialog_title=self.tr("Select the file for this view"),
+                file_filters=self.tr("Raster or vector files (*.tif *.img *.gpkg *.shp);;All files (*.*)"),
+            )
+        )
         # edit layer properties
         self.layerStyleEditor.clicked.connect(self.render_widget.layer_style_editor)
         # active/deactive
@@ -113,7 +118,7 @@ class LayerViewWidget(QWidget, FORM_CLASS):
     @pyqtSlot()
     def browser_dialog_to_load_file(self, combo_box, dialog_title, file_filters):
         file_path, _ = QFileDialog.getOpenFileName(self, dialog_title, "", file_filters)
-        if file_path != '' and os.path.isfile(file_path):
+        if file_path != "" and os.path.isfile(file_path):
             # load to qgis and update combobox list
             load_and_select_filepath_in(combo_box, file_path)
 
@@ -125,6 +130,7 @@ class LayerViewWidget(QWidget, FORM_CLASS):
             new_extent = self.render_widget.canvas.extent()
             # update canvas for all view activated except this view
             from pca4cd.gui.main_analysis_dialog import MainAnalysisDialog
+
             for view_widget in MainAnalysisDialog.view_widgets:
                 # for layer view widget in main analysis dialog
                 if view_widget.is_active and view_widget != self:
@@ -145,8 +151,10 @@ class LayerViewWidget(QWidget, FORM_CLASS):
         if not self.component_analysis_dialog:
             self.component_analysis_dialog = ComponentAnalysisDialog(parent_view_widget=self)
         if self.component_analysis_dialog.is_opened:
-            self.component_analysis_dialog.setWindowState(self.component_analysis_dialog.windowState()
-                                                          & ~Qt.WindowState.WindowMinimized | Qt.WindowState.WindowActive)
+            self.component_analysis_dialog.setWindowState(
+                self.component_analysis_dialog.windowState() & ~Qt.WindowState.WindowMinimized
+                | Qt.WindowState.WindowActive
+            )
             self.component_analysis_dialog.raise_()
             self.component_analysis_dialog.activateWindow()
             return

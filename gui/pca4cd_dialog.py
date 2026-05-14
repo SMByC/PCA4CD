@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 """
 /***************************************************************************
  PCA4CD
@@ -19,32 +18,32 @@
  ***************************************************************************/
 """
 
-import os
 import configparser
+import os
 import webbrowser
 from multiprocessing import cpu_count
 from pathlib import Path
-from osgeo import gdal
 
+from osgeo import gdal
+from qgis.core import Qgis, QgsMapLayerProxyModel
 from qgis.PyQt import uic
-from qgis.PyQt.QtCore import pyqtSignal, pyqtSlot, Qt
-from qgis.PyQt.QtWidgets import QFileDialog, QDialog, QMessageBox
-from qgis.core import QgsMapLayerProxyModel, Qgis
+from qgis.PyQt.QtCore import Qt, pyqtSignal, pyqtSlot
+from qgis.PyQt.QtWidgets import QDialog, QFileDialog, QMessageBox
 
 from pca4cd.core.pca_dask_gdal import pca
 from pca4cd.gui.about_dialog import AboutDialog
 from pca4cd.gui.main_analysis_dialog import MainAnalysisDialog
-from pca4cd.utils.qgis_utils import load_and_select_filepath_in, load_layer, get_file_path_of_layer
+from pca4cd.utils.qgis_utils import get_file_path_of_layer, load_and_select_filepath_in, load_layer
 from pca4cd.utils.system_utils import error_handler, wait_process
 
 # plugin path
 plugin_folder = os.path.dirname(os.path.dirname(__file__))
-FORM_CLASS, _ = uic.loadUiType(Path(plugin_folder, 'ui', 'pca4cd_dialog.ui'))
+FORM_CLASS, _ = uic.loadUiType(Path(plugin_folder, "ui", "pca4cd_dialog.ui"))
 
 cfg = configparser.ConfigParser()
-cfg.read(str(Path(plugin_folder, 'metadata.txt')))
-VERSION = cfg.get('general', 'version')
-HOMEPAGE = cfg.get('general', 'homepage')
+cfg.read(str(Path(plugin_folder, "metadata.txt")))
+VERSION = cfg.get("general", "version")
+HOMEPAGE = cfg.get("general", "homepage")
 
 
 class PCA4CDDialog(QDialog, FORM_CLASS):
@@ -52,7 +51,7 @@ class PCA4CDDialog(QDialog, FORM_CLASS):
 
     def __init__(self, parent=None):
         """Constructor."""
-        super(PCA4CDDialog, self).__init__(parent)
+        super().__init__(parent)
         # Set up the user interface from Designer.
         # After setupUI you can access any designer object by doing
         # self.<objectname>, and you can use autoconnect slots - see
@@ -68,24 +67,26 @@ class PCA4CDDialog(QDialog, FORM_CLASS):
 
     def keyPressEvent(self, event):
         # ignore esc key for close the main dialog
-        if not event.key() == Qt.Key.Key_Escape:
-            super(PCA4CDDialog, self).keyPressEvent(event)
+        if event.key() != Qt.Key.Key_Escape:
+            super().keyPressEvent(event)
 
     def check_dependencies(self):
         try:
-            import pyqtgraph  # noqa: F401
             import dask  # noqa: F401
+            import pyqtgraph  # noqa: F401
         except ImportError:
             self.MsgBar.pushMessage("Error: missing dependencies.", level=Qgis.MessageLevel.Critical)
-            msg = "\nError loading PCA4CD, this plugin requires additional Python packages to work. " \
-                  "There are some alternatives to supply these dependencies. Read the install instructions here:\n\n" \
-                  "https://github.com/SMByC/PCA4CD#installation\n\n"
-            QMessageBox.critical(None, 'Error loading PCA4CD', msg, QMessageBox.StandardButton.Ok)
+            msg = (
+                "\nError loading PCA4CD, this plugin requires additional Python packages to work. "
+                "There are some alternatives to supply these dependencies. Read the install instructions here:\n\n"
+                "https://github.com/SMByC/PCA4CD#installation\n\n"
+            )
+            QMessageBox.critical(None, "Error loading PCA4CD", msg, QMessageBox.StandardButton.Ok)
 
     def setup_gui(self):
         # ######### plugin info ######### #
         self.about_dialog = AboutDialog()
-        self.QPBtn_PluginInfo.setText("v{}".format(VERSION))
+        self.QPBtn_PluginInfo.setText(f"v{VERSION}")
         self.QPBtn_PluginInfo.clicked.connect(self.about_dialog.show)
         self.QPBtn_PluginDocs.clicked.connect(lambda: webbrowser.open("https://smbyc.github.io/PCA4CD/"))
 
@@ -95,10 +96,13 @@ class PCA4CDDialog(QDialog, FORM_CLASS):
         self.QCBox_InputData_A.setCurrentIndex(-1)
         self.QCBox_InputData_A.setFilters(QgsMapLayerProxyModel.Filter.RasterLayer)
         # call to browse the thematic raster file
-        self.QPBtn_browseData_A.clicked.connect(lambda: self.browser_dialog_to_load_file(
-            self.QCBox_InputData_A,
-            dialog_title=self.tr("Select the first period of the raster image to analyze"),
-            file_filters=self.tr("Raster files (*.tif *.img);;All files (*.*)")))
+        self.QPBtn_browseData_A.clicked.connect(
+            lambda: self.browser_dialog_to_load_file(
+                self.QCBox_InputData_A,
+                dialog_title=self.tr("Select the first period of the raster image to analyze"),
+                file_filters=self.tr("Raster files (*.tif *.img);;All files (*.*)"),
+            )
+        )
         self.QCBox_InputData_A.currentIndexChanged.connect(self.set_number_of_components)
         self.QCBox_InputData_A.currentIndexChanged.connect(self.set_nodata_value_in_computePC)
         self.EnableInputData_A.toggled.connect(lambda: self.EnableInputData_A.setChecked(True))
@@ -107,10 +111,13 @@ class PCA4CDDialog(QDialog, FORM_CLASS):
         self.QCBox_InputData_B.setCurrentIndex(-1)
         self.QCBox_InputData_B.setFilters(QgsMapLayerProxyModel.Filter.RasterLayer)
         # call to browse the thematic raster file
-        self.QPBtn_browseData_B.clicked.connect(lambda: self.browser_dialog_to_load_file(
-            self.QCBox_InputData_B,
-            dialog_title=self.tr("Select the second period of the raster image to analyze"),
-            file_filters=self.tr("Raster files (*.tif *.img);;All files (*.*)")))
+        self.QPBtn_browseData_B.clicked.connect(
+            lambda: self.browser_dialog_to_load_file(
+                self.QCBox_InputData_B,
+                dialog_title=self.tr("Select the second period of the raster image to analyze"),
+                file_filters=self.tr("Raster files (*.tif *.img);;All files (*.*)"),
+            )
+        )
         self.QCBox_InputData_B.currentIndexChanged.connect(self.set_number_of_components)
         self.EnableInputData_B.toggled.connect(lambda: self.QCBox_InputData_B.setCurrentIndex(-1))
 
@@ -128,7 +135,7 @@ class PCA4CDDialog(QDialog, FORM_CLASS):
     @pyqtSlot()
     def browser_dialog_to_load_file(self, combo_box, dialog_title, file_filters):
         file_path, _ = QFileDialog.getOpenFileName(self, dialog_title, "", file_filters)
-        if file_path != '' and os.path.isfile(file_path):
+        if file_path != "" and os.path.isfile(file_path):
             # load to qgis and update combobox list
             load_and_select_filepath_in(combo_box, file_path)
 
@@ -175,12 +182,14 @@ class PCA4CDDialog(QDialog, FORM_CLASS):
         if layer_A.crs() != layer_B.crs():
             self.MsgBar.pushMessage("The layers don't have the same projection", level=Qgis.MessageLevel.Warning)
             return False
-        if layer_A.width() != layer_B.width() or \
-           layer_A.height() != layer_B.height():
-            self.MsgBar.pushMessage("The layers don't have the same dimensions (columns/rows)", level=Qgis.MessageLevel.Warning)
+        if layer_A.width() != layer_B.width() or layer_A.height() != layer_B.height():
+            self.MsgBar.pushMessage(
+                "The layers don't have the same dimensions (columns/rows)", level=Qgis.MessageLevel.Warning
+            )
             return False
-        if round(layer_A.rasterUnitsPerPixelX(), 6) != round(layer_B.rasterUnitsPerPixelX(), 6) or \
-           round(layer_A.rasterUnitsPerPixelY(), 6) != round(layer_B.rasterUnitsPerPixelY(), 6):
+        if round(layer_A.rasterUnitsPerPixelX(), 6) != round(layer_B.rasterUnitsPerPixelX(), 6) or round(
+            layer_A.rasterUnitsPerPixelY(), 6
+        ) != round(layer_B.rasterUnitsPerPixelY(), 6):
             self.MsgBar.pushMessage("The layers don't have the same pixel size", level=Qgis.MessageLevel.Warning)
             return False
         return True
@@ -189,6 +198,7 @@ class PCA4CDDialog(QDialog, FORM_CLASS):
     @error_handler
     def generate_principal_components(self):
         from pca4cd.pca4cd import PCA4CD as pca4cd
+
         # check if is valid the input raster layer
         if self.QCBox_InputData_A.currentLayer() is None:
             self.MsgBar.pushMessage("Select a valid input raster layer", level=Qgis.MessageLevel.Warning)
@@ -210,14 +220,24 @@ class PCA4CDDialog(QDialog, FORM_CLASS):
         n_pc = int(self.QCBox_nComponents.currentText())
         estimator_matrix = self.QCBox_EstimatorMatrix.currentText()
 
-        pca_files, pca_stats = pca(path_layer_A, path_layer_B, n_pc, estimator_matrix, pca4cd.tmp_dir,
-                                   self.nThreads.value(), self.BlockSize.value(), nodata)
+        pca_files, pca_stats = pca(
+            path_layer_A,
+            path_layer_B,
+            n_pc,
+            estimator_matrix,
+            pca4cd.tmp_dir,
+            self.nThreads.value(),
+            self.BlockSize.value(),
+            nodata,
+        )
 
         if pca_files is False and pca_stats is False:
             self.MsgBar.pushMessage("Error calculating PCA", level=Qgis.MessageLevel.Critical, duration=10)
-            quit_msg = "The estimation matrix is empty, which usually happens due to NoData values. " \
-                       "Check that the NoData value set in the plugin matches the NoData value of the selected layer."
-            QMessageBox.critical(self, 'Error calculating PCA', quit_msg, QMessageBox.StandardButton.Ok)
+            quit_msg = (
+                "The estimation matrix is empty, which usually happens due to NoData values. "
+                "Check that the NoData value set in the plugin matches the NoData value of the selected layer."
+            )
+            QMessageBox.critical(self, "Error calculating PCA", quit_msg, QMessageBox.StandardButton.Ok)
             return
 
         pca_layers = []
@@ -227,7 +247,9 @@ class PCA4CDDialog(QDialog, FORM_CLASS):
             # then, open main analysis dialog
             self.open_main_analysis_dialog(pca_layers, pca_stats, nodata)
         else:
-            self.MsgBar.pushMessage("Error while generating the principal components; check the QGIS log", level=Qgis.MessageLevel.Critical)
+            self.MsgBar.pushMessage(
+                "Error while generating the principal components; check the QGIS log", level=Qgis.MessageLevel.Critical
+            )
 
     @pyqtSlot()
     def open_main_analysis_dialog(self, pca_layers, pca_stats, nodata):
@@ -242,6 +264,7 @@ class PCA4CDDialog(QDialog, FORM_CLASS):
     @wait_process
     def load_external_pc_in_main_analysis_dialog(self):
         from pca4cd.pca4cd import PCA4CD as pca4cd
+
         stack_path = self.QgsFile_LoadStackPCA.filePath()
         if not os.path.isfile(stack_path):
             self.MsgBar.pushMessage("Select a valid stack to load", level=Qgis.MessageLevel.Warning)
@@ -261,7 +284,7 @@ class PCA4CDDialog(QDialog, FORM_CLASS):
         del src_ds
         pca_layers = []
         for component in range(num_bands):
-            tmp_pca_file = pca4cd.tmp_dir / 'pc_{}.tif'.format(component + 1)
+            tmp_pca_file = pca4cd.tmp_dir / f"pc_{component + 1}.tif"
             gdal.Translate(str(tmp_pca_file), stack_path, bandList=[component + 1], noData=nodata)
             pca_layers.append(load_layer(tmp_pca_file, add_to_legend=False))
 

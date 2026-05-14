@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 """
 /***************************************************************************
  PCA4CD
@@ -18,10 +17,12 @@
  *                                                                         *
  ***************************************************************************/
 """
+
+from multiprocessing.pool import ThreadPool
 from pathlib import Path
+
 import numpy as np
 from osgeo import gdal
-from multiprocessing.pool import ThreadPool
 
 from pca4cd.utils.system_utils import wait_process
 
@@ -40,6 +41,7 @@ def pca(A, B, n_pc, estimator_matrix, out_dir, n_threads, block_size, nodata=Non
     """
     import dask
     from dask import array as da
+
     # init dask as threads (shared memory is required)
     dask.config.set(pool=ThreadPool(n_threads))
 
@@ -55,7 +57,7 @@ def pca(A, B, n_pc, estimator_matrix, out_dir, n_threads, block_size, nodata=Non
         elif nodata is not None:
             nodata_mask = ds == nodata if nodata_mask is None else np.logical_or(nodata_mask, ds == nodata)
         raw_image.append(ds)
-        band_labels.append("A·B{}".format(band + 1) if B else "B{}".format(band + 1))
+        band_labels.append(f"A·B{band + 1}" if B else f"B{band + 1}")
     if B:
         src_ds_B = gdal.Open(str(B), gdal.GA_ReadOnly)
         for band in range(src_ds_B.RasterCount):
@@ -65,13 +67,13 @@ def pca(A, B, n_pc, estimator_matrix, out_dir, n_threads, block_size, nodata=Non
             elif nodata is not None:
                 nodata_mask = np.logical_or(nodata_mask, ds == nodata)
             raw_image.append(ds)
-            band_labels.append("B·B{}".format(band + 1))
+            band_labels.append(f"B·B{band + 1}")
 
     # pair-masking data, let only the valid data across all dimensions/bands
     if nodata is not None:
         raw_image = [b[~nodata_mask] for b in raw_image]
     # flat each dimension (bands)
-    flat_dims = da.vstack(raw_image).rechunk((1, block_size ** 2))
+    flat_dims = da.vstack(raw_image).rechunk((1, block_size**2))
     # bands
     n_bands = flat_dims.shape[0]
 
@@ -90,15 +92,17 @@ def pca(A, B, n_pc, estimator_matrix, out_dir, n_threads, block_size, nodata=Non
             deviation_scores_band_i = flat_dims[i] - band_mean[i]
             for j in range(i, n_bands):
                 deviation_scores_band_j = flat_dims[j] - band_mean[j]
-                estimation_matrix[j][i] = estimation_matrix[i][j] = \
-                    da.corrcoef(deviation_scores_band_i, deviation_scores_band_j)[0][1]
+                estimation_matrix[j][i] = estimation_matrix[i][j] = da.corrcoef(
+                    deviation_scores_band_i, deviation_scores_band_j
+                )[0][1]
     if estimator_matrix == "Covariance":
         for i in range(n_bands):
             deviation_scores_band_i = flat_dims[i] - band_mean[i]
             for j in range(i, n_bands):
                 deviation_scores_band_j = flat_dims[j] - band_mean[j]
-                estimation_matrix[j][i] = estimation_matrix[i][j] = \
-                    da.cov(deviation_scores_band_i, deviation_scores_band_j)[0][1]
+                estimation_matrix[j][i] = estimation_matrix[i][j] = da.cov(
+                    deviation_scores_band_i, deviation_scores_band_j
+                )[0][1]
     # free mem
     del raw_image, flat_dims, ds
 
@@ -141,7 +145,7 @@ def pca(A, B, n_pc, estimator_matrix, out_dir, n_threads, block_size, nodata=Non
             pc[nodata_mask] = nodata
         pc = pc.reshape((src_ds_A.RasterYSize, src_ds_A.RasterXSize))
         # save component as file
-        tmp_pca_file = Path(out_dir) / 'pc_{}.tif'.format(i + 1)
+        tmp_pca_file = Path(out_dir) / f"pc_{i + 1}.tif"
         driver = gdal.GetDriverByName("GTiff")
         out_pc = driver.Create(str(tmp_pca_file), src_ds_A.RasterXSize, src_ds_A.RasterYSize, 1, gdal.GDT_Float32)
         pcband = out_pc.GetRasterBand(1)
@@ -164,12 +168,12 @@ def pca(A, B, n_pc, estimator_matrix, out_dir, n_threads, block_size, nodata=Non
     del nodata_mask
 
     # compute the pyramids for each pc image
-    gdal.SetConfigOption('BIGTIFF_OVERVIEW', 'YES')
+    gdal.SetConfigOption("BIGTIFF_OVERVIEW", "YES")
     for pca_file in pca_files:
         ds = gdal.Open(str(pca_file), gdal.GA_Update)
-        ds.BuildOverviews('AVERAGE', [2, 4, 8, 16, 32])
+        ds.BuildOverviews("AVERAGE", [2, 4, 8, 16, 32])
         ds = None
-    gdal.SetConfigOption('BIGTIFF_OVERVIEW', None)
+    gdal.SetConfigOption("BIGTIFF_OVERVIEW", None)
 
     ########
     # pca statistics

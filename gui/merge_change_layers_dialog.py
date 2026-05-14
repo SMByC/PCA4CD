@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 """
 /***************************************************************************
  PCA4CD
@@ -28,7 +27,7 @@ from qgis.PyQt.QtWidgets import QDialog
 
 # plugin path
 plugin_folder = os.path.dirname(os.path.dirname(__file__))
-FORM_CLASS, _ = uic.loadUiType(Path(plugin_folder, 'ui', 'merge_change_layers_dialog.ui'))
+FORM_CLASS, _ = uic.loadUiType(Path(plugin_folder, "ui", "merge_change_layers_dialog.ui"))
 
 
 class MergeChangeLayersDialog(QDialog, FORM_CLASS):
@@ -49,7 +48,9 @@ class MergeChangeLayersDialog(QDialog, FORM_CLASS):
         if len(activated_ids) == 1:
             self.setWindowTitle("Save and Load the Selected Change Layer")
             self.LabelMergeMethod.setEnabled(False)
-            self.LabelMergeMethod.setText("To use a combination method, create and activate more than one detection layer")
+            self.LabelMergeMethod.setText(
+                "To use a combination method, create and activate more than one detection layer"
+            )
             self.MergeMethod.setEnabled(False)
             self.LabelMergeFileWidget.setText("Save the change layer")
             self.MergeFileWidget.setDialogTitle("Save the change layer")

@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 """
 /***************************************************************************
  PCA4CD
@@ -18,28 +17,25 @@
  *                                                                         *
  ***************************************************************************/
 """
+
 import os
 import platform
+from multiprocessing import cpu_count
+from pathlib import Path
 
 import numpy as np
-from pathlib import Path
-from multiprocessing import cpu_count
-
-from qgis.PyQt.QtCore import QTimer, Qt, pyqtSlot
+import pyqtgraph as pg  # must be imported before uic.loadUiType to avoid partial-load issue with pyqtgraph.Qt
+from osgeo import gdal
+from qgis.core import QgsFeature, QgsProject, QgsRaster, QgsVectorLayer, QgsWkbTypes, edit
+from qgis.gui import QgsMapTool, QgsRubberBand
+from qgis.PyQt import uic
+from qgis.PyQt.QtCore import Qt, QTimer, pyqtSlot
 from qgis.PyQt.QtGui import QColor
 from qgis.PyQt.QtWidgets import QWidget
-from osgeo import gdal
-
-from qgis.PyQt import uic
-from qgis.core import QgsRaster, QgsWkbTypes, QgsFeature, QgsVectorLayer, QgsProject
-from qgis.gui import QgsMapTool, QgsRubberBand
-from qgis.core import edit
-
-import pyqtgraph as pg  # must be imported before uic.loadUiType to avoid partial-load issue with pyqtgraph.Qt
 
 from pca4cd.utils.others_utils import clip_raster_with_shape
-from pca4cd.utils.qgis_utils import get_file_path_of_layer, load_layer, apply_symbology
-from pca4cd.utils.system_utils import wait_process, block_signals_to
+from pca4cd.utils.qgis_utils import apply_symbology, get_file_path_of_layer, load_layer
+from pca4cd.utils.system_utils import block_signals_to, wait_process
 
 
 class PickerPixelPointTool(QgsMapTool):
@@ -52,7 +48,12 @@ class PickerPixelPointTool(QgsMapTool):
         x = event.pos().x()
         y = event.pos().y()
         point = self.render_widget.canvas.getCoordinateTransform().toMapCoordinates(x, y)
-        pixel_value = self.render_widget.layer.dataProvider().identify(point, QgsRaster.IdentifyFormat.IdentifyFormatValue).results().get(1)
+        pixel_value = (
+            self.render_widget.layer.dataProvider()
+            .identify(point, QgsRaster.IdentifyFormat.IdentifyFormatValue)
+            .results()
+            .get(1)
+        )
         if pixel_value is not None:
             self.picker_widget.setValue(pixel_value)
 
@@ -68,7 +69,14 @@ class PickerPixelPointTool(QgsMapTool):
         QTimer.singleShot(180, lambda: self.render_widget.canvas.setMapTool(self.render_widget.pan_zoom_tool))
 
     def keyReleaseEvent(self, event):
-        if event.key() in [Qt.Key.Key_Up, Qt.Key.Key_Down, Qt.Key.Key_Right, Qt.Key.Key_Left, Qt.Key.Key_PageUp, Qt.Key.Key_PageDown]:
+        if event.key() in [
+            Qt.Key.Key_Up,
+            Qt.Key.Key_Down,
+            Qt.Key.Key_Right,
+            Qt.Key.Key_Left,
+            Qt.Key.Key_PageUp,
+            Qt.Key.Key_PageDown,
+        ]:
             QTimer.singleShot(10, self.render_widget.parent_view.canvas_changed)
 
 
@@ -144,13 +152,20 @@ class PickerAOIPointTool(QgsMapTool):
                 self.cad.aoi_changes(new_feature)
 
     def keyReleaseEvent(self, event):
-        if event.key() in [Qt.Key.Key_Up, Qt.Key.Key_Down, Qt.Key.Key_Right, Qt.Key.Key_Left, Qt.Key.Key_PageUp, Qt.Key.Key_PageDown]:
+        if event.key() in [
+            Qt.Key.Key_Up,
+            Qt.Key.Key_Down,
+            Qt.Key.Key_Right,
+            Qt.Key.Key_Left,
+            Qt.Key.Key_PageUp,
+            Qt.Key.Key_PageDown,
+        ]:
             QTimer.singleShot(10, self.cad.render_widget.parent_view.canvas_changed)
 
 
 # plugin path
 plugin_folder = os.path.dirname(os.path.dirname(__file__))
-FORM_CLASS, _ = uic.loadUiType(Path(plugin_folder, 'ui', 'component_analysis_dialog.ui'))
+FORM_CLASS, _ = uic.loadUiType(Path(plugin_folder, "ui", "component_analysis_dialog.ui"))
 
 
 class ComponentAnalysisDialog(QWidget, FORM_CLASS):
@@ -188,7 +203,9 @@ class ComponentAnalysisDialog(QWidget, FORM_CLASS):
         # aoi
         self.rubber_bands = []
         self.tmp_rubber_band = []
-        self.AOI_Picker.clicked.connect(lambda: self.render_widget.canvas.setMapTool(PickerAOIPointTool(self), clean=True))
+        self.AOI_Picker.clicked.connect(
+            lambda: self.render_widget.canvas.setMapTool(PickerAOIPointTool(self), clean=True)
+        )
         self.UndoAOI.clicked.connect(self.undo_aoi)
         self.DeleteAllAOI.clicked.connect(self.delete_all_aoi)
         # set statistics from combobox
@@ -197,14 +214,19 @@ class ComponentAnalysisDialog(QWidget, FORM_CLASS):
 
         # init histogram plot
         self.hist_data = None
-        self.hist_data_pc = {"auto": None, "doane": None, "scott": None, "rice": None}  # store histogram done for principal components
+        self.hist_data_pc = {
+            "auto": None,
+            "doane": None,
+            "scott": None,
+            "rice": None,
+        }  # store histogram done for principal components
         self.hist_bins = {"pc": {"type": "auto", "bins": None}, "aoi": {"type": "auto", "bins": None}}
         self.HistogramPlot.setBackground((245, 245, 245))
         self.HistogramPlot.showGrid(x=True, y=True, alpha=0.5)
-        self.HistogramPlot.setLabel('bottom', 'Value', size='8pt')
-        self.HistogramPlot.setLabel('left', 'Count', size='8pt')
-        self.HistogramPlot.showAxis('right', False)
-        self.HistogramPlot.showAxis('top', False)
+        self.HistogramPlot.setLabel("bottom", "Value", size="8pt")
+        self.HistogramPlot.setLabel("left", "Count", size="8pt")
+        self.HistogramPlot.showAxis("right", False)
+        self.HistogramPlot.showAxis("top", False)
         self.HistogramPlot.hideButtons()
         self.HistogramTypeBins.currentTextChanged.connect(lambda value: self.histogram_plot(bins=value))
         self.HistogramCustomBins.hide()
@@ -222,12 +244,13 @@ class ComponentAnalysisDialog(QWidget, FORM_CLASS):
         # statistics for current principal component
         self.pc_gdal_ds = gdal.Open(str(get_file_path_of_layer(self.pc_layer)), gdal.GA_ReadOnly)
         if self.pc_gdal_ds is None:
-            raise RuntimeError("Could not open raster file for component: {}".format(self.pc_layer.name()))
+            raise RuntimeError(f"Could not open raster file for component: {self.pc_layer.name()}")
         self.pc_data = self.pc_gdal_ds.GetRasterBand(1).ReadAsArray()
         self.pc_data_flat = self.pc_data.flatten()
         self.pc_data_flat = self.pc_data_flat[~np.isnan(self.pc_data_flat)]
         self.stats_pc = None  # store stats done for principal components
         from pca4cd.gui.main_analysis_dialog import MainAnalysisDialog
+
         if MainAnalysisDialog.nodata is not None:
             self.pc_data_flat = np.delete(self.pc_data_flat, np.where(self.pc_data_flat == MainAnalysisDialog.nodata))
         self.set_statistics(stats_for=self.pc_name)
@@ -249,25 +272,25 @@ class ComponentAnalysisDialog(QWidget, FORM_CLASS):
         # release GDAL handles before dropping references
         self.pc_gdal_ds = None
         self.driver_detection_layer = None
-        del self.pc_data, self.pc_data_flat, self.aoi_data, self.HistogramPlot, self.hist_data, \
-            self.hist_data_pc
+        del self.pc_data, self.pc_data_flat, self.aoi_data, self.HistogramPlot, self.hist_data, self.hist_data_pc
 
     @pyqtSlot()
     def show(self):
         self.is_opened = True
         self.parent_view_widget.QPBtn_ComponentAnalysisDialog.setText("Opened, click to show")
-        super(ComponentAnalysisDialog, self).show()
+        super().show()
 
     def closeEvent(self, event):
         self.is_opened = False
         self.parent_view_widget.QPBtn_ComponentAnalysisDialog.setText("Change detection layer")
-        super(ComponentAnalysisDialog, self).closeEvent(event)
+        super().closeEvent(event)
 
     @pyqtSlot()
     def canvas_changed(self):
         new_extent = self.render_widget.canvas.extent()
         # update canvas for all view activated except this view
         from pca4cd.gui.main_analysis_dialog import MainAnalysisDialog
+
         for view_widget in MainAnalysisDialog.view_widgets:
             # for layer view widget in main analysis dialog
             if view_widget.is_active and view_widget != self:
@@ -297,7 +320,9 @@ class ComponentAnalysisDialog(QWidget, FORM_CLASS):
     @wait_process
     def generate_detection_layer(self):
         from dask import array as da
+
         from pca4cd.pca4cd import PCA4CD as pca4cd
+
         detection_from = self.RangeChangeFrom.value()
         detection_to = self.RangeChangeTo.value()
         output_change_layer = Path(pca4cd.tmp_dir, self.pc_layer.name() + "_detection.tif")
@@ -309,15 +334,21 @@ class ComponentAnalysisDialog(QWidget, FORM_CLASS):
             result = np.zeros_like(block)
             result[(block >= range_from) & (block <= range_to) & (block != 0)] = 1
             return result
+
         # process
         map_blocks = da.map_blocks(calc, da_pc, range_from=detection_from, range_to=detection_to, dtype=np.int8)
-        detection_layer_ds = map_blocks.compute(scheduler='threads', num_workers=cpu_count())
+        detection_layer_ds = map_blocks.compute(scheduler="threads", num_workers=cpu_count())
         # save
         if self.driver_detection_layer is None:
             driver = gdal.GetDriverByName("GTiff")
-            self.driver_detection_layer = driver.Create(str(output_change_layer), self.pc_gdal_ds.RasterXSize,
-                                                        self.pc_gdal_ds.RasterYSize, 1, gdal.GDT_Byte,
-                                                        ["NBITS=1", "COMPRESS=NONE"])
+            self.driver_detection_layer = driver.Create(
+                str(output_change_layer),
+                self.pc_gdal_ds.RasterXSize,
+                self.pc_gdal_ds.RasterYSize,
+                1,
+                gdal.GDT_Byte,
+                ["NBITS=1", "COMPRESS=NONE"],
+            )
         dl_band = self.driver_detection_layer.GetRasterBand(1)
         dl_band.SetNoDataValue(0)
         dl_band.WriteArray(detection_layer_ds)
@@ -331,7 +362,7 @@ class ComponentAnalysisDialog(QWidget, FORM_CLASS):
         self.driver_detection_layer.FlushCache()
         # necessary for fix flushing cache generating the detection layer the first time (Linux/Mac)
         # and not in Windows due to permission problems when the detection layer is overwritten
-        if platform.system() != 'Windows':
+        if platform.system() != "Windows":
             self.driver_detection_layer = None
 
         detection_layer = load_layer(output_change_layer, add_to_legend=False)
@@ -346,6 +377,7 @@ class ComponentAnalysisDialog(QWidget, FORM_CLASS):
     def set_statistics(self, stats_for=None):
         if stats_for is None or stats_for == self.pc_name:
             from pca4cd.gui.main_analysis_dialog import MainAnalysisDialog
+
             with block_signals_to(self.QCBox_StatsLayer):
                 self.QCBox_StatsLayer.setCurrentIndex(0)
             self.statistics(self.pc_data_flat, MainAnalysisDialog.pca_stats)
@@ -359,20 +391,32 @@ class ComponentAnalysisDialog(QWidget, FORM_CLASS):
     @wait_process
     def statistics(self, data, pca_stats=None):
         from dask import array as da
+
         # set headers
         if pca_stats:  # for pca
             if pca_stats["eigenvals"] is not None:
-                self.stats_header.setText("Eigenvalue: {} ({}%)".format(round(pca_stats["eigenvals"][self.pc_id - 1], 2),
-                                                                        round(pca_stats["eigenvals_%"][self.pc_id - 1], 2)))
+                self.stats_header.setText(
+                    "Eigenvalue: {} ({}%)".format(
+                        round(pca_stats["eigenvals"][self.pc_id - 1], 2),
+                        round(pca_stats["eigenvals_%"][self.pc_id - 1], 2),
+                    )
+                )
                 self.stats_header.setToolTip("Shows the dispersion of the data relative to this component")
             else:
                 self.stats_header.setText("Eigenvalue: --")
                 self.stats_header.setToolTip("Only available when components are computed with this plugin")
         else:  # for aoi
-            self.stats_header.setText("Pixels in AOI: {}".format(round(data.size if data.size > 1 else 0, 2)))
+            self.stats_header.setText(f"Pixels in AOI: {round(data.size if data.size > 1 else 0, 2)}")
             self.stats_header.setToolTip("")
             if data.size <= 1:
-                for w in [self.stats_min, self.stats_max, self.stats_std, self.stats_p25, self.stats_p50, self.stats_p75]:
+                for w in [
+                    self.stats_min,
+                    self.stats_max,
+                    self.stats_std,
+                    self.stats_p25,
+                    self.stats_p50,
+                    self.stats_p75,
+                ]:
                     w.setText("--")
                 return
         # restore or compute the statistics
@@ -400,6 +444,7 @@ class ComponentAnalysisDialog(QWidget, FORM_CLASS):
     @wait_process
     def histogram_plot(self, data=None, bins=None):
         from dask import array as da
+
         # which plot
         stats_for = self.QCBox_StatsLayer.currentText()
         if stats_for == self.pc_name:
@@ -444,7 +489,7 @@ class ComponentAnalysisDialog(QWidget, FORM_CLASS):
             bin_edges = np.histogram_bin_edges(data, bins=bins)
             da_hist_data = da.from_array(data, chunks=(8000000,))
             counts, edges = da.histogram(da_hist_data, bins=bin_edges)
-            return counts.compute(scheduler='threads', num_workers=cpu_count()), edges
+            return counts.compute(scheduler="threads", num_workers=cpu_count()), edges
 
         if stats_for == self.pc_name and set_bins in ["auto", "doane", "scott", "rice"]:
             if self.hist_data_pc[set_bins] is not None:
@@ -455,9 +500,9 @@ class ComponentAnalysisDialog(QWidget, FORM_CLASS):
         else:
             y, x = _histogram(self.hist_data, set_bins)
         self.HistogramPlot.clear()
-        self.HistogramPlot.plot(x, y, stepMode=True, fillLevel=0,
-                                brush=(100, 160, 220, 180),
-                                pen=pg.mkPen(color=(60, 120, 180), width=0.8))
+        self.HistogramPlot.plot(
+            x, y, stepMode=True, fillLevel=0, brush=(100, 160, 220, 180), pen=pg.mkPen(color=(60, 120, 180), width=0.8)
+        )
         self.HistogramPlot.autoRange()
         self.HistogramPlot.addItem(self.linear_region)
         hist_bins["bins"] = len(y)  # store bins
@@ -478,8 +523,9 @@ class ComponentAnalysisDialog(QWidget, FORM_CLASS):
     @wait_process
     def aoi_changes(self, new_feature=None):
         """Actions after added each polygon in the AOI"""
-        from pca4cd.pca4cd import PCA4CD as pca4cd
         from pca4cd.gui.main_analysis_dialog import MainAnalysisDialog
+        from pca4cd.pca4cd import PCA4CD as pca4cd
+
         # update AOI
         if new_feature is not None:
             with edit(self.aoi_features):
