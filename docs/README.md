@@ -1,4 +1,4 @@
-# PCA4CD
+# PCA for Change Detection
 
 ![](img/overview.png)
 
