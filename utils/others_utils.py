@@ -65,13 +65,16 @@ def clip_raster_with_shape(target_layer, shape_layer, out_path, dst_nodata=None)
         shape_file = tmp_memory_file
 
     # clipping in shape
-    warp_opts = gdal.WarpOptions(
-        options=["--config", "GDALWARP_IGNORE_BAD_CUTLINE", "YES"],
-        cutlineDSName=str(shape_file),
-        cropToCutline=True,
-        dstNodata=dst_nodata,
-    )
-    gdal.Warp(str(out_path), str(target_file), options=warp_opts)
+    gdal.SetConfigOption("GDALWARP_IGNORE_BAD_CUTLINE", "YES")
+    try:
+        warp_opts = gdal.WarpOptions(
+            cutlineDSName=str(shape_file),
+            cropToCutline=True,
+            dstNodata=dst_nodata,
+        )
+        gdal.Warp(str(out_path), str(target_file), options=warp_opts)
+    finally:
+        gdal.SetConfigOption("GDALWARP_IGNORE_BAD_CUTLINE", None)
 
     # clean tmp file
     if tmp_memory_file is not None and tmp_memory_file.is_file():
