@@ -427,9 +427,9 @@ class ComponentAnalysisDialog(QWidget, FORM_CLASS):
             min = da.min(da_data).compute()
             max = da.max(da_data).compute()
             std = da.std(da_data).compute()
-            p25 = float(da.percentile(da_data, 25).compute())
-            p50 = float(da.percentile(da_data, 50).compute())
-            p75 = float(da.percentile(da_data, 75).compute())
+            p25 = float(da.percentile(da_data, 25).compute().item())
+            p50 = float(da.percentile(da_data, 50).compute().item())
+            p75 = float(da.percentile(da_data, 75).compute().item())
             if self.QCBox_StatsLayer.currentText() == self.pc_name:
                 self.stats_pc = (min, max, std, p25, p50, p75)
         # set in dialog
