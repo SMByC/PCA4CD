@@ -1,6 +1,6 @@
 [project]
 name = "pca4cd"
-version = "26.5"
+version = "26.6"
 description = "QGIS plugin that computes Principal Component Analysis (PCA) and creates change detection layers using PCA dimensionality reduction properties"
 authors = [{ name = "Xavier Corredor Llano, SMByC", email = "xavier.corredor.llano@gmail.com" }]
 license = { text = "GPL-2.0-or-later" }
