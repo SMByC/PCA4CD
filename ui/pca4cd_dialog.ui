@@ -201,13 +201,16 @@
              <property name="bottomMargin">
               <number>0</number>
              </property>
-             <item>
-              <widget class="QRadioButton" name="EnableInputData_B">
-               <property name="text">
-                <string/>
-               </property>
-              </widget>
-             </item>
+              <item>
+               <widget class="QRadioButton" name="EnableInputData_B">
+                <property name="toolTip">
+                 <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Enable a second input layer (B) when comparing two time periods or datasets. Both layers must share the same extent, pixel size, and projection. Use a single layer (A) when all bands to analyze are already stacked in one raster.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+                </property>
+                <property name="text">
+                 <string/>
+                </property>
+               </widget>
+              </item>
              <item>
               <widget class="QWidget" name="widget_3" native="true">
                <property name="enabled">
@@ -360,9 +363,13 @@
                </property>
               </widget>
              </item>
-             <item>
-              <widget class="QComboBox" name="QCBox_nComponents"/>
-             </item>
+              <item>
+               <widget class="QComboBox" name="QCBox_nComponents">
+                <property name="toolTip">
+                 <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Number of principal components to compute. Cannot exceed the total number of bands across input layers A and B.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+                </property>
+               </widget>
+              </item>
             </layout>
            </widget>
           </item>
@@ -388,20 +395,23 @@
                </property>
               </widget>
              </item>
-             <item>
-              <widget class="QComboBox" name="QCBox_EstimatorMatrix">
-               <item>
-                <property name="text">
-                 <string>Correlation</string>
+              <item>
+               <widget class="QComboBox" name="QCBox_EstimatorMatrix">
+                <property name="toolTip">
+                 <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;&lt;b&gt;Correlation&lt;/b&gt; (default, recommended): normalizes each variable to unit variance. Use when variables have different scales or units (e.g., multiple spectral bands).&lt;br/&gt;&lt;b&gt;Covariance&lt;/b&gt;: scale-dependent. Use when all variables share the same units and similar value ranges.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
                 </property>
-               </item>
-               <item>
-                <property name="text">
-                 <string>Covariance</string>
-                </property>
-               </item>
-              </widget>
-             </item>
+                <item>
+                 <property name="text">
+                  <string>Correlation</string>
+                 </property>
+                </item>
+                <item>
+                 <property name="text">
+                  <string>Covariance</string>
+                 </property>
+                </item>
+               </widget>
+              </item>
             </layout>
            </widget>
           </item>
@@ -427,13 +437,16 @@
                   </property>
                  </widget>
                 </item>
-                <item>
-                 <widget class="QSpinBox" name="nThreads">
-                  <property name="minimum">
-                   <number>1</number>
-                  </property>
-                 </widget>
-                </item>
+                 <item>
+                  <widget class="QSpinBox" name="nThreads">
+                   <property name="toolTip">
+                    <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Number of parallel threads used for the PCA computation. Reduce if the process runs out of memory.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+                   </property>
+                   <property name="minimum">
+                    <number>1</number>
+                   </property>
+                  </widget>
+                 </item>
                 <item>
                  <widget class="QLabel" name="label_7">
                   <property name="text">
@@ -441,22 +454,25 @@
                   </property>
                  </widget>
                 </item>
-                <item>
-                 <widget class="QSpinBox" name="BlockSize">
-                  <property name="minimum">
-                   <number>50</number>
-                  </property>
-                  <property name="maximum">
-                   <number>10000</number>
-                  </property>
-                  <property name="singleStep">
-                   <number>10</number>
-                  </property>
-                  <property name="value">
-                   <number>1000</number>
-                  </property>
-                 </widget>
-                </item>
+                 <item>
+                  <widget class="QSpinBox" name="BlockSize">
+                   <property name="toolTip">
+                    <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Number of pixels per block processed at once. Larger blocks use more memory; smaller blocks reduce memory usage but may increase overhead.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+                   </property>
+                   <property name="minimum">
+                    <number>50</number>
+                   </property>
+                   <property name="maximum">
+                    <number>10000</number>
+                   </property>
+                   <property name="singleStep">
+                    <number>10</number>
+                   </property>
+                   <property name="value">
+                    <number>1000</number>
+                   </property>
+                  </widget>
+                 </item>
                </layout>
               </widget>
              </item>
