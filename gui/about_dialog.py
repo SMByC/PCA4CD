@@ -22,6 +22,7 @@ import os
 from pathlib import Path
 
 from qgis.PyQt import uic
+from qgis.PyQt.QtCore import QUrl
 from qgis.PyQt.QtWidgets import QDialog
 
 # plugin path
@@ -34,6 +35,5 @@ class AboutDialog(QDialog, FORM_CLASS):
         QDialog.__init__(self)
         self.setupUi(self)
         about_file = Path(plugin_folder, "gui", "about.html")
-        html_text = about_file.read_text(encoding="utf-8")
-        self.about_html.setHtml(html_text)
+        self.about_html.setSource(QUrl.fromLocalFile(str(about_file)))
         self.about_html.setOpenExternalLinks(True)

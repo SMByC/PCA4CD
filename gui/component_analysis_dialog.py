@@ -26,7 +26,7 @@ from pathlib import Path
 import numpy as np
 import pyqtgraph as pg  # must be imported before uic.loadUiType to avoid partial-load issue with pyqtgraph.Qt
 from osgeo import gdal
-from qgis.core import QgsFeature, QgsProject, QgsRaster, QgsVectorLayer, QgsWkbTypes, edit
+from qgis.core import Qgis, QgsFeature, QgsProject, QgsVectorLayer, edit
 from qgis.gui import QgsMapTool, QgsRubberBand
 from qgis.PyQt import uic
 from qgis.PyQt.QtCore import Qt, QTimer, pyqtSlot
@@ -50,7 +50,7 @@ class PickerPixelPointTool(QgsMapTool):
         point = self.render_widget.canvas.getCoordinateTransform().toMapCoordinates(x, y)
         pixel_value = (
             self.render_widget.layer.dataProvider()
-            .identify(point, QgsRaster.IdentifyFormat.IdentifyFormatValue)
+            .identify(point, Qgis.RasterIdentifyFormat.Value)
             .results()
             .get(1)
         )
@@ -88,11 +88,11 @@ class PickerAOIPointTool(QgsMapTool):
         color = QColor("red")
         color.setAlpha(70)
         # create the main polygon rubber band
-        self.rubber_band = QgsRubberBand(cad.render_widget.canvas, QgsWkbTypes.GeometryType.PolygonGeometry)
+        self.rubber_band = QgsRubberBand(cad.render_widget.canvas, Qgis.GeometryType.Polygon)
         self.rubber_band.setColor(color)
         self.rubber_band.setWidth(3)
         # create the mouse/tmp polygon rubber band, this is main rubber band + current mouse position
-        self.tmp_rubber_band = QgsRubberBand(cad.render_widget.canvas, QgsWkbTypes.GeometryType.PolygonGeometry)
+        self.tmp_rubber_band = QgsRubberBand(cad.render_widget.canvas, Qgis.GeometryType.Polygon)
         self.tmp_rubber_band.setColor(color)
         self.tmp_rubber_band.setWidth(3)
         self.tmp_rubber_band.setLineStyle(Qt.PenStyle.DotLine)
@@ -120,8 +120,8 @@ class PickerAOIPointTool(QgsMapTool):
             self.rubber_band.removeLastPoint()
             self.tmp_rubber_band.removeLastPoint()
         if event.key() == Qt.Key.Key_Escape:
-            self.rubber_band.reset(QgsWkbTypes.GeometryType.PolygonGeometry)
-            self.tmp_rubber_band.reset(QgsWkbTypes.GeometryType.PolygonGeometry)
+            self.rubber_band.reset(Qgis.GeometryType.Polygon)
+            self.tmp_rubber_band.reset(Qgis.GeometryType.Polygon)
 
     def canvasPressEvent(self, event):
         if self.rubber_band is None:
@@ -264,7 +264,7 @@ class ComponentAnalysisDialog(QWidget, FORM_CLASS):
         self.render_widget.canvas.clearCache()
         # clear/reset all rubber bands
         for rubber_band in self.rubber_bands + self.tmp_rubber_band:
-            rubber_band.reset(QgsWkbTypes.GeometryType.PolygonGeometry)
+            rubber_band.reset(Qgis.GeometryType.Polygon)
         self.rubber_bands = []
         self.tmp_rubber_band = []
         # remove all features in aoi
@@ -574,8 +574,8 @@ class ComponentAnalysisDialog(QWidget, FORM_CLASS):
         with edit(self.aoi_features):
             self.aoi_features.deleteFeature(features_ids[-1])
         # delete rubber bands
-        self.rubber_bands.pop().reset(QgsWkbTypes.GeometryType.PolygonGeometry)
-        self.tmp_rubber_band.pop().reset(QgsWkbTypes.GeometryType.PolygonGeometry)
+        self.rubber_bands.pop().reset(Qgis.GeometryType.Polygon)
+        self.tmp_rubber_band.pop().reset(Qgis.GeometryType.Polygon)
         # update
         if len(list(self.aoi_features.getFeatures())) > 0:
             self.aoi_changes()
@@ -587,7 +587,7 @@ class ComponentAnalysisDialog(QWidget, FORM_CLASS):
     def delete_all_aoi(self):
         # clear/reset all rubber bands
         for rubber_band in self.rubber_bands + self.tmp_rubber_band:
-            rubber_band.reset(QgsWkbTypes.GeometryType.PolygonGeometry)
+            rubber_band.reset(Qgis.GeometryType.Polygon)
         self.rubber_bands = []
         self.tmp_rubber_band = []
         # remove all features in aoi

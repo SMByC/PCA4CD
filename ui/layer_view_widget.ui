@@ -107,7 +107,7 @@
         </property>
         <property name="icon">
          <iconset>
-          <normaloff>:/plugins/pca4cd/icons/layer_properties.svg</normaloff>:/plugins/pca4cd/icons/layer_properties.svg</iconset>
+          <normaloff>../icons/layer_properties.svg</normaloff>../icons/layer_properties.svg</iconset>
         </property>
         <property name="toolButtonStyle">
          <enum>Qt::ToolButtonIconOnly</enum>
@@ -266,7 +266,7 @@
         </property>
         <property name="icon">
          <iconset>
-          <normaloff>:/plugins/pca4cd/icons/change_detection_layer.svg</normaloff>:/plugins/pca4cd/icons/change_detection_layer.svg</iconset>
+          <normaloff>../icons/change_detection_layer.svg</normaloff>../icons/change_detection_layer.svg</iconset>
         </property>
         <property name="toolButtonStyle">
          <enum>Qt::ToolButtonTextBesideIcon</enum>

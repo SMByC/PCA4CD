@@ -689,7 +689,7 @@
            </property>
            <property name="icon">
             <iconset>
-             <normaloff>:/plugins/pca4cd/icons/pca4cd.svg</normaloff>:/plugins/pca4cd/icons/pca4cd.svg</iconset>
+             <normaloff>../icons/pca4cd.svg</normaloff>../icons/pca4cd.svg</iconset>
            </property>
            <property name="flat">
             <bool>true</bool>
@@ -714,7 +714,7 @@
            </property>
            <property name="icon">
             <iconset>
-             <normaloff>:/plugins/pca4cd/icons/about.svg</normaloff>:/plugins/pca4cd/icons/about.svg</iconset>
+             <normaloff>../icons/about.svg</normaloff>../icons/about.svg</iconset>
            </property>
            <property name="flat">
             <bool>true</bool>
@@ -746,7 +746,7 @@
            </property>
            <property name="icon">
             <iconset>
-             <normaloff>:/plugins/pca4cd/icons/close.svg</normaloff>:/plugins/pca4cd/icons/close.svg</iconset>
+             <normaloff>../icons/close.svg</normaloff>../icons/close.svg</iconset>
            </property>
            <property name="flat">
             <bool>true</bool>

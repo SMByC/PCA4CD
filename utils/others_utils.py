@@ -21,7 +21,7 @@
 import os
 
 from osgeo import gdal
-from qgis.core import QgsVectorFileWriter
+from qgis.core import QgsProject, QgsVectorFileWriter
 
 from pca4cd.utils.qgis_utils import get_file_path_of_layer
 
@@ -54,8 +54,11 @@ def clip_raster_with_shape(target_layer, shape_layer, out_path, dst_nodata=None)
         shape_file = shape_path
     else:
         tmp_memory_file = pca4cd.tmp_dir / "memory_layer_aoi.gpkg"
-        error, msg = QgsVectorFileWriter.writeAsVectorFormat(
-            shape_layer, str(tmp_memory_file), "System", shape_layer.crs(), "GPKG"
+        options = QgsVectorFileWriter.SaveVectorOptions()
+        options.driverName = "GPKG"
+        options.fileEncoding = "System"
+        error, msg, _, _ = QgsVectorFileWriter.writeAsVectorFormatV3(
+            shape_layer, str(tmp_memory_file), QgsProject.instance().transformContext(), options
         )
         if error != QgsVectorFileWriter.WriterError.NoError:
             raise RuntimeError(f"Failed to save memory layer to disk: {msg}")

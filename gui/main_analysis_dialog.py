@@ -250,9 +250,7 @@ class MainAnalysisDialog(QDialog, FORM_CLASS):
                 std = np.std(ds)
                 renderer = QgsSingleBandGrayRenderer(view_widget.render_widget.layer.dataProvider(), 1)
                 ce = QgsContrastEnhancement(view_widget.render_widget.layer.dataProvider().dataType(0))
-                ce.setContrastEnhancementAlgorithm(
-                    QgsContrastEnhancement.ContrastEnhancementAlgorithm.StretchToMinimumMaximum
-                )
+                ce.setContrastEnhancementAlgorithm(QgsContrastEnhancement.StretchToMinimumMaximum)
                 ce.setMinimumValue(mean - 5 * std)
                 ce.setMaximumValue(mean + 5 * std)
                 renderer.setContrastEnhancement(ce)

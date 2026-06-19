@@ -58,7 +58,7 @@
             </property>
             <property name="icon">
              <iconset>
-              <normaloff>:/plugins/pca4cd/icons/layer_properties.svg</normaloff>:/plugins/pca4cd/icons/layer_properties.svg</iconset>
+              <normaloff>../icons/layer_properties.svg</normaloff>../icons/layer_properties.svg</iconset>
             </property>
             <property name="toolButtonStyle">
              <enum>Qt::ToolButtonIconOnly</enum>
@@ -94,7 +94,7 @@
             </property>
             <property name="icon">
              <iconset>
-              <normaloff>:/plugins/pca4cd/icons/zoom_to_layer.svg</normaloff>:/plugins/pca4cd/icons/zoom_to_layer.svg</iconset>
+              <normaloff>../icons/zoom_to_layer.svg</normaloff>../icons/zoom_to_layer.svg</iconset>
             </property>
             <property name="toolButtonStyle">
              <enum>Qt::ToolButtonIconOnly</enum>
@@ -158,7 +158,7 @@
             </property>
             <property name="icon">
              <iconset>
-              <normaloff>:/plugins/pca4cd/icons/visibility.svg</normaloff>:/plugins/pca4cd/icons/visibility.svg</iconset>
+              <normaloff>../icons/visibility.svg</normaloff>../icons/visibility.svg</iconset>
             </property>
             <property name="checked">
              <bool>true</bool>
@@ -198,7 +198,7 @@
             </property>
             <property name="icon">
              <iconset>
-              <normaloff>:/plugins/pca4cd/icons/cursor_picker.svg</normaloff>:/plugins/pca4cd/icons/cursor_picker.svg</iconset>
+              <normaloff>../icons/cursor_picker.svg</normaloff>../icons/cursor_picker.svg</iconset>
             </property>
             <property name="autoRaise">
              <bool>true</bool>
@@ -244,7 +244,7 @@
             </property>
             <property name="icon">
              <iconset>
-              <normaloff>:/plugins/pca4cd/icons/cursor_picker.svg</normaloff>:/plugins/pca4cd/icons/cursor_picker.svg</iconset>
+              <normaloff>../icons/cursor_picker.svg</normaloff>../icons/cursor_picker.svg</iconset>
             </property>
             <property name="autoRaise">
              <bool>true</bool>
@@ -299,7 +299,7 @@
             </property>
             <property name="icon">
              <iconset>
-              <normaloff>:/plugins/pca4cd/icons/run.svg</normaloff>:/plugins/pca4cd/icons/run.svg</iconset>
+              <normaloff>../icons/run.svg</normaloff>../icons/run.svg</iconset>
             </property>
             <property name="toolButtonStyle">
              <enum>Qt::ToolButtonTextBesideIcon</enum>
@@ -373,7 +373,7 @@
             </property>
             <property name="icon">
              <iconset>
-              <normaloff>:/plugins/pca4cd/icons/aoi_picker.svg</normaloff>:/plugins/pca4cd/icons/aoi_picker.svg</iconset>
+              <normaloff>../icons/aoi_picker.svg</normaloff>../icons/aoi_picker.svg</iconset>
             </property>
             <property name="toolButtonStyle">
              <enum>Qt::ToolButtonTextBesideIcon</enum>
@@ -393,7 +393,7 @@
             </property>
             <property name="icon">
              <iconset>
-              <normaloff>:/plugins/pca4cd/icons/undo.svg</normaloff>:/plugins/pca4cd/icons/undo.svg</iconset>
+              <normaloff>../icons/undo.svg</normaloff>../icons/undo.svg</iconset>
             </property>
             <property name="toolButtonStyle">
              <enum>Qt::ToolButtonIconOnly</enum>
@@ -413,7 +413,7 @@
             </property>
             <property name="icon">
              <iconset>
-              <normaloff>:/plugins/pca4cd/icons/trash.svg</normaloff>:/plugins/pca4cd/icons/trash.svg</iconset>
+              <normaloff>../icons/trash.svg</normaloff>../icons/trash.svg</iconset>
             </property>
             <property name="toolButtonStyle">
              <enum>Qt::ToolButtonIconOnly</enum>

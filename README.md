@@ -19,7 +19,7 @@ The plugin bundles its required Python dependencies and should work out of the b
 * Dask
 * PyQtGraph
 
-> **Requirements:** QGIS >= 3.18. Compatible with both QGIS 3.x (Qt5/PyQt5) and QGIS 4.x (Qt6/PyQt6).
+> **Requirements:** QGIS >= 3.36. Compatible with both QGIS 3.x (Qt5/PyQt5) and QGIS 4.x (Qt6/PyQt6).
 
 If dependency loading fails, install them manually using [conda](https://docs.conda.io/en/latest/miniconda.html):
 

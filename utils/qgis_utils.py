@@ -24,7 +24,6 @@ from pathlib import Path
 from qgis.core import (
     Qgis,
     QgsColorRampShader,
-    QgsMapLayer,
     QgsProject,
     QgsRasterLayer,
     QgsRasterRange,
@@ -142,10 +141,10 @@ class StyleEditorDialog(QDialog, FORM_CLASS):
 
         self.setWindowTitle(f"{self.layer.name()} - Style Editor")
 
-        if self.layer.type() == QgsMapLayer.LayerType.VectorLayer:
+        if self.layer.type() == Qgis.LayerType.Vector:
             self.StyleEditorWidget = QgsRendererPropertiesDialog(self.layer, QgsStyle(), True, parent)
 
-        if self.layer.type() == QgsMapLayer.LayerType.RasterLayer:
+        if self.layer.type() == Qgis.LayerType.Raster:
             self.StyleEditorWidget = QgsRendererRasterPropertiesWidget(self.layer, canvas, parent)
 
         self.scrollArea.setWidget(self.StyleEditorWidget)
