@@ -89,7 +89,7 @@ class PCA4CD:
     def initGui(self):
         # Main dialog menu
         # Create action that will start plugin configuration
-        icon_path = os.path.join(self.plugin_dir, "icons", "pca4cd.svg")
+        icon_path = ":/plugins/pca4cd/icons/pca4cd.svg"
         self.dockable_action = QAction(QIcon(icon_path), "PCA4CD", self.iface.mainWindow())
         # connect the action to the run method
         self.dockable_action.triggered.connect(self.run)
@@ -99,7 +99,7 @@ class PCA4CD:
 
         # Plugin info
         # Create action that will start plugin configuration
-        icon_path = os.path.join(self.plugin_dir, "icons", "about.svg")
+        icon_path = ":/plugins/pca4cd/icons/about.svg"
         self.about_action = QAction(QIcon(icon_path), self.tr("About"), self.iface.mainWindow())
         # connect the action to the run method
         self.about_action.triggered.connect(self.about)

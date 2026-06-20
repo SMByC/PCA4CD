@@ -50,7 +50,9 @@ EXTRAS = metadata.txt LICENSE
 
 EXTRA_DIRS = core utils gui libs ui icons
 
-PEP8EXCLUDE=pydev,conf.py,third_party,ui
+COMPILED_RESOURCE_FILES = resources.py
+
+PEP8EXCLUDE=pydev,resources.py,conf.py,third_party,ui
 
 
 #################################################
@@ -59,9 +61,18 @@ PEP8EXCLUDE=pydev,conf.py,third_party,ui
 
 PLUGIN_UPLOAD = python3 plugin_upload.py -u xaviercll
 
+RESOURCE_SRC=$(shell grep '^ *<file' resources.qrc | sed 's@</file>@@g;s/.*>//g' | tr '\n' ' ')
+
 default: compile
 
-compile:
+compile: $(COMPILED_RESOURCE_FILES)
+
+# Resource compiler: prefer pyrcc6 (Qt6) when available, fall back to pyrcc5 (Qt5).
+PYRCC := $(shell command -v pyrcc6 2>/dev/null || command -v pyrcc5 2>/dev/null)
+
+%.py : %.qrc $(RESOURCE_SRC)
+	$(PYRCC) -o $*.py $<
+	sed -i 's/^from PyQt[56] import QtCore$$/from qgis.PyQt import QtCore/' $*.py
 
 %.qm : %.ts
 	$(LRELEASE) $<
@@ -104,7 +115,7 @@ zip: compile
 	@echo "---------------------------"
 	rm -f $(PLUGINNAME).zip
 	mkdir -p .pkg_tmp/$(PLUGINNAME)
-	cp -f $(PY_FILES) $(EXTRAS) .pkg_tmp/$(PLUGINNAME)/
+	cp -f $(PY_FILES) $(COMPILED_RESOURCE_FILES) $(EXTRAS) .pkg_tmp/$(PLUGINNAME)/
 	@for d in $(EXTRA_DIRS); do \
 		if [ -d "$$d" ]; then cp -rf $$d .pkg_tmp/$(PLUGINNAME)/; fi; \
 	done
@@ -149,6 +160,7 @@ clean:
 	@echo "------------------------------------"
 	@echo "Removing generated files"
 	@echo "------------------------------------"
+	rm -f $(COMPILED_RESOURCE_FILES)
 	find . -name "*.pyc" -delete
 	find . -name "__pycache__" -type d -exec rm -rf {} + 2>/dev/null || true
 

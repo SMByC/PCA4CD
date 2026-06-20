@@ -81,6 +81,8 @@ def classFactory(iface):  # pylint: disable=invalid-name
                 QMessageBox.StandardButton.Ok,
             )
 
+    # Register icons under :/plugins/pca4cd/ before the plugin class is imported
+    from . import resources  # noqa: F401
     from .pca4cd import PCA4CD
 
     return PCA4CD(iface)

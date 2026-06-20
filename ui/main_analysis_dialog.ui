@@ -70,7 +70,7 @@
            </property>
            <property name="icon">
             <iconset>
-             <normaloff>../icons/return.svg</normaloff>../icons/return.svg</iconset>
+             <normaloff>:/plugins/pca4cd/icons/return.svg</normaloff>:/plugins/pca4cd/icons/return.svg</iconset>
            </property>
            <property name="toolButtonStyle">
             <enum>Qt::ToolButtonTextBesideIcon</enum>
@@ -103,7 +103,7 @@
            </property>
            <property name="icon">
             <iconset>
-             <normaloff>../icons/save.svg</normaloff>../icons/save.svg</iconset>
+             <normaloff>:/plugins/pca4cd/icons/save.svg</normaloff>:/plugins/pca4cd/icons/save.svg</iconset>
            </property>
            <property name="toolButtonStyle">
             <enum>Qt::ToolButtonTextBesideIcon</enum>
@@ -123,7 +123,7 @@
            </property>
            <property name="icon">
             <iconset>
-             <normaloff>../icons/about.svg</normaloff>../icons/about.svg</iconset>
+             <normaloff>:/plugins/pca4cd/icons/about.svg</normaloff>:/plugins/pca4cd/icons/about.svg</iconset>
            </property>
            <property name="toolButtonStyle">
             <enum>Qt::ToolButtonTextBesideIcon</enum>
@@ -143,7 +143,7 @@
            </property>
            <property name="icon">
             <iconset>
-             <normaloff>../icons/merge_layers.svg</normaloff>../icons/merge_layers.svg</iconset>
+             <normaloff>:/plugins/pca4cd/icons/merge_layers.svg</normaloff>:/plugins/pca4cd/icons/merge_layers.svg</iconset>
            </property>
            <property name="toolButtonStyle">
             <enum>Qt::ToolButtonTextBesideIcon</enum>
@@ -173,7 +173,7 @@
            </property>
            <property name="icon">
             <iconset>
-             <normaloff>../icons/close.svg</normaloff>../icons/close.svg</iconset>
+             <normaloff>:/plugins/pca4cd/icons/close.svg</normaloff>:/plugins/pca4cd/icons/close.svg</iconset>
            </property>
            <property name="toolButtonStyle">
             <enum>Qt::ToolButtonTextBesideIcon</enum>
