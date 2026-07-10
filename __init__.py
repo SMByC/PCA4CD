@@ -32,6 +32,7 @@ def check_dependencies() -> bool:
     try:
         import dask  # noqa: F401
         import pyqtgraph  # noqa: F401
+        import colorama  # noqa: F401
 
         return True
     except ImportError:
